@@ -45,10 +45,14 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
-  if (allowedTypes.includes(file.mimetype)) {
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+  
+  const ext = path.extname(file.originalname).toLowerCase()
+  
+  if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
     cb(null, true)
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed.'))
+    cb(new Error(`Invalid file type. Only JPEG, PNG, GIF, WebP, and SVG are allowed. Received: ${file.mimetype} (${ext})`))
   }
 }
 
@@ -62,11 +66,25 @@ const pagesFile = path.join(__dirname, 'public/data/pages.json')
 // Upload image
 app.post('/api/upload', upload.single('image'), (req, res) => {
   if (req.file) {
+    console.log('✅ File uploaded:', req.file.filename, 'Type:', req.file.mimetype)
     // Return relative URL so it works in both dev and production
     res.json({ url: `/uploads/${req.file.filename}` })
   } else {
+    console.error('❌ No file uploaded')
     res.status(400).json({ error: 'No file uploaded' })
   }
+})
+
+// Error handling middleware for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    console.error('❌ Multer error:', error.message)
+    return res.status(400).json({ error: `Upload error: ${error.message}` })
+  } else if (error) {
+    console.error('❌ Upload error:', error.message)
+    return res.status(400).json({ error: error.message })
+  }
+  next()
 })
 
 // Projects endpoints

@@ -62,22 +62,17 @@ const Home = () => {
             borderRadius: '20px'
           }}
         >
-          {/* Background Images */}
+          {/* Background Image */}
           <div className="absolute inset-0">
-            <LazyImage 
-              src="https://www.figma.com/api/mcp/asset/d467fd6e-154f-456c-b346-3780beb81779"
-              alt=""
-              className="absolute w-full h-full object-cover"
-              style={{ opacity: 0.9 }}
-              priority={true}
-            />
-            {homePage.heroImage && (
+            {homePage.heroImage ? (
               <LazyImage 
                 src={getImageUrl(homePage.heroImage)}
                 alt="Hero background"
                 className="absolute w-full h-full object-cover"
                 priority={true}
               />
+            ) : (
+              <div className="absolute w-full h-full bg-gray-200" />
             )}
           </div>
 

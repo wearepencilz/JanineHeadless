@@ -48,50 +48,50 @@
   ],
   "taxonomy": [
     {
-      "id": "tag-1772125602371-0",
+      "id": "tag-1772128835762-0",
       "name": "Design",
+      "link": "",
+      "type": "general",
+      "usageCount": 4
+    },
+    {
+      "id": "tag-1772128835762-1",
+      "name": "Design, development",
       "link": "",
       "type": "general",
       "usageCount": 1
     },
     {
-      "id": "tag-1772125602371-1",
-      "name": "Development",
-      "link": "",
-      "type": "general",
-      "usageCount": 2
-    },
-    {
-      "id": "tag-1772125602371-4",
+      "id": "tag-1772128835762-2",
       "name": "Internal project",
       "link": "",
       "type": "general",
       "usageCount": 1
     },
     {
-      "id": "tag-1772125602371-2",
-      "name": "Marketing",
-      "link": "",
-      "type": "general",
-      "usageCount": 1
-    },
-    {
-      "id": "tag-1772125602371-5",
+      "id": "tag-1772128835762-3",
       "name": "React native app",
       "link": "",
       "type": "general",
       "usageCount": 1
     },
     {
-      "id": "tag-1772125602371-6",
+      "id": "tag-1772128835762-4",
       "name": "Shopify Development",
+      "link": "",
+      "type": "general",
+      "usageCount": 3
+    },
+    {
+      "id": "tag-1772128835762-5",
+      "name": "Shopify Migration",
       "link": "",
       "type": "general",
       "usageCount": 1
     },
     {
-      "id": "tag-1772125602371-7",
-      "name": "Shopify Migration",
+      "id": "tag-1772128835762-6",
+      "name": "Strategy",
       "link": "",
       "type": "general",
       "usageCount": 1
