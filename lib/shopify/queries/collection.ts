@@ -50,7 +50,6 @@ export const getCollectionQuery = `
                 node {
                   id
                   availableForSale
-                  quantityAvailable
                 }
               }
             }

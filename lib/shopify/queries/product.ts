@@ -39,7 +39,6 @@ export const getProductQuery = `
             id
             title
             availableForSale
-            quantityAvailable
             price {
               amount
               currencyCode
