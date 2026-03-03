@@ -120,8 +120,8 @@ This implementation plan transforms the existing Pencilz React/Vite/Express port
 
 ### PHASE 2: CORE E-COMMERCE
 
-- [ ] 7. Product catalog pages
-  - [ ] 7.1 Create collection (PLP) page structure
+- [-] 7. Product catalog pages
+  - [-] 7.1 Create collection (PLP) page structure
     - Create `app/[locale]/collections/[handle]/page.tsx`
     - Implement server component to fetch collection data from Shopify
     - Display collection title and description
