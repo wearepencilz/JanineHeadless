@@ -120,34 +120,34 @@ This implementation plan transforms the existing Pencilz React/Vite/Express port
 
 ### PHASE 2: CORE E-COMMERCE
 
-- [-] 7. Product catalog pages
-  - [-] 7.1 Create collection (PLP) page structure
+- [x] 7. Product catalog pages
+  - [x] 7.1 Create collection (PLP) page structure
     - Create `app/[locale]/collections/[handle]/page.tsx`
     - Implement server component to fetch collection data from Shopify
     - Display collection title and description
     - _Requirements: 5.1, 5.8_
   
-  - [ ] 7.2 Build product grid with filtering
+  - [x] 7.2 Build product grid with filtering
     - Create `components/product/ProductGrid.tsx` client component
     - Implement availability filter (In Stock, Pre-order, Sold Out)
     - Implement size filter (if applicable)
     - Display filtered product cards
     - _Requirements: 5.3, 5.5, 5.6_
   
-  - [ ] 7.3 Implement sorting functionality
+  - [x] 7.3 Implement sorting functionality
     - Add sort dropdown with options: Featured, Price Low-High, Price High-Low, Newest
     - Implement sort logic in client component
     - Preserve sort selection in URL params
     - _Requirements: 5.4_
   
-  - [ ] 7.4 Create product card component
+  - [x] 7.4 Create product card component
     - Create `components/product/ProductCard.tsx`
     - Display product image, title, price, availability badge
     - Show pre-order badge and date when applicable
     - Link to product detail page
     - _Requirements: 5.3, 6.4, 6.5_
   
-  - [ ] 7.5 Add empty state handling
+  - [x] 7.5 Add empty state handling
     - Display message when no products match filters
     - Provide clear call-to-action to adjust filters
     - _Requirements: 5.7_
