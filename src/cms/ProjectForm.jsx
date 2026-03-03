@@ -7,6 +7,7 @@ import Textarea from '../components/ui/Textarea'
 import FileInput from '../components/ui/FileInput'
 import TagInput from '../components/ui/TagInput'
 import Button from '../components/ui/Button'
+import RichTextEditor from '../components/ui/RichTextEditor'
 
 const ProjectForm = ({ project = {}, onSave, onCancel, onFormChange }) => {
   const [availableTags, setAvailableTags] = useState([])
@@ -237,13 +238,14 @@ const ProjectForm = ({ project = {}, onSave, onCancel, onFormChange }) => {
               control={control}
               rules={{ required: 'Description is required' }}
               render={({ field }) => (
-                <Textarea
-                  {...field}
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
                   label="Description"
-                  rows={4}
                   placeholder="Describe the project, your role, and key achievements..."
                   error={errors.description?.message}
-                  helperText="Provide a compelling overview of the project"
+                  helperText="Provide a compelling overview of the project. Use formatting to make it engaging."
+                  minHeight="250px"
                 />
               )}
             />

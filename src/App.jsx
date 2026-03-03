@@ -9,6 +9,9 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import FAQ from './pages/FAQ'
 import TestStack from './pages/TestStack'
+import LinkTest from './pages/LinkTest'
+import MegaMenuTest from './pages/MegaMenuTest'
+import Tests from './pages/Tests'
 import CMSLogin from './cms/CMSLogin'
 import CMSDashboard from './cms/CMSDashboard'
 import ProjectEditPage from './cms/ProjectEditPage'
@@ -21,7 +24,10 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/tests" element={<Tests />} />
           <Route path="/test-stack" element={<TestStack />} />
+          <Route path="/link-test" element={<LinkTest />} />
+          <Route path="/mega-menu-test" element={<MegaMenuTest />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="services" element={<Services />} />

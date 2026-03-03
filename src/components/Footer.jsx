@@ -36,11 +36,13 @@ const Footer = () => {
 
         {/* Footer links - Full Width with Auto Spacing */}
         <div className="w-full flex md:flex-row flex-col md:justify-between md:items-center items-start text-base mb-4 gap-2">
-          <Link to="/news" className="hover:opacity-70">News & Insights</Link>
           <Link to="/terms" className="hover:opacity-70">Terms & Conditions</Link>
           <Link to="/privacy" className="hover:opacity-70">Privacy Policy</Link>
           <Link to="/faq" className="hover:opacity-70">Faq</Link>
           <Link to="/" className="text-gray-600 hover:opacity-70">{settings.companyName}</Link>
+          {import.meta.env.DEV && (
+            <Link to="/tests" className="text-blue-600 hover:opacity-70">Tests</Link>
+          )}
         </div>
       </div>
     </footer>

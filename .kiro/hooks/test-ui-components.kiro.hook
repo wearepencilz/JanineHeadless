@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Test UI Components",
+  "description": "Runs tests for reusable UI components (TagInput, FileInput, etc.)",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npm test src/components/ui/__tests__ -- --run"
+  }
+}

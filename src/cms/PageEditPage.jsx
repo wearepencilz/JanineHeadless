@@ -8,7 +8,7 @@ const PageEditPage = () => {
   const navigate = useNavigate()
 
   const handleClose = () => {
-    navigate('/cms')
+    navigate('/cms?section=pages')
   }
 
   const pageNames = {

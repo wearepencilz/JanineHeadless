@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Test Specific CMS Form",
+  "description": "Runs tests for a specific CMS form component (ProjectForm, NewsForm, or TaxonomyForm)",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Ask the user which form they want to test (ProjectForm, NewsForm, TaxonomyForm, or CMSDashboard), then run the corresponding test file with: npm test src/cms/__tests__/{FormName}.comprehensive.test.jsx -- --run"
+  }
+}

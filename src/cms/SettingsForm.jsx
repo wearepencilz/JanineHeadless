@@ -9,13 +9,14 @@ import FileInput from '../components/ui/FileInput'
 import Button from '../components/ui/Button'
 import SortableList from '../components/ui/SortableList'
 
-const SettingsForm = ({ onFormChange, onSaveSuccess }) => {
+const SettingsForm = ({ onFormChange, onSaveSuccess, onCancelRef }) => {
   const { register, handleSubmit, setValue, watch, reset, formState: { isDirty } } = useForm()
   const [settings, setSettings] = useState({})
   const [services, setServices] = useState([])
   const [aboutItems, setAboutItems] = useState([])
   const [initialServices, setInitialServices] = useState([])
   const [initialAboutItems, setInitialAboutItems] = useState([])
+  const [isInitialized, setIsInitialized] = useState(false)
   const logoValue = watch('logo')
   const hamburgerIconValue = watch('hamburgerIcon')
   const buttonIconValue = watch('buttonIcon')
@@ -24,19 +25,32 @@ const SettingsForm = ({ onFormChange, onSaveSuccess }) => {
   const servicesChanged = JSON.stringify(services) !== JSON.stringify(initialServices)
   const aboutItemsChanged = JSON.stringify(aboutItems) !== JSON.stringify(initialAboutItems)
 
-  // Notify parent of changes
+  // Expose cancel function to parent
   useEffect(() => {
-    if ((isDirty || servicesChanged || aboutItemsChanged) && onFormChange) {
+    if (onCancelRef) {
+      onCancelRef.current = () => {
+        console.log('SettingsForm: Cancel called, reloading data')
+        loadData()
+      }
+    }
+  }, [onCancelRef])
+
+  // Notify parent of changes (only after initialization)
+  useEffect(() => {
+    if (isInitialized && (isDirty || servicesChanged || aboutItemsChanged) && onFormChange) {
       onFormChange()
     }
-  }, [isDirty, servicesChanged, aboutItemsChanged, onFormChange])
+  }, [isDirty, servicesChanged, aboutItemsChanged, onFormChange, isInitialized])
 
-  useEffect(() => {
+  const loadData = () => {
+    console.log('SettingsForm: loadData called')
+    setIsInitialized(false)
     fetch(`${API_URL}/api/settings`)
       .then(res => res.json())
       .then(data => {
+        console.log('SettingsForm: Data loaded from API:', data)
         setSettings(data)
-        reset({
+        const formData = {
           email: data.email || '',
           companyName: data.companyName || '',
           location: data.location || '',
@@ -45,13 +59,21 @@ const SettingsForm = ({ onFormChange, onSaveSuccess }) => {
           buttonIcon: data.buttonIcon || '',
           servicesDescription: data.servicesDescription || '',
           aboutDescription: data.aboutDescription || ''
-        })
+        }
+        reset(formData)
+        console.log('SettingsForm: Form reset with data')
         setServices(data.services || [])
         setAboutItems(data.aboutItems || [])
         setInitialServices(data.services || [])
         setInitialAboutItems(data.aboutItems || [])
+        setIsInitialized(true)
       })
-  }, [reset])
+  }
+
+  useEffect(() => {
+    console.log('SettingsForm: Component mounted/remounted')
+    loadData()
+  }, [])
 
   const handleImageUpload = async (file) => {
     if (!file) return null
@@ -102,6 +124,18 @@ const SettingsForm = ({ onFormChange, onSaveSuccess }) => {
         setAboutItems(savedData.aboutItems || [])
         setInitialServices(savedData.services || [])
         setInitialAboutItems(savedData.aboutItems || [])
+        // Reset form dirty state
+        const formData = {
+          email: savedData.email || '',
+          companyName: savedData.companyName || '',
+          location: savedData.location || '',
+          logo: savedData.logo || '',
+          hamburgerIcon: savedData.hamburgerIcon || '',
+          buttonIcon: savedData.buttonIcon || '',
+          servicesDescription: savedData.servicesDescription || '',
+          aboutDescription: savedData.aboutDescription || ''
+        }
+        reset(formData)
         if (onSaveSuccess) {
           onSaveSuccess()
         }

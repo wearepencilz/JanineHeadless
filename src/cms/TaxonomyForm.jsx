@@ -7,32 +7,48 @@ import Button from '../components/ui/Button'
 import SortableList from '../components/ui/SortableList'
 import AlertDialog from '../components/ui/AlertDialog'
 
-const TaxonomyForm = ({ onFormChange, onSaveSuccess }) => {
+const TaxonomyForm = ({ onFormChange, onSaveSuccess, onCancelRef }) => {
   const [taxonomy, setTaxonomy] = useState([])
   const [initialTaxonomy, setInitialTaxonomy] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, tag: null })
 
   // Track changes
   const taxonomyChanged = JSON.stringify(taxonomy) !== JSON.stringify(initialTaxonomy)
 
-  // Notify parent of changes
+  // Expose cancel function to parent
   useEffect(() => {
-    if (taxonomyChanged && onFormChange) {
+    if (onCancelRef) {
+      onCancelRef.current = () => {
+        console.log('TaxonomyForm: Cancel called, reloading data')
+        loadTaxonomy()
+      }
+    }
+  }, [onCancelRef])
+
+  // Notify parent of changes (only after initialization)
+  useEffect(() => {
+    if (isInitialized && taxonomyChanged && onFormChange) {
       onFormChange()
     }
-  }, [taxonomyChanged, onFormChange])
+  }, [taxonomyChanged, onFormChange, isInitialized])
 
   useEffect(() => {
+    console.log('TaxonomyForm: Component mounted/remounted')
     loadTaxonomy()
   }, [])
 
   const loadTaxonomy = async () => {
+    console.log('TaxonomyForm: loadTaxonomy called')
+    setIsInitialized(false)
     try {
       const response = await fetch(`${API_URL}/api/settings`)
       const data = await response.json()
+      console.log('TaxonomyForm: Data loaded from API:', data.taxonomy)
       setTaxonomy(data.taxonomy || [])
       setInitialTaxonomy(data.taxonomy || [])
+      setIsInitialized(true)
     } catch (error) {
       console.error('Error loading taxonomy:', error)
     } finally {

@@ -1,14 +1,15 @@
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { useState, useEffect } from 'react'
 import { API_URL } from '../config'
 import Input from '../components/ui/Input'
 import Textarea from '../components/ui/Textarea'
 import Button from '../components/ui/Button'
+import RichTextEditor from '../components/ui/RichTextEditor'
 
 const PageEditor = ({ pageName, onClose }) => {
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm()
+  const { register, handleSubmit, control, formState: { isSubmitting, errors } } = useForm()
   const [loading, setLoading] = useState(true)
-  const [pageData, setPageData] = useState({ title: '', content: '' })
+  const [pageData, setPageData] = useState({ title: '', content: '', lastUpdated: '' })
 
   useEffect(() => {
     setLoading(true)
@@ -18,12 +19,14 @@ const PageEditor = ({ pageName, onClose }) => {
         if (data[pageName]) {
           setPageData({
             title: data[pageName].title || '',
-            content: data[pageName].content || ''
+            content: data[pageName].content || '',
+            lastUpdated: data[pageName].lastUpdated || ''
           })
         } else {
           setPageData({
             title: '',
-            content: ''
+            content: '',
+            lastUpdated: ''
           })
         }
         setLoading(false)
@@ -35,10 +38,16 @@ const PageEditor = ({ pageName, onClose }) => {
 
   const onSave = async (data) => {
     try {
+      // Add lastUpdated timestamp
+      const saveData = {
+        ...data,
+        lastUpdated: new Date().toISOString()
+      }
+      
       const response = await fetch(`${API_URL}/api/pages/${pageName}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(saveData)
       })
       
       if (response.ok) {
@@ -62,12 +71,22 @@ const PageEditor = ({ pageName, onClose }) => {
             defaultValue={pageData.title}
             required
           />
-          <Textarea
-            label="Content"
-            {...register('content')}
+          <Controller
+            name="content"
+            control={control}
             defaultValue={pageData.content}
-            rows={10}
-            required
+            rules={{ required: 'Content is required' }}
+            render={({ field }) => (
+              <RichTextEditor
+                value={field.value}
+                onChange={field.onChange}
+                label="Content"
+                placeholder="Write your page content here..."
+                error={errors.content?.message}
+                helperText="Format your content with headings, lists, links, and images"
+                minHeight="500px"
+              />
+            )}
           />
         </div>
 

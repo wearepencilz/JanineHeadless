@@ -55,7 +55,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <div className="p-5 md:p-[20px]">
+      <div className="px-5 md:px-[20px] pt-2 md:pt-[10px]">
         <div 
           className="relative w-full overflow-hidden aspect-[4/5] md:aspect-[2/1]"
           style={{ 

@@ -104,7 +104,7 @@ const ProjectEditPage = () => {
         return
       }
     }
-    navigate('/cms')
+    navigate('/cms?section=projects')
   }
 
   if (loading) {

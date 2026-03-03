@@ -46,7 +46,7 @@ const NewsEditPage = () => {
       
       if (response.ok) {
         alert('News article saved successfully!')
-        navigate('/cms')
+        navigate('/cms?section=news')
       } else {
         alert('Failed to save news article')
       }
@@ -56,7 +56,7 @@ const NewsEditPage = () => {
   }
 
   const handleCancel = () => {
-    navigate('/cms')
+    navigate('/cms?section=news')
   }
 
   if (loading) {

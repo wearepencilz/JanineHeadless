@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import SettingsForm from './SettingsForm'
@@ -21,6 +21,8 @@ const CMSDashboard = () => {
   const [news, setNews] = useState([])
   const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null, type: null })
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [formKey, setFormKey] = useState(0)
+  const formCancelRef = useRef(null)
   const { logout } = useAuth()
   const navigate = useNavigate()
 
@@ -31,9 +33,9 @@ const CMSDashboard = () => {
         return
       }
     }
+    setHasUnsavedChanges(false)
     setActiveSection(sectionId)
     setSearchParams({ section: sectionId })
-    setHasUnsavedChanges(false)
   }
 
   // Sync activeSection with URL on mount and URL changes
@@ -77,7 +79,8 @@ const CMSDashboard = () => {
       }
     }
     logout()
-    navigate('/cms/login')
+    // Use replace to prevent going back to CMS after logout
+    navigate('/cms/login', { replace: true })
   }
 
   const handleSaveChanges = () => {
@@ -88,13 +91,15 @@ const CMSDashboard = () => {
   }
 
   const handleCancelChanges = () => {
-    // Trigger form reset by toggling section
-    const currentSection = activeSection
-    setActiveSection(null)
-    setTimeout(() => {
-      setActiveSection(currentSection)
-      setHasUnsavedChanges(false)
-    }, 0)
+    console.log('handleCancelChanges called!')
+    // Immediately cancel without confirmation
+    setHasUnsavedChanges(false)
+    if (formCancelRef.current) {
+      console.log('Calling formCancelRef.current()')
+      formCancelRef.current()
+    } else {
+      console.log('formCancelRef.current is null!')
+    }
   }
 
   const confirmDelete = async () => {
@@ -167,7 +172,7 @@ const CMSDashboard = () => {
                 </Button>
               </>
             )}
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
@@ -234,7 +239,12 @@ const CMSDashboard = () => {
                           )}
                           <div>
                             <div className="font-medium text-gray-900">{project.title}</div>
-                            <div className="text-xs text-gray-500 line-clamp-1">{project.description}</div>
+                            <div 
+                              className="text-xs text-gray-500 line-clamp-1"
+                              dangerouslySetInnerHTML={{ 
+                                __html: project.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || '' 
+                              }}
+                            />
                           </div>
                         </div>
                       </Table.Cell>
@@ -467,8 +477,10 @@ const CMSDashboard = () => {
               <p className="text-sm text-gray-600 mt-1">Customize your homepage content</p>
             </div>
             <HomePageForm 
+              key={`home-form-${formKey}`}
               onFormChange={() => setHasUnsavedChanges(true)}
               onSaveSuccess={() => setHasUnsavedChanges(false)}
+              onCancelRef={formCancelRef}
             />
           </div>
         )}
@@ -481,8 +493,10 @@ const CMSDashboard = () => {
               <p className="text-sm text-gray-600 mt-1">Configure global site settings</p>
             </div>
             <SettingsForm 
+              key={`settings-form-${formKey}`}
               onFormChange={() => setHasUnsavedChanges(true)}
               onSaveSuccess={() => setHasUnsavedChanges(false)}
+              onCancelRef={formCancelRef}
             />
           </div>
         )}
@@ -495,8 +509,10 @@ const CMSDashboard = () => {
               <p className="text-sm text-gray-600 mt-1">Manage reusable tags for projects</p>
             </div>
             <TaxonomyForm 
+              key={`taxonomy-form-${formKey}`}
               onFormChange={() => setHasUnsavedChanges(true)}
               onSaveSuccess={() => setHasUnsavedChanges(false)}
+              onCancelRef={formCancelRef}
             />
           </div>
         )}

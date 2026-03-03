@@ -5,6 +5,55 @@ import LazyImage from './LazyImage'
 import { API_URL } from '../config'
 import { getImageUrl } from '../utils/imageUrl'
 
+const LinkDecoration = ({ isActive, textRef }) => {
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    if (textRef?.current) {
+      const textWidth = textRef.current.offsetWidth
+      // Calculate closest multiple of 9px (center piece width) that fits
+      const centerPieceWidth = 9
+      const availableWidth = textWidth - 10 // subtract left (5px) and right (5px) caps
+      const numCenterPieces = Math.max(0, Math.round(availableWidth / centerPieceWidth))
+      const calculatedWidth = numCenterPieces * centerPieceWidth + 10 // add back the caps
+      setWidth(calculatedWidth)
+    }
+  }, [textRef, isActive])
+
+  return (
+    <motion.div
+      className="absolute flex items-center overflow-hidden pointer-events-none"
+      style={{ 
+        top: 'calc(100% + 4px)', 
+        height: '4px',
+        left: 0,
+        width: `${width}px`
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ 
+        opacity: isActive ? 1 : 0
+      }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+    >
+      <svg width="5" height="4" viewBox="0 0 5 4" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, width: '5px', height: '4px' }}>
+        <path d="M2.33034 1.54656C2.90184 0.858122 3.61419 6.05759e-08 5 0V0.248086V1.37819C4.26155 1.37819 3.90275 1.76582 3.33853 2.44953L3.33529 2.45343C2.7638 3.14187 2.05145 4 0.665628 4C0.296411 4 1.6708e-08 3.69314 0 3.3109C-1.6708e-08 2.92867 0.296411 2.62181 0.665628 2.62181C1.40667 2.62181 1.76288 2.23418 2.3271 1.55047L2.33034 1.54656Z" fill="#7A8F26"/>
+      </svg>
+      <div 
+        className="flex-1" 
+        style={{ 
+          height: '4px',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='9' height='4' viewBox='0 0 9 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.77629 1.55315C2.18367 0.86137 1.44495 6.31609e-08 6.02428e-08 0L0 1.37819C0.768507 1.37819 1.13921 1.76313 1.7237 2.44685L1.72684 2.45049C2.32162 3.14165 3.06028 4 4.5027 4C5.94765 4 6.6864 3.13863 7.279 2.44685C7.86352 1.76581 8.23149 1.37819 9 1.37819V3.93403e-07C7.55505 3.30242e-07 6.81631 0.86137 6.22371 1.55315C5.63919 2.23419 5.2712 2.62181 4.5027 2.62181C3.73419 2.62181 3.36349 2.23417 2.77629 1.55315Z' fill='%237A8F26'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat-x',
+          backgroundSize: '9px 4px'
+        }}
+      />
+      <svg width="5" height="4" viewBox="0 0 5 4" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, width: '5px', height: '4px' }}>
+        <path d="M2.66965 1.54656C2.09816 0.858122 1.38581 5.88437e-08 0 0V0.248086V1.37819C0.738448 1.37819 1.09725 1.76582 1.66147 2.44953L1.66471 2.45343C2.2362 3.14187 2.94855 4 4.33437 4C4.70359 4 5 3.69314 5 3.3109C5 2.92867 4.70359 2.62181 4.33437 2.62181C3.59333 2.62181 3.23712 2.23418 2.6729 1.55047L2.66965 1.54656Z" fill="#7A8F26"/>
+      </svg>
+    </motion.div>
+  )
+}
+
 const Navigation = () => {
   const [settings, setSettings] = useState({})
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -13,10 +62,14 @@ const Navigation = () => {
   const [megamenuStyle, setMegamenuStyle] = useState({})
   const [hoveredService, setHoveredService] = useState(null)
   const [hoveredAbout, setHoveredAbout] = useState(null)
+  const [hoveredProject, setHoveredProject] = useState(false)
   const [hidden, setHidden] = useState(false)
   
   const servicesButtonRef = useRef(null)
   const aboutButtonRef = useRef(null)
+  const servicesTextRef = useRef(null)
+  const aboutTextRef = useRef(null)
+  const projectTextRef = useRef(null)
   const closeTimeoutRef = useRef(null)
 
   const { scrollY } = useScroll()
@@ -35,13 +88,16 @@ const Navigation = () => {
 
   const alignMegamenu = (buttonRef) => {
     if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      setMegamenuStyle({
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        top: `${rect.bottom}px`,
-      })
+      const navElement = buttonRef.current.closest('nav')
+      if (navElement) {
+        const rect = navElement.getBoundingClientRect()
+        setMegamenuStyle({
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          top: `${rect.bottom}px`,
+        })
+      }
     }
   }
 
@@ -108,7 +164,7 @@ const Navigation = () => {
   return (
     <>
       <motion.nav 
-        className="bg-white shadow-sm sticky top-0 z-50 w-full"
+        className="bg-white sticky top-0 z-50 w-full"
         animate={{
           y: hidden ? -100 : 0,
           opacity: hidden ? 0 : 1,
@@ -145,33 +201,44 @@ const Navigation = () => {
               <div className="hidden md:flex items-center -mx-3">
                 {/* Services */}
                 <div
-                  className="relative"
+                  className="relative py-6 px-3"
                   onMouseEnter={handleServicesEnter}
                   onMouseLeave={handleMegamenuLeave}
                 >
                   <button 
                     ref={servicesButtonRef}
-                    className="hover:font-medium transition-all py-6 px-3"
+                    className="relative transition-all"
                   >
-                    Services
+                    <span ref={servicesTextRef}>Services</span>
+                    <LinkDecoration isActive={megamenuContent === 'services'} textRef={servicesTextRef} />
                   </button>
                 </div>
 
                 {/* About */}
                 <div
-                  className="relative"
+                  className="relative py-6 px-3"
                   onMouseEnter={handleAboutEnter}
                   onMouseLeave={handleMegamenuLeave}
                 >
                   <button 
                     ref={aboutButtonRef}
-                    className="hover:font-medium transition-all py-6 px-3"
+                    className="relative transition-all"
                   >
-                    About
+                    <span ref={aboutTextRef}>About</span>
+                    <LinkDecoration isActive={megamenuContent === 'about'} textRef={aboutTextRef} />
                   </button>
                 </div>
 
-                <Link to="/" className="hover:font-medium transition-all py-6 px-3">Start a project</Link>
+                <div
+                  className="relative py-6 px-3"
+                  onMouseEnter={() => setHoveredProject(true)}
+                  onMouseLeave={() => setHoveredProject(false)}
+                >
+                  <Link to="/" className="relative transition-all">
+                    <span ref={projectTextRef}>Start a project</span>
+                    <LinkDecoration isActive={hoveredProject} textRef={projectTextRef} />
+                  </Link>
+                </div>
               </div>
             </div>
             
@@ -297,8 +364,11 @@ const Navigation = () => {
       <AnimatePresence>
         {megamenuOpen && (
           <motion.div
-            className="hidden md:block bg-white w-full shadow-lg z-[1000]"
-            style={megamenuStyle}
+            className="hidden md:block bg-white w-full z-[1000]"
+            style={{
+              ...megamenuStyle,
+              boxShadow: '0 4px 20px 0 rgba(0, 0, 0, 0.05)'
+            }}
             onMouseEnter={() => clearTimeout(closeTimeoutRef.current)}
             onMouseLeave={handleMegamenuLeave}
             initial={{ height: 0, opacity: 0 }}

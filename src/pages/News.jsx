@@ -37,9 +37,10 @@ const News = () => {
               </div>
               <h2 className="text-2xl font-bold mb-3">{item.title}</h2>
               <p className="text-gray-600 mb-4">{item.excerpt}</p>
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap">{item.content}</p>
-              </div>
+              <div 
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: item.content }}
+              />
             </article>
           ))
         )}

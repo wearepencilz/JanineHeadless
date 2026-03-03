@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Run CMS Tests",
+  "description": "Runs all comprehensive CMS test suites to verify forms, inputs, tags, file uploads, and CRUD operations",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npm test src/cms/__tests__"
+  }
+}

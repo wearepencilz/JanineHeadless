@@ -91,9 +91,10 @@ const ProjectCard = ({ project, priority = false }) => {
           <h3 className="text-3xl font-bold mb-2">{project.title}</h3>
           <p className="text-sm text-gray-500 mb-6">/ {project.category}</p>
           
-          <p className="text-gray-700 mb-6 leading-relaxed">
-            {project.description}
-          </p>
+          <div 
+            className="text-gray-700 mb-6 leading-relaxed prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: project.description }}
+          />
 
           {project.services && project.services.length > 0 && project.services.some(s => s && s.trim()) && (
             <ul className="space-y-2 mb-6">

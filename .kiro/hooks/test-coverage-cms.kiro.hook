@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "CMS Test Coverage",
+  "description": "Runs CMS tests with coverage report to see which code paths are tested",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npm test src/cms/__tests__ -- --coverage --run"
+  }
+}

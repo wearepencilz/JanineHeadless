@@ -9,24 +9,41 @@ import FileInput from '../components/ui/FileInput'
 import Button from '../components/ui/Button'
 import SortableList from '../components/ui/SortableList'
 
-const HomePageForm = ({ onFormChange, onSaveSuccess }) => {
-  const { register, handleSubmit, setValue, watch, formState: { isDirty } } = useForm()
+const HomePageForm = ({ onFormChange, onSaveSuccess, onCancelRef }) => {
+  const { register, handleSubmit, reset, setValue, watch, formState: { isDirty } } = useForm()
   const [homePage, setHomePage] = useState({})
   const [heroButtons, setHeroButtons] = useState([])
   const [initialHeroButtons, setInitialHeroButtons] = useState([])
+  const [isInitialized, setIsInitialized] = useState(false)
   const heroImageValue = watch('heroImage')
 
   // Track changes in hero buttons
   const heroButtonsChanged = JSON.stringify(heroButtons) !== JSON.stringify(initialHeroButtons)
 
-  // Notify parent of changes
+  // Expose cancel function to parent
   useEffect(() => {
-    if ((isDirty || heroButtonsChanged) && onFormChange) {
+    console.log('HomePageForm: Setting up cancel ref, onCancelRef:', onCancelRef)
+    if (onCancelRef) {
+      onCancelRef.current = () => {
+        console.log('HomePageForm: Cancel called, reloading data')
+        loadData()
+      }
+      console.log('HomePageForm: Cancel ref set successfully')
+    } else {
+      console.log('HomePageForm: onCancelRef is null/undefined')
+    }
+  }, [onCancelRef])
+
+  // Notify parent of changes (only after initialization)
+  useEffect(() => {
+    if (isInitialized && (isDirty || heroButtonsChanged) && onFormChange) {
       onFormChange()
     }
-  }, [isDirty, heroButtonsChanged, onFormChange])
+  }, [isDirty, heroButtonsChanged, onFormChange, isInitialized])
 
-  useEffect(() => {
+  const loadData = () => {
+    console.log('HomePageForm: loadData called')
+    setIsInitialized(false)
     fetch(`${API_URL}/api/pages/home`)
       .then(res => {
         if (!res.ok) {
@@ -35,25 +52,40 @@ const HomePageForm = ({ onFormChange, onSaveSuccess }) => {
         return res.json()
       })
       .then(data => {
+        console.log('HomePageForm: Data loaded from API:', data)
         setHomePage(data)
-        setValue('heroImage', data.heroImage)
-        setValue('heroText', data.heroText)
-        setValue('contactHeading', data.contactHeading)
-        setValue('contactButtonText', data.contactButtonText)
-        setValue('contactEmail', data.contactEmail)
-        setValue('emailSubject', data.emailSubject)
-        setValue('emailBody', data.emailBody)
-        setValue('metaTitle', data.metaTitle)
-        setValue('metaDescription', data.metaDescription)
-        setValue('metaKeywords', data.metaKeywords)
-        setValue('ogImage', data.ogImage)
+        const formData = {
+          heroImage: data.heroImage || '',
+          heroText: data.heroText || '',
+          contactHeading: data.contactHeading || '',
+          contactButtonText: data.contactButtonText || '',
+          contactEmail: data.contactEmail || '',
+          emailSubject: data.emailSubject || '',
+          emailBody: data.emailBody || '',
+          metaTitle: data.metaTitle || '',
+          metaDescription: data.metaDescription || '',
+          metaKeywords: data.metaKeywords || '',
+          ogImage: data.ogImage || ''
+        }
+        reset(formData)
+        console.log('HomePageForm: Form reset with data')
         setHeroButtons(data.heroButtons || [])
         setInitialHeroButtons(data.heroButtons || [])
+        // Mark as initialized after a delay to avoid false positives
+        setTimeout(() => {
+          setIsInitialized(true)
+          console.log('HomePageForm: Initialized set to true')
+        }, 100)
       })
       .catch(error => {
         console.error('Error loading home page:', error)
       })
-  }, [setValue])
+  }
+
+  useEffect(() => {
+    console.log('HomePageForm: Component mounted/remounted')
+    loadData()
+  }, [])
 
   const handleImageUpload = async (file) => {
     if (!file) return null
@@ -102,6 +134,21 @@ const HomePageForm = ({ onFormChange, onSaveSuccess }) => {
         setHomePage(savedData)
         setHeroButtons(savedData.heroButtons || [])
         setInitialHeroButtons(savedData.heroButtons || [])
+        // Reset form dirty state
+        const formData = {
+          heroImage: savedData.heroImage || '',
+          heroText: savedData.heroText || '',
+          contactHeading: savedData.contactHeading || '',
+          contactButtonText: savedData.contactButtonText || '',
+          contactEmail: savedData.contactEmail || '',
+          emailSubject: savedData.emailSubject || '',
+          emailBody: savedData.emailBody || '',
+          metaTitle: savedData.metaTitle || '',
+          metaDescription: savedData.metaDescription || '',
+          metaKeywords: savedData.metaKeywords || '',
+          ogImage: savedData.ogImage || ''
+        }
+        reset(formData)
         if (onSaveSuccess) {
           onSaveSuccess()
         }
@@ -174,7 +221,7 @@ const HomePageForm = ({ onFormChange, onSaveSuccess }) => {
               accept="image/*"
               onUpload={handleImageUpload}
               value={heroImageValue}
-              onChange={(url) => setValue('heroImage', url)}
+              onChange={(url) => setValue('heroImage', url, { shouldDirty: true })}
               helperText="Recommended: 1920x1080px, JPG or PNG"
             />
             <Textarea

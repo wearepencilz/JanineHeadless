@@ -5,6 +5,7 @@ import Input from '../components/ui/Input'
 import Textarea from '../components/ui/Textarea'
 import FileInput from '../components/ui/FileInput'
 import Button from '../components/ui/Button'
+import RichTextEditor from '../components/ui/RichTextEditor'
 
 const NewsForm = ({ newsItem = {}, onSave, onCancel }) => {
   const { register, handleSubmit, control, watch, formState: { isSubmitting, errors } } = useForm({
@@ -86,11 +87,21 @@ const NewsForm = ({ newsItem = {}, onSave, onCancel }) => {
               placeholder="Short description"
               required
             />
-            <Textarea
-              label="Content"
-              {...register('content')}
-              rows={6}
-              required
+            <Controller
+              name="content"
+              control={control}
+              rules={{ required: 'Content is required' }}
+              render={({ field }) => (
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  label="Content"
+                  placeholder="Write your article content here..."
+                  error={errors.content?.message}
+                  helperText="Format your article with headings, lists, links, and images"
+                  minHeight="400px"
+                />
+              )}
             />
           </FormSection>
 
