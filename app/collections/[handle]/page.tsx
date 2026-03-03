@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { getCollection, enrichProduct } from '@/lib/shopify';
 import type { Metadata } from 'next';
 
@@ -47,7 +49,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         {products.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <a
+              <Link
                 key={product.id}
                 href={`/products/${product.handle}`}
                 className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
@@ -55,10 +57,11 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 {/* Product Image */}
                 {product.images[0] && (
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <img
+                    <Image
                       src={product.images[0].url}
                       alt={product.images[0].altText || product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
                     />
                     {/* Availability Badge */}
                     {product.availability === 'preorder' && (
@@ -95,7 +98,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                     </p>
                   )}
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         ) : (

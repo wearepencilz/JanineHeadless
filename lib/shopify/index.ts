@@ -2,6 +2,7 @@ import { shopifyFetch } from './client';
 import { getShopQuery } from './queries/shop';
 import { getCollectionQuery, getCollectionsQuery } from './queries/collection';
 import { getProductQuery } from './queries/product';
+import { getProductsQuery } from './queries/products';
 import type { Shop } from './types';
 import type { ShopifyCollection, ShopifyProduct, EnrichedProduct, ProductAvailability } from './types';
 
@@ -100,4 +101,18 @@ export function enrichProduct(product: ShopifyProduct): EnrichedProduct {
     requiresScheduling,
     leadTimeHours: leadTimeHours ? parseInt(leadTimeHours, 10) : undefined,
   };
+}
+
+export async function getProducts(): Promise<ShopifyProduct[]> {
+  try {
+    const res = await shopifyFetch<{ products: { edges: Array<{ node: ShopifyProduct }> } }>({
+      query: getProductsQuery,
+      cache: 'no-store',
+    });
+
+    return res.data.products.edges.map((edge) => edge.node);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
 }
