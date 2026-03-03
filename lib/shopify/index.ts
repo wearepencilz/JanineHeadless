@@ -67,14 +67,14 @@ export async function getProduct(handle: string): Promise<ShopifyProduct | null>
 export function enrichProduct(product: ShopifyProduct): EnrichedProduct {
   const metafields = product.metafields || [];
   
-  // Extract metafield values
-  const isPreorder = metafields.find((m) => m.key === 'is_preorder')?.value === 'true';
-  const preorderDate = metafields.find((m) => m.key === 'preorder_ship_date')?.value;
-  const preorderDisclaimerEn = metafields.find((m) => m.key === 'preorder_disclaimer_en')?.value;
-  const preorderDisclaimerFr = metafields.find((m) => m.key === 'preorder_disclaimer_fr')?.value;
-  const isIceCream = metafields.find((m) => m.key === 'is_ice_cream')?.value === 'true';
-  const requiresScheduling = metafields.find((m) => m.key === 'requires_scheduling')?.value === 'true';
-  const leadTimeHours = metafields.find((m) => m.key === 'lead_time_hours')?.value;
+  // Extract metafield values safely
+  const isPreorder = metafields.find((m) => m?.key === 'is_preorder')?.value === 'true';
+  const preorderDate = metafields.find((m) => m?.key === 'preorder_ship_date')?.value;
+  const preorderDisclaimerEn = metafields.find((m) => m?.key === 'preorder_disclaimer_en')?.value;
+  const preorderDisclaimerFr = metafields.find((m) => m?.key === 'preorder_disclaimer_fr')?.value;
+  const isIceCream = metafields.find((m) => m?.key === 'is_ice_cream')?.value === 'true';
+  const requiresScheduling = metafields.find((m) => m?.key === 'requires_scheduling')?.value === 'true';
+  const leadTimeHours = metafields.find((m) => m?.key === 'lead_time_hours')?.value;
 
   // Determine availability
   let availability: ProductAvailability = 'in_stock';
@@ -84,9 +84,9 @@ export function enrichProduct(product: ShopifyProduct): EnrichedProduct {
     availability = 'preorder';
   }
 
-  // Flatten images and variants
-  const images = product.images.edges.map((edge) => edge.node);
-  const variants = product.variants.edges.map((edge) => edge.node);
+  // Flatten images and variants safely
+  const images = product.images?.edges?.map((edge) => edge.node) || [];
+  const variants = product.variants?.edges?.map((edge) => edge.node) || [];
 
   return {
     ...product,
