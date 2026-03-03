@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import '../src/styles/index.css';
+import { CartProvider } from '@/contexts/CartContext';
+import Header from '@/components/Header';
+import CartModal from '@/components/CartModal';
 
 export const metadata: Metadata = {
   title: 'Janine Headless Store',
@@ -13,7 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <CartProvider>
+          <Header />
+          {children}
+          <CartModal />
+        </CartProvider>
+      </body>
     </html>
   );
 }

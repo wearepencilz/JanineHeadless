@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getProduct, enrichProduct } from '@/lib/shopify';
+import AddToCartButton from '@/components/AddToCartButton';
 import type { Metadata } from 'next';
 
 interface ProductPageProps {
@@ -149,22 +150,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
 
             {/* Add to Cart Button */}
-            <button
-              disabled={product.availability === 'sold_out'}
-              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
-                product.availability === 'sold_out'
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : product.availability === 'preorder'
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-black hover:bg-gray-800 text-white'
-              }`}
-            >
-              {product.availability === 'sold_out'
-                ? 'Sold Out'
-                : product.availability === 'preorder'
-                ? 'Pre-order Now'
-                : 'Add to Cart'}
-            </button>
+            <AddToCartButton
+              variantId={product.variants[0].id}
+              availability={product.availability}
+            />
 
             {/* Product Details */}
             {(product.productType || product.tags.length > 0) && (
