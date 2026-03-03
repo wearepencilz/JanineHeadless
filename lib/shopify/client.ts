@@ -1,11 +1,7 @@
 const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
-if (!domain || !storefrontAccessToken) {
-  throw new Error('Missing Shopify environment variables');
-}
-
-const endpoint = `https://${domain}/api/2024-01/graphql.json`;
+const endpoint = domain ? `https://${domain}/api/2024-01/graphql.json` : '';
 
 export async function shopifyFetch<T>({
   query,
@@ -16,6 +12,10 @@ export async function shopifyFetch<T>({
   variables?: Record<string, any>;
   cache?: RequestCache;
 }): Promise<{ data: T; errors?: any[] }> {
+  if (!domain || !storefrontAccessToken) {
+    throw new Error('Shopify environment variables are not configured');
+  }
+
   try {
     const result = await fetch(endpoint, {
       method: 'POST',

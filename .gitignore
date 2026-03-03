@@ -27,3 +27,7 @@ dist-ssr
 
 # Build info (generated during build)
 src/buildInfo.json
+
+# Next.js
+.next/
+out/

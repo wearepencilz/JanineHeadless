@@ -20,14 +20,14 @@ This implementation plan transforms the existing Pencilz React/Vite/Express port
     - Push to new repository: `git push -u origin main`
     - _Requirements: Project Setup_
 
-- [-] 2. Next.js Commerce boilerplate setup
+- [x] 2. Next.js Commerce boilerplate setup
   - [x] 2.1 Clone and configure Vercel Commerce boilerplate
     - Clone https://github.com/vercel/commerce to a temporary directory
     - Copy relevant files to project root (preserve git history)
     - Install dependencies: `npm install`
     - _Requirements: 1.1, 1.2, 1.3_
   
-  - [-] 2.2 Configure Shopify Storefront API integration
+  - [x] 2.2 Configure Shopify Storefront API integration
     - Create `.env.local` with Shopify credentials
     - Set `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN`
     - Set `NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN`
@@ -35,7 +35,7 @@ This implementation plan transforms the existing Pencilz React/Vite/Express port
     - Test API connection with a simple product query
     - _Requirements: 3.1, 3.2_
   
-  - [ ] 2.3 Verify build and development server
+  - [x] 2.3 Verify build and development server
     - Run `npm run dev` to start development server
     - Run `npm run build` to verify production build
     - Verify no build errors or warnings
