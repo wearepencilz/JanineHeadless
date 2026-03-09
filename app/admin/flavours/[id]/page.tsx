@@ -29,7 +29,7 @@ interface Flavour {
 export default function EditFlavourPage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,7 +38,9 @@ export default function EditFlavourPage() {
   const [formData, setFormData] = useState<Flavour | null>(null);
 
   useEffect(() => {
-    fetchData();
+    if (id) {
+      fetchData();
+    }
   }, [id]);
 
   const fetchData = async () => {
