@@ -2,17 +2,35 @@
 
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
   const { cart, openCart } = useCart();
   const itemCount = cart?.totalQuantity || 0;
+  const [logo, setLogo] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('Janine');
+
+  useEffect(() => {
+    // Fetch settings from CMS
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.logo) setLogo(data.logo);
+        if (data.companyName) setCompanyName(data.companyName);
+      })
+      .catch((error) => console.error('Failed to fetch settings:', error));
+  }, []);
 
   return (
     <header className="border-b sticky top-0 bg-white z-30">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold">
-          Janine
+        <Link href="/" className="flex items-center">
+          {logo ? (
+            <img src={logo} alt={companyName} className="h-8 object-contain" />
+          ) : (
+            <span className="text-2xl font-bold">{companyName}</span>
+          )}
         </Link>
 
         {/* Navigation */}

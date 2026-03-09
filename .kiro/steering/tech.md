@@ -1,26 +1,63 @@
 # Tech Stack
 
 ## Frontend
+- **Next.js 14.2** - React framework with App Router
 - **React 18.3** - UI framework
-- **React Router DOM 6.22** - Client-side routing
-- **Vite 5.1** - Build tool and dev server
+- **TypeScript 5.9** - Type safety
 - **Tailwind CSS 3.4** - Utility-first CSS framework
 - **PostCSS + Autoprefixer** - CSS processing
 - **Framer Motion 11** - Animation library
 - **React Hook Form 7.50** - Form management
 
 ## Backend
-- **Express 4.18** - API server
-- **Multer** - File upload handling
-- **CORS** - Cross-origin resource sharing
+- **Next.js API Routes** - RESTful API endpoints
+- **NextAuth** - Authentication
+- **Shopify Storefront API** - Product catalog and checkout
+- **Headless CMS** - Content management (Sanity/Contentful/Strapi recommended)
+- **Vercel Blob** - Image storage
+- **Vercel KV** - Session and cache storage
 - **Node.js with ES modules** - Runtime environment
+
+## CMS (New!)
+- **Admin Panel**: `/admin` - Full content management system
+- **Authentication**: NextAuth with credentials (admin/admin123)
+- **Content Types**: 
+  - Ingredients (library with provenance)
+  - Flavours (archive with relationships)
+  - Batches (test kitchen tracking)
+  - Stories (editorial content)
+  - Launch Events (marketing campaigns)
+  - Settings (global configuration)
+- **Image Uploads**: Vercel Blob (production) or local files (dev)
+- **Relationships**: Shopify products linked to CMS flavours and ingredients
+- **QR Code Generator**: Generate codes for flavours, ingredients, stories
+
+## Recommended CMS Architecture
+
+**Headless CMS** (Sanity, Contentful, or Strapi) for:
+- Richer relational data modeling
+- Flavour archive independent of commerce lifecycle
+- Editorial flexibility
+- Test kitchen workflow
+
+**Next.js API Routes** for:
+- Shopify ↔ CMS relationship mapping
+- Golden Spoon membership logic
+- Flavour ratings aggregation
+- QR code generation
 
 ## Development Setup
 
-The project requires **two servers running simultaneously**:
+**Single server** - Next.js handles everything:
 
-1. **API Server** (port 3001) - Handles data operations and file uploads
-2. **Vite Dev Server** (port 5173) - Serves the React application
+```bash
+# Start Next.js dev server (includes API routes and CMS)
+npm run dev
+
+# Access:
+# - Shopify Store: http://localhost:3001
+# - CMS Admin: http://localhost:3001/admin/login
+```
 
 ## Common Commands
 
@@ -28,24 +65,24 @@ The project requires **two servers running simultaneously**:
 # Install dependencies
 npm install
 
-# Start API server (terminal 1)
-npm run server
-
-# Start dev server (terminal 2)
+# Start dev server
 npm run dev
 
 # Build for production
 npm run build
 
-# Preview production build
-npm preview
+# Start production server
+npm start
+
+# Deploy to Vercel
+npm run deploy
 ```
 
 ## Build Configuration
 
 - **Module type**: ES modules (`"type": "module"` in package.json)
-- **Vite config**: Standard React plugin setup
-- **Tailwind**: Scans all JSX/TSX files in src and index.html
+- **Next.js**: App Router with TypeScript
+- **Tailwind**: Scans all JSX/TSX files in src, app, and index.html
 - **PostCSS**: Configured for Tailwind processing
 
 ## Design System
@@ -55,9 +92,15 @@ Customize design tokens in `tailwind.config.js`:
 - Typography: `theme.extend.fontFamily` and `theme.fontSize`
 - Border radius: `theme.extend.borderRadius`
 
+Reference Untitled UI patterns for component design (see `.kiro/steering/untitled-ui-reference.md`)
+
 ## File Upload Configuration
 
-- Allowed types: JPEG, PNG, GIF, WebP, SVG
+### Development
 - Storage: `public/uploads/` directory
 - Naming: Timestamp prefix for uniqueness
-- Access: Static file serving via Express
+
+### Production
+- Storage: Vercel Blob
+- Allowed types: JPEG, PNG, GIF, WebP, SVG
+- API: `/api/upload` (authentication required)

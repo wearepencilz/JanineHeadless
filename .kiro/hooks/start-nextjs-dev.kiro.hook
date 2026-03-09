@@ -1,10 +1,10 @@
 {
   "enabled": true,
   "name": "Start Next.js Dev Server",
-  "description": "Automatically starts the Next.js development server on prompt submit",
+  "description": "Starts the Next.js development server when manually triggered",
   "version": "1",
   "when": {
-    "type": "promptSubmit"
+    "type": "userTriggered"
   },
   "then": {
     "type": "runCommand",

@@ -1,161 +1,350 @@
-# Deployment Guide
+# Janine Vercel Deployment Guide
 
-## Quick Deploy
+Complete guide for deploying the Janine ice cream shop website to Vercel.
+
+## Project Overview
+
+Janine is a Next.js-based ice cream shop with:
+- Shopify integration for e-commerce
+- Custom CMS for managing projects, news, pages, and settings
+- Image uploads (Vercel Blob in production)
+- Data storage (Vercel KV/Redis in production, JSON files in development)
+
+## Prerequisites
+
+1. Vercel account (sign up at vercel.com)
+2. Shopify store with Storefront API access
+3. Git repository (GitHub, GitLab, or Bitbucket)
+
+## Step 1: Install Vercel CLI
 
 ```bash
-# Deploy to production
-npm run deploy
-
-# Deploy preview
-npm run deploy:preview
+npm install -g vercel
 ```
 
-## Setup Instructions
-
-### 1. Vercel Project Setup
-
-The project is already linked to Vercel. If you need to re-link:
+## Step 2: Login to Vercel
 
 ```bash
-vercel link
+vercel login
 ```
 
-### 2. Choose Your Database (Pick One)
+This opens your browser for authentication.
 
-The database adapter supports multiple backends. Choose the one that fits your needs:
+## Step 3: Initial Deployment
 
-#### Option A: Upstash Redis via Vercel (Recommended)
+From your project root:
 
-1. Go to [vercel.com/dashboard](https://vercel.com/dashboard)
-2. Select your project → **Integrations**
-3. Search for **Upstash Redis**
-4. Click **Add Integration** and follow setup
+```bash
+vercel
+```
 
-Environment variables added automatically:
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+Answer the prompts:
+1. **Set up and deploy?** → Yes
+2. **Which scope?** → Select your account/team
+3. **Link to existing project?** → No (first time)
+4. **Project name?** → `janine-test` (or your preferred name)
+5. **Code directory?** → `./` (press Enter)
+6. **Override settings?** → No (Next.js auto-detected)
 
-#### Option B: Vercel KV (Legacy)
+This creates a preview deployment and initializes your project.
 
-1. Go to your project → **Storage** tab
-2. Click **Create Database** → Select **KV**
-3. Name it and create
+## Step 4: Configure Environment Variables
 
-Environment variables added automatically:
+Go to your Vercel dashboard: `https://vercel.com/[your-username]/janine-test`
+
+Navigate to **Settings** → **Environment Variables**
+
+### Required Variables
+
+#### Shopify Configuration
+```
+NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-storefront-token
+SHOPIFY_ADMIN_ACCESS_TOKEN=your-admin-token (optional)
+```
+
+**How to get Shopify tokens:**
+1. Go to Shopify Admin → Settings → Apps and sales channels
+2. Click "Develop apps" → "Create an app"
+3. Configure Storefront API access
+4. Copy the Storefront Access Token
+
+#### Authentication
+```
+NEXTAUTH_SECRET=generate-with-openssl-rand-base64-32
+NEXTAUTH_URL=https://janine-test.vercel.app
+AUTH_SECRET=same-as-nextauth-secret-or-generate-another
+```
+
+**Generate secrets:**
+```bash
+openssl rand -base64 32
+```
+
+### Important Notes
+- Set all variables for **Production**, **Preview**, and **Development** environments
+- `NEXTAUTH_URL` should match your Vercel domain
+- After adding variables, redeploy for them to take effect
+
+## Step 5: Add Vercel KV (Data Storage)
+
+Janine uses Vercel KV (Redis) for production data storage.
+
+1. In your Vercel project, go to **Storage** tab
+2. Click **Create Database** → **KV**
+3. Name it: `janine-kv`
+4. Click **Create**
+5. Click **Connect to Project** → Select your project
+
+This automatically adds these environment variables:
+- `KV_URL`
 - `KV_REST_API_URL`
 - `KV_REST_API_TOKEN`
+- `KV_REST_API_READ_ONLY_TOKEN`
 
-#### Option C: Custom Redis Server
+### Data Migration to Production
 
-Add these environment variables in Vercel:
+Your development data is in JSON files (`public/data/*.json`). To migrate to production:
 
-```
-REDIS_URL=redis://your-redis-server:6379
-```
+**Option 1: Manual via CMS**
+1. Deploy to production
+2. Login to `/admin/login` (admin/admin123)
+3. Recreate your content through the CMS interface
 
-Works with:
-- Redis Labs
-- AWS ElastiCache
-- DigitalOcean Redis
-- Any Redis-compatible server
-
-#### Option D: No Database (Development Only)
-
-Skip database setup - uses JSON files (data won't persist on Vercel)
-
-### 3. Install Required Packages
+**Option 2: Migration Script** (recommended for large datasets)
+Create a migration script to seed Vercel KV with your JSON data:
 
 ```bash
-# For Vercel KV / Upstash (Options A & B)
-npm install @vercel/kv
-
-# For custom Redis (Option C)
-npm install redis
-
-# Or install both
-npm install @vercel/kv redis
+# Run locally with production KV credentials
+node scripts/migrate-to-redis.js
 ```
 
-### 4. Deploy
+## Step 6: Add Vercel Blob (Image Storage)
+
+Janine uses Vercel Blob for production image uploads.
+
+1. In **Storage** tab, click **Create Database** → **Blob**
+2. Name it: `janine-blob`
+3. Click **Create**
+4. Click **Connect to Project** → Select your project
+
+This automatically adds:
+- `BLOB_READ_WRITE_TOKEN`
+
+### Migrating Existing Images
+
+Your development images are in `public/uploads/`. To migrate:
+
+1. Upload images through the CMS after deployment, or
+2. Use Vercel Blob API to bulk upload existing images
+
+## Step 7: Deploy to Production
+
+```bash
+vercel --prod
+```
+
+Or use the npm script:
 
 ```bash
 npm run deploy
 ```
 
-## How It Works
+Your site will be live at: `https://janine-test.vercel.app`
 
-### Local Development
-- Uses JSON files in `public/data/` for storage
-- Run `npm run server` for API
-- Run `npm run dev` for frontend
+## Step 8: Verify Deployment
+
+Test these critical paths:
+
+1. **Homepage**: `https://janine-test.vercel.app`
+2. **Admin Login**: `https://janine-test.vercel.app/admin/login`
+3. **Shopify Products**: Browse collections and products
+4. **CMS Functions**: Create/edit content in admin
+5. **Image Uploads**: Upload an image through CMS
+
+## Step 9: Connect Git Repository (Recommended)
+
+For automatic deployments on every push:
+
+1. Go to **Settings** → **Git**
+2. Click **Connect Git Repository**
+3. Select your repository
+4. Choose branch (usually `main` or `master`)
+
+Now every push to your main branch automatically deploys to production!
+
+## Data Storage Architecture
+
+### Development (Local)
+```
+Storage: JSON files in public/data/
+- projects.json
+- news.json
+- pages.json
+- settings.json
+
+Images: Local files in public/uploads/
+```
 
 ### Production (Vercel)
-The database adapter automatically detects and uses (in order of priority):
-
-1. **Upstash Redis** (via Vercel Integration) - if `UPSTASH_REDIS_REST_URL` exists
-2. **Vercel KV** (legacy) - if `KV_REST_API_URL` exists
-3. **Custom Redis** - if `REDIS_URL` exists
-4. **File System** (fallback) - not recommended for production
-
-## Environment Variables
-
-### Local (.env.local)
 ```
-# Option A: Upstash Redis
-UPSTASH_REDIS_REST_URL=your_url
-UPSTASH_REDIS_REST_TOKEN=your_token
+Storage: Vercel KV (Redis)
+- Key-value pairs for each data type
+- Automatic persistence
+- Fast read/write
 
-# Option B: Vercel KV
-KV_REST_API_URL=your_url
-KV_REST_API_TOKEN=your_token
-
-# Option C: Custom Redis
-REDIS_URL=redis://your-server:6379
+Images: Vercel Blob
+- Secure cloud storage
+- CDN delivery
+- Automatic optimization
 ```
 
-### Vercel Dashboard
-Environment variables are automatically configured when you add the integration.
+### How the Database Adapter Works
 
-## File Uploads
+The `lib/db.js` adapter automatically detects the environment:
 
-**Important:** File uploads on Vercel are temporary. For production, consider:
+**Development:**
+- Reads/writes JSON files in `public/data/`
+- No setup required
 
-1. **Vercel Blob Storage** (Recommended)
-   ```bash
-   npm install @vercel/blob
-   ```
+**Production (Vercel):**
+- Detects `VERCEL=1` environment variable
+- Connects to Vercel KV if `KV_REST_API_URL` exists
+- Falls back to Redis if `REDIS_URL` exists
+- Falls back to file system (not recommended)
 
-2. **Cloudinary** (Image hosting)
-3. **AWS S3** (Object storage)
+## Custom Domain Setup
 
-## Deployment Workflow
+To use your own domain:
 
-1. Make changes locally
-2. Test with `npm run dev` and `npm run server`
-3. Commit changes: `git add -A && git commit -m "message"`
-4. Push to GitHub: `git push origin main`
-5. Vercel automatically deploys from GitHub
-6. Or manually deploy: `npm run deploy`
+1. Go to **Settings** → **Domains**
+2. Click **Add Domain**
+3. Enter your domain (e.g., `janine.com`)
+4. Follow DNS configuration instructions
+5. Update `NEXTAUTH_URL` environment variable to match
 
-## Troubleshooting
+## Useful Commands
 
-### Database not persisting
-- Ensure Vercel KV is created and linked
-- Check environment variables in Vercel dashboard
-- Verify `@vercel/kv` is installed
+```bash
+# Preview deployment (test branch)
+vercel
 
-### Build fails
-- Check build logs in Vercel dashboard
+# Production deployment
+vercel --prod
+
+# Check deployment status
+vercel ls
+
+# View deployment logs
+vercel logs [deployment-url]
+
+# Pull environment variables to local
+vercel env pull
+
+# Remove deployment
+vercel remove [deployment-name]
+```
+
+## Monitoring & Debugging
+
+### View Logs
+```bash
+vercel logs --follow
+```
+
+Or in Vercel dashboard: **Deployments** → Click deployment → **Logs**
+
+### Common Issues
+
+**Build fails:**
+- Check environment variables are set
+- Review build logs in Vercel dashboard
 - Ensure all dependencies are in `package.json`
-- Verify `vercel.json` configuration
 
-### API not working
-- Check `api/index.js` is properly configured
-- Verify CORS settings in production
-- Check Vercel function logs
+**Authentication not working:**
+- Verify `NEXTAUTH_URL` matches your domain
+- Check `NEXTAUTH_SECRET` is set
+- Clear browser cookies and try again
 
-## Monitoring
+**Shopify products not loading:**
+- Verify Shopify credentials
+- Check Storefront API permissions
+- Test API connection in logs
 
-- **Logs**: Vercel Dashboard → Your Project → Logs
-- **Analytics**: Vercel Dashboard → Your Project → Analytics
-- **Performance**: Vercel Dashboard → Your Project → Speed Insights
+**Images not uploading:**
+- Verify Vercel Blob is connected
+- Check `BLOB_READ_WRITE_TOKEN` exists
+- Review upload API logs
+
+**Data not persisting:**
+- Verify Vercel KV is connected
+- Check KV environment variables
+- Review database adapter logs
+
+## Performance Optimization
+
+Vercel automatically provides:
+- Edge caching
+- Image optimization
+- Automatic compression
+- Global CDN
+
+For additional optimization:
+- Use Next.js Image component for all images
+- Enable ISR (Incremental Static Regeneration) for product pages
+- Configure caching headers in `next.config.js`
+
+## Security Checklist
+
+- [ ] Change default admin password (admin/admin123)
+- [ ] Set strong `NEXTAUTH_SECRET`
+- [ ] Restrict Shopify API permissions to minimum required
+- [ ] Enable HTTPS only (automatic on Vercel)
+- [ ] Review Vercel security headers
+- [ ] Set up environment variable encryption
+
+## Backup Strategy
+
+### Data Backup
+Vercel KV data should be backed up regularly:
+
+```bash
+# Export data from production
+node scripts/export-kv-data.js > backup-$(date +%Y%m%d).json
+```
+
+### Image Backup
+Vercel Blob files are automatically backed up by Vercel.
+
+## Cost Considerations
+
+**Vercel Free Tier includes:**
+- Unlimited deployments
+- 100 GB bandwidth/month
+- Serverless function executions
+
+**Vercel KV Free Tier:**
+- 256 MB storage
+- 10,000 commands/day
+
+**Vercel Blob Free Tier:**
+- 500 MB storage
+- 5 GB bandwidth/month
+
+Monitor usage in Vercel dashboard under **Usage**.
+
+## Next Steps
+
+1. Set up custom domain
+2. Configure analytics (Vercel Analytics or Google Analytics)
+3. Set up monitoring (Vercel Monitoring or Sentry)
+4. Create staging environment (separate Vercel project)
+5. Document content management workflows
+6. Train team on CMS usage
+
+## Support
+
+- Vercel Docs: https://vercel.com/docs
+- Next.js Docs: https://nextjs.org/docs
+- Shopify Storefront API: https://shopify.dev/docs/api/storefront
+- Vercel Support: support@vercel.com

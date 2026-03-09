@@ -122,7 +122,7 @@ export async function createCart(): Promise<Cart> {
   `;
 
   const response = await shopifyFetch({ query });
-  return response.data.cartCreate.cart;
+  return (response.data as any).cartCreate.cart;
 }
 
 export async function addToCart(cartId: string, lines: Array<{ merchandiseId: string; quantity: number }>): Promise<Cart> {
@@ -142,7 +142,7 @@ export async function addToCart(cartId: string, lines: Array<{ merchandiseId: st
     variables: { cartId, lines },
   });
 
-  return response.data.cartLinesAdd.cart;
+  return (response.data as any).cartLinesAdd.cart;
 }
 
 export async function updateCartLine(cartId: string, lineId: string, quantity: number): Promise<Cart> {
@@ -165,7 +165,7 @@ export async function updateCartLine(cartId: string, lineId: string, quantity: n
     },
   });
 
-  return response.data.cartLinesUpdate.cart;
+  return (response.data as any).cartLinesUpdate.cart;
 }
 
 export async function removeFromCart(cartId: string, lineIds: string[]): Promise<Cart> {
@@ -185,7 +185,7 @@ export async function removeFromCart(cartId: string, lineIds: string[]): Promise
     variables: { cartId, lineIds },
   });
 
-  return response.data.cartLinesRemove.cart;
+  return (response.data as any).cartLinesRemove.cart;
 }
 
 export async function getCart(cartId: string): Promise<Cart> {
@@ -203,5 +203,5 @@ export async function getCart(cartId: string): Promise<Cart> {
     variables: { cartId },
   });
 
-  return response.data.cart;
+  return (response.data as any).cart;
 }

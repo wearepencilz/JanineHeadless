@@ -4,73 +4,109 @@
 
 ```
 /
-├── src/                    # React application source
-│   ├── pages/             # Public-facing page components
-│   ├── cms/               # CMS admin interface components
-│   ├── components/        # Reusable UI components
-│   ├── contexts/          # React context providers
-│   ├── styles/            # Global CSS and Tailwind imports
-│   ├── App.jsx            # Root component with routing
-│   └── main.jsx           # Application entry point
+├── app/                    # Next.js App Router
+│   ├── admin/             # CMS admin interface (protected)
+│   │   ├── components/    # Admin-specific components
+│   │   ├── login/         # Login page
+│   │   ├── ingredients/   # Ingredient library management
+│   │   ├── products/      # Product-Shopify relationship management
+│   │   ├── launch-events/ # Launch event management
+│   │   ├── settings/      # Settings
+│   │   └── layout.tsx     # Admin layout with auth
+│   ├── api/               # API routes
+│   │   ├── auth/          # NextAuth endpoints
+│   │   ├── ingredients/   # Ingredient CRUD
+│   │   ├── products/      # Product metadata & relationships
+│   │   ├── launch-events/ # Launch event CRUD
+│   │   ├── settings/      # Settings API
+│   │   └── upload/        # Image upload
+│   ├── collections/       # Shopify collections
+│   ├── products/          # Shopify products
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Home page
+├── lib/                   # Shared utilities
+│   ├── auth.ts            # NextAuth configuration
+│   ├── db.js              # Database adapter
+│   └── shopify/           # Shopify API client
+├── components/            # React components (Shopify store)
+├── contexts/              # React contexts (Cart, etc.)
 ├── public/
-│   ├── data/              # JSON data storage
-│   └── uploads/           # User-uploaded images
-├── server.js              # Express API server
-└── [config files]         # Vite, Tailwind, PostCSS configs
+│   ├── data/              # JSON data storage (dev)
+│   │   ├── ingredients.json
+│   │   ├── product-metadata.json
+│   │   ├── launch-events.json
+│   │   └── settings.json
+│   └── uploads/           # User-uploaded images (dev)
+├── middleware.ts          # Route protection
+└── [config files]         # Next.js, Tailwind, PostCSS configs
 ```
 
 ## Architecture Patterns
 
 ### Routing Structure
-- **Public routes**: Wrapped in `<Layout>` component (includes Navigation + Footer)
-- **CMS routes**: Separate from Layout, protected by `<ProtectedRoute>`
-- All routing defined in `App.jsx` using React Router DOM v6
+- **Next.js App Router**: File-based routing in `app/` directory
+- **Public routes**: Shopify storefront pages (collections, products)
+- **Admin routes**: CMS interface at `/admin/*` (protected by middleware)
+- **API routes**: RESTful endpoints at `/api/*`
 
 ### Component Organization
-- **Pages** (`/src/pages`): Full page components for public site
-- **CMS** (`/src/cms`): Admin interface components (login, dashboard, forms)
-- **Components** (`/src/components`): Shared components (Layout, Navigation, Footer, etc.)
-- **Contexts** (`/src/contexts`): Global state management (AuthContext)
+- **app/**: Next.js pages and layouts (TypeScript)
+- **components/**: Shared React components for Shopify store
+- **app/admin/**: CMS admin interface components
+- **lib/**: Utilities, API clients, and configurations
+- **src/**: Legacy components (reference only, not used in production)
 
 ### Data Flow
-- API calls to Express server at `http://localhost:3001/api/*`
-- JSON files serve as database (`/public/data/*.json`)
-- File uploads handled by Multer middleware
-- CORS enabled for cross-origin requests
+- **API calls**: Next.js API routes at `/api/*`
+- **Data storage**: 
+  - Development: JSON files in `/public/data/`
+  - Production: Vercel KV or Upstash Redis
+- **Image uploads**:
+  - Development: Local files in `/public/uploads/`
+  - Production: Vercel Blob storage
+- **Authentication**: NextAuth with JWT sessions
 
 ## Code Conventions
 
 ### Component Style
-- Functional components with hooks (no class components)
-- Arrow function exports: `const ComponentName = () => { ... }`
-- Default exports for all components
+- **Next.js pages**: TypeScript with `.tsx` extension
+- **Components**: Functional components with hooks
+- **Server Components**: Default in Next.js App Router
+- **Client Components**: Use `'use client'` directive when needed
 
 ### File Naming
-- Components: PascalCase (e.g., `ProjectCard.jsx`)
-- Utilities/configs: camelCase or kebab-case
-- All React components use `.jsx` extension
+- **Pages**: lowercase with hyphens (e.g., `page.tsx`, `[id]/page.tsx`)
+- **Components**: PascalCase (e.g., `AdminNav.tsx`, `Button.tsx`)
+- **Utilities**: camelCase (e.g., `auth.ts`, `db.js`)
+- **API routes**: `route.ts` in appropriate directory
 
 ### Styling
 - Tailwind utility classes for all styling
 - No CSS modules or styled-components
 - Global styles in `src/styles/index.css`
 - Design tokens configured in `tailwind.config.js`
+- Follow Untitled UI patterns for component design
 
 ### State Management
-- React Context for global state (authentication)
-- React Hook Form for form state
-- Local component state with `useState` for UI state
+- **Server state**: React Server Components (default)
+- **Client state**: `useState` for local UI state
+- **Forms**: React Hook Form for complex forms
+- **Auth**: NextAuth with JWT sessions
+- **Cart**: React Context (CartContext)
 
 ## API Endpoints
 
 All endpoints prefixed with `/api/`:
 
-- **Projects**: GET, POST, PUT, DELETE `/api/projects`
-- **News**: GET, POST, PUT, DELETE `/api/news`
+- **Ingredients**: GET, POST, PUT, DELETE `/api/ingredients`
+- **Products**: GET, PUT `/api/products` (metadata & relationships)
+- **Launch Events**: GET, POST, PUT, DELETE `/api/launch-events`
 - **Settings**: GET, PUT `/api/settings`
-- **Pages**: GET, PUT `/api/pages/:pageName`
 - **Upload**: POST `/api/upload` (multipart/form-data)
 
 ## Protected Routes
 
-CMS routes require authentication via `<ProtectedRoute>` wrapper component that checks `AuthContext` state.
+Admin routes are protected by Next.js middleware that checks NextAuth session:
+- All `/admin/*` routes require authentication
+- Unauthenticated users are redirected to `/admin/login`
+- Authentication handled by `middleware.ts`
