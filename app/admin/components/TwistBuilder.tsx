@@ -18,7 +18,7 @@ export default function TwistBuilder({
   onDisplayNameChange,
 }: TwistBuilderProps) {
   // Filter to only twist-eligible flavours
-  const twistEligibleFlavours = flavours.filter(f => f.canBeUsedInTwist && f.availabilityStatus === 'active');
+  const twistEligibleFlavours = flavours.filter(f => f.canBeUsedInTwist && f.status === 'active');
 
   const handleFlavourAChange = (flavourId: string) => {
     const newSelection = [flavourId, selectedFlavourIds[1] || ''].filter(Boolean);
