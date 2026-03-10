@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ImageUploader from '../../components/ImageUploader';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     allergens: [] as string[],
     isOrganic: false,
     image: '',
+    imageAlt: '',
   });
 
   const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
@@ -48,6 +50,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
             : data.tastingNotes || '',
           allergens: data.allergens || [],
           availableMonths: data.availableMonths || [],
+          imageAlt: data.imageAlt || '',
         });
       } else {
         alert('Ingredient not found');
@@ -320,20 +323,16 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
             </label>
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image URL
-            </label>
-            <input
-              type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="/uploads/ingredient.jpg"
-            />
-            <p className="text-sm text-gray-500 mt-1">Upload image first, then paste URL here</p>
-          </div>
+          {/* Image Upload */}
+          <ImageUploader
+            value={formData.image}
+            onChange={(url: string) => setFormData({ ...formData, image: url })}
+            altText={formData.imageAlt}
+            onAltTextChange={(alt: string) => setFormData({ ...formData, imageAlt: alt })}
+            aspectRatio="1:1"
+            label="Ingredient Image"
+            required={false}
+          />
         </div>
 
         <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">

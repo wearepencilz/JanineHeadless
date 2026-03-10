@@ -1,0 +1,113 @@
+{
+  "description": "Current default game layout - Medium difficulty with varied platform heights (all platforms moved 16px higher)",
+  "gameResolution": {
+    "width": 512,
+    "height": 448,
+    "aspectRatio": "3:4 vertical"
+  },
+  "worldWidth": 1208,
+  "platforms": [
+    {
+      "name": "Ground - Start",
+      "x": 0,
+      "y": 358,
+      "width": 635,
+      "height": 16,
+      "notes": "Starting platform (moved 16px higher)"
+    },
+    {
+      "name": "Ground - Middle",
+      "x": 844,
+      "y": 399,
+      "width": 119,
+      "height": 16,
+      "notes": "Middle platform (moved 16px higher)"
+    },
+    {
+      "name": "Ground - End",
+      "x": 958,
+      "y": 311,
+      "width": 259,
+      "height": 16,
+      "notes": "Final platform (moved 16px higher)"
+    },
+    {
+      "name": "Mid Platform 1",
+      "x": 40,
+      "y": 190,
+      "width": 176,
+      "height": 16,
+      "notes": "Higher platform for ingredient 1 (moved 16px higher)"
+    },
+    {
+      "name": "Mid Platform 2",
+      "x": 466,
+      "y": 205,
+      "width": 128,
+      "height": 16,
+      "notes": "Highest platform for ingredient 2 (moved 16px higher)"
+    },
+    {
+      "name": "Mid Platform 3",
+      "x": 823,
+      "y": 158,
+      "width": 200,
+      "height": 16,
+      "notes": "Mid-height platform (moved 16px higher)"
+    }
+  ],
+  "iceCreams": [
+    {
+      "x": 915,
+      "y": 93,
+      "notes": "Goal - on final ground platform, 40px above platform surface"
+    }
+  ],
+  "ingredients": [
+    {
+      "name": "Ingredient 1",
+      "x": 128,
+      "y": 125,
+      "notes": "On Mid Platform 1 (y=190), 40px above surface"
+    },
+    {
+      "name": "Ingredient 2",
+      "x": 518,
+      "y": 141,
+      "notes": "On Mid Platform 2 (y=205), 40px above surface - highest"
+    },
+    {
+      "name": "Ingredient 3",
+      "x": 884,
+      "y": 342,
+      "notes": "On ground platform"
+    }
+  ],
+  "hazards": [],
+  "spawnPoint": {
+    "x": 48,
+    "y": 286,
+    "notes": "Start position - on first ground platform (moved 16px higher)"
+  },
+  "physics": {
+    "gravity": 700,
+    "playerSpeed": 200,
+    "playerJumpVelocity": -520,
+    "playerSize": {
+      "width": 32,
+      "height": 48
+    }
+  },
+  "gameplay": {
+    "fallThreshold": 460,
+    "timerDuration": 60,
+    "totalIngredients": 3,
+    "scoringFormula": "1000 + (remaining_time * 10) + (ingredients * 50)"
+  },
+  "visualDesign": {
+    "backgroundColor": "#87CEEB",
+    "platformColor": "#8B4513",
+    "playerColor": "#ff6b6b",
+    "iceCreamColor": "#ffc0cb"
+  }
+}

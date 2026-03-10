@@ -24,14 +24,19 @@ export default function IngredientsPage() {
 
   useEffect(() => {
     fetchIngredients();
-  }, []);
+  }, [searchTerm, categoryFilter]);
 
   const fetchIngredients = async () => {
     try {
-      const response = await fetch('/api/ingredients');
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (categoryFilter !== 'all') params.append('category', categoryFilter);
+      
+      const response = await fetch(`/api/ingredients?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setIngredients(data);
+        // Handle paginated response
+        setIngredients(data.data || data);
       }
     } catch (error) {
       console.error('Error fetching ingredients:', error);
@@ -86,12 +91,20 @@ export default function IngredientsPage() {
           <h1 className="text-3xl font-semibold text-gray-900">Ingredients</h1>
           <p className="text-gray-600 mt-1">Manage your ingredient library</p>
         </div>
-        <Link
-          href="/admin/ingredients/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Add Ingredient
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/ingredients/seed"
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Seed Data
+          </Link>
+          <Link
+            href="/admin/ingredients/create"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Add Ingredient
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 mb-6 p-4">

@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Soft Serve",
+    "slug": "soft-serve",
+    "category": "frozen",
+    "description": "Single flavour soft serve in cup or cone",
+    "requiresFlavours": true,
+    "minFlavours": 1,
+    "maxFlavours": 1,
+    "allowMixedTypes": true,
+    "canIncludeAddOns": true,
+    "defaultSizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "servingStyle": "soft-serve",
+    "menuSection": "Soft Serve",
+    "id": "c2979175-b674-4b74-96a2-86bbc7d3322f",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T04:22:42.086Z"
+  },
+  {
+    "name": "Twist",
+    "slug": "twist",
+    "category": "frozen",
+    "description": "Two flavours swirled together in soft serve",
+    "requiresFlavours": true,
+    "minFlavours": 2,
+    "maxFlavours": 2,
+    "allowMixedTypes": true,
+    "canIncludeAddOns": true,
+    "defaultSizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "servingStyle": "soft-serve",
+    "menuSection": "Soft Serve",
+    "id": "0fa99421-7da9-4e2c-a266-4b721210d510",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T02:15:56.873Z"
+  },
+  {
+    "name": "Pint",
+    "slug": "pint",
+    "category": "frozen",
+    "description": "Packaged pint for take-home",
+    "requiresFlavours": true,
+    "minFlavours": 1,
+    "maxFlavours": 4,
+    "allowMixedTypes": false,
+    "canIncludeAddOns": false,
+    "defaultSizes": [
+      "pint"
+    ],
+    "servingStyle": "packaged",
+    "menuSection": "Take Home",
+    "id": "fe6f1cc8-6876-4a33-bab2-f7fb7b47d8ca",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T04:22:08.402Z"
+  },
+  {
+    "name": "Sandwich",
+    "slug": "sandwich",
+    "category": "frozen",
+    "description": "Ice cream sandwich with cookie or wafer",
+    "requiresFlavours": true,
+    "minFlavours": 1,
+    "maxFlavours": 1,
+    "allowMixedTypes": false,
+    "canIncludeAddOns": true,
+    "defaultSizes": [
+      "standard"
+    ],
+    "servingStyle": "plated",
+    "menuSection": "Sandwiches",
+    "id": "5a7df028-a7d6-444d-8150-57fcd944c0ae",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T02:18:20.927Z"
+  },
+  {
+    "name": "Tasting",
+    "slug": "tasting",
+    "category": "experience",
+    "description": "Curated tasting with multiple flavours and pairings",
+    "requiresFlavours": true,
+    "minFlavours": 2,
+    "maxFlavours": 5,
+    "allowMixedTypes": true,
+    "canIncludeAddOns": true,
+    "defaultSizes": [
+      "tasting"
+    ],
+    "servingStyle": "plated",
+    "menuSection": "Experiences",
+    "id": "86fa886b-4e3e-41ac-846b-e99944c63405",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T02:15:56.873Z"
+  },
+  {
+    "name": "Combo",
+    "slug": "combo",
+    "category": "bundle",
+    "description": "Bundle of multiple items (e.g., focaccia + soft serve)",
+    "requiresFlavours": false,
+    "minFlavours": 0,
+    "maxFlavours": 0,
+    "allowMixedTypes": false,
+    "canIncludeAddOns": true,
+    "defaultSizes": [],
+    "servingStyle": "plated",
+    "menuSection": "Combos",
+    "id": "5b61bbed-d467-49d9-ab78-df5836116def",
+    "createdAt": "2026-03-10T02:15:56.873Z",
+    "updatedAt": "2026-03-10T02:18:37.610Z"
+  },
+  {
+    "id": "4287bb8a-1aec-46d3-b107-22ccf935b66a",
+    "name": "Gallon",
+    "slug": "gallon",
+    "category": "frozen",
+    "description": "A full sized pint serving",
+    "requiresFlavours": true,
+    "minFlavours": 1,
+    "maxFlavours": 4,
+    "allowMixedTypes": false,
+    "canIncludeAddOns": false,
+    "defaultSizes": [],
+    "servingStyle": "packaged",
+    "menuSection": "Frozen",
+    "image": "",
+    "icon": "",
+    "createdAt": "2026-03-10T02:31:29.522Z",
+    "updatedAt": "2026-03-10T04:22:16.110Z"
+  }
+]

@@ -1,23 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getIngredients, saveIngredients, getFlavours } from '@/lib/db';
+import type { Ingredient, Flavour, ErrorResponse } from '@/types';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const ingredients = await getIngredients();
-    const ingredient = ingredients.find((i: any) => i.id === params.id);
+    const ingredients = await getIngredients() as Ingredient[];
+    const ingredient = ingredients.find(i => i.id === params.id);
     
     if (!ingredient) {
-      return NextResponse.json({ error: 'Ingredient not found' }, { status: 404 });
+      const errorResponse: ErrorResponse = {
+        error: 'Ingredient not found',
+        code: 'NOT_FOUND',
+        timestamp: new Date().toISOString()
+      };
+      return NextResponse.json(errorResponse, { status: 404 });
     }
     
     return NextResponse.json(ingredient);
   } catch (error) {
     console.error('Error fetching ingredient:', error);
-    return NextResponse.json({ error: 'Failed to fetch ingredient' }, { status: 500 });
+    const errorResponse: ErrorResponse = {
+      error: 'Failed to fetch ingredient',
+      timestamp: new Date().toISOString()
+    };
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 
@@ -28,16 +38,41 @@ export async function PUT(
   const session = await auth();
   
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const errorResponse: ErrorResponse = {
+      error: 'Unauthorized',
+      code: 'AUTH_REQUIRED',
+      timestamp: new Date().toISOString()
+    };
+    return NextResponse.json(errorResponse, { status: 401 });
   }
 
   try {
     const body = await request.json();
-    const ingredients = await getIngredients();
-    const index = ingredients.findIndex((i: any) => i.id === params.id);
+    const ingredients = await getIngredients() as Ingredient[];
+    const index = ingredients.findIndex(i => i.id === params.id);
     
     if (index === -1) {
-      return NextResponse.json({ error: 'Ingredient not found' }, { status: 404 });
+      const errorResponse: ErrorResponse = {
+        error: 'Ingredient not found',
+        code: 'NOT_FOUND',
+        timestamp: new Date().toISOString()
+      };
+      return NextResponse.json(errorResponse, { status: 404 });
+    }
+    
+    // Check for duplicate name (excluding current ingredient)
+    const duplicate = ingredients.find(
+      ing => ing.id !== params.id && ing.name.toLowerCase() === body.name.toLowerCase()
+    );
+    
+    if (duplicate) {
+      const errorResponse: ErrorResponse = {
+        error: 'An ingredient with this name already exists',
+        code: 'DUPLICATE_NAME',
+        details: { existingId: duplicate.id },
+        timestamp: new Date().toISOString()
+      };
+      return NextResponse.json(errorResponse, { status: 409 });
     }
     
     ingredients[index] = {
@@ -52,7 +87,11 @@ export async function PUT(
     return NextResponse.json(ingredients[index]);
   } catch (error) {
     console.error('Error updating ingredient:', error);
-    return NextResponse.json({ error: 'Failed to update ingredient' }, { status: 500 });
+    const errorResponse: ErrorResponse = {
+      error: 'Failed to update ingredient',
+      timestamp: new Date().toISOString()
+    };
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 
@@ -63,32 +102,44 @@ export async function DELETE(
   const session = await auth();
   
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const errorResponse: ErrorResponse = {
+      error: 'Unauthorized',
+      code: 'AUTH_REQUIRED',
+      timestamp: new Date().toISOString()
+    };
+    return NextResponse.json(errorResponse, { status: 401 });
   }
 
   try {
     // Check if ingredient is used in any flavours
-    const flavours = await getFlavours();
-    const usedInFlavours = flavours.filter((f: any) => 
-      f.coreIngredients?.includes(params.id) || f.allIngredients?.includes(params.id)
+    const flavours = await getFlavours() as Flavour[];
+    const usedInFlavours = flavours.filter(f => 
+      f.ingredients?.some(ing => ing.ingredientId === params.id)
     );
     
     if (usedInFlavours.length > 0) {
-      return NextResponse.json(
-        { 
-          error: 'Cannot delete ingredient',
+      const errorResponse: ErrorResponse = {
+        error: 'Cannot delete ingredient',
+        code: 'RESOURCE_IN_USE',
+        details: {
           message: `This ingredient is used in ${usedInFlavours.length} flavour(s)`,
-          flavours: usedInFlavours.map((f: any) => f.name)
+          flavours: usedInFlavours.map(f => ({ id: f.id, name: f.name }))
         },
-        { status: 400 }
-      );
+        timestamp: new Date().toISOString()
+      };
+      return NextResponse.json(errorResponse, { status: 409 });
     }
     
-    const ingredients = await getIngredients();
-    const filtered = ingredients.filter((i: any) => i.id !== params.id);
+    const ingredients = await getIngredients() as Ingredient[];
+    const filtered = ingredients.filter(i => i.id !== params.id);
     
     if (filtered.length === ingredients.length) {
-      return NextResponse.json({ error: 'Ingredient not found' }, { status: 404 });
+      const errorResponse: ErrorResponse = {
+        error: 'Ingredient not found',
+        code: 'NOT_FOUND',
+        timestamp: new Date().toISOString()
+      };
+      return NextResponse.json(errorResponse, { status: 404 });
     }
     
     await saveIngredients(filtered);
@@ -96,6 +147,10 @@ export async function DELETE(
     return NextResponse.json({ message: 'Ingredient deleted successfully' });
   } catch (error) {
     console.error('Error deleting ingredient:', error);
-    return NextResponse.json({ error: 'Failed to delete ingredient' }, { status: 500 });
+    const errorResponse: ErrorResponse = {
+      error: 'Failed to delete ingredient',
+      timestamp: new Date().toISOString()
+    };
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

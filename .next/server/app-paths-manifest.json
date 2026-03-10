@@ -1,12 +1,10 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
+  "/leaderboard/[campaignId]/page": "app/leaderboard/[campaignId]/page.js",
+  "/api/game/campaigns/[id]/reset/route": "app/api/game/campaigns/[id]/reset/route.js",
+  "/game/[campaignId]/page": "app/game/[campaignId]/page.js",
+  "/api/game/campaigns/[id]/route": "app/api/game/campaigns/[id]/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/upload/route": "app/api/upload/route.js",
-  "/collections/[handle]/page": "app/collections/[handle]/page.js",
-  "/api/settings/route": "app/api/settings/route.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/settings/page": "app/admin/settings/page.js",
-  "/admin/ingredients/create/page": "app/admin/ingredients/create/page.js",
-  "/admin/login/page": "app/admin/login/page.js"
+  "/admin/games/[id]/page": "app/admin/games/[id]/page.js",
+  "/admin/games/[id]/leaderboard/page": "app/admin/games/[id]/leaderboard/page.js",
+  "/admin/games/page": "app/admin/games/page.js"
 }

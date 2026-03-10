@@ -31,7 +31,7 @@ export default function CreateBatchPage() {
     try {
       const res = await fetch('/api/flavours');
       const data = await res.json();
-      setFlavours(data);
+      setFlavours(data.data || data);
     } catch (error) {
       console.error('Error fetching flavours:', error);
     }

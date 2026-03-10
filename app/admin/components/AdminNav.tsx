@@ -9,10 +9,13 @@ export default function AdminNav() {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
+    { href: '/admin/formats', label: 'Formats' },
     { href: '/admin/ingredients', label: 'Ingredients' },
     { href: '/admin/flavours', label: 'Flavours' },
+    { href: '/admin/offerings', label: 'Offerings' },
     { href: '/admin/batches', label: 'Batches' },
     { href: '/admin/stories', label: 'Stories' },
+    { href: '/admin/games', label: 'Games' },
     { href: '/admin/settings', label: 'Settings' },
   ];
 

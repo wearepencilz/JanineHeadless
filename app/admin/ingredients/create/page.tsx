@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ImageUploader from '../../components/ImageUploader';
+import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
 
 export default function CreateIngredientPage() {
   const router = useRouter();
@@ -11,7 +13,10 @@ export default function CreateIngredientPage() {
     name: '',
     latinName: '',
     origin: '',
-    category: 'flavor',
+    category: 'Fruit' as typeof ingredientCategoryOptions[number],
+    roles: [] as string[],
+    descriptors: [] as string[],
+    description: '',
     story: '',
     tastingNotes: '',
     supplier: '',
@@ -19,12 +24,14 @@ export default function CreateIngredientPage() {
     seasonal: false,
     availableMonths: [] as number[],
     allergens: [] as string[],
+    dietaryFlags: [] as string[],
     isOrganic: false,
     image: '',
+    imageAlt: '',
   });
 
-  const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
-  const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs'];
+  const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs', 'sesame'];
+  const dietaryOptions = ['vegan', 'vegetarian', 'gluten-free', 'dairy-free', 'nut-free'];
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -57,12 +64,39 @@ export default function CreateIngredientPage() {
     }
   };
 
+  const toggleRole = (role: string) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.includes(role)
+        ? prev.roles.filter(r => r !== role)
+        : [...prev.roles, role]
+    }));
+  };
+
+  const toggleDescriptor = (descriptor: string) => {
+    setFormData(prev => ({
+      ...prev,
+      descriptors: prev.descriptors.includes(descriptor)
+        ? prev.descriptors.filter(d => d !== descriptor)
+        : [...prev.descriptors, descriptor]
+    }));
+  };
+
   const toggleAllergen = (allergen: string) => {
     setFormData(prev => ({
       ...prev,
       allergens: prev.allergens.includes(allergen)
         ? prev.allergens.filter(a => a !== allergen)
         : [...prev.allergens, allergen]
+    }));
+  };
+
+  const toggleDietaryFlag = (flag: string) => {
+    setFormData(prev => ({
+      ...prev,
+      dietaryFlags: prev.dietaryFlags.includes(flag)
+        ? prev.dietaryFlags.filter(f => f !== flag)
+        : [...prev.dietaryFlags, flag]
     }));
   };
 
@@ -135,21 +169,83 @@ export default function CreateIngredientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
+                Primary Category *
               </label>
               <select
                 required
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {categories.map((cat) => (
+                {ingredientCategoryOptions.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    {cat}
                   </option>
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Usage Roles */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Usage Roles (multi-select)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {ingredientRoleOptions.map((role) => (
+                <button
+                  key={role}
+                  type="button"
+                  onClick={() => toggleRole(role)}
+                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                    formData.roles.includes(role)
+                      ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
+                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                  }`}
+                >
+                  {role}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Select all applicable usage roles</p>
+          </div>
+
+          {/* Descriptor Tags */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Descriptor Tags (optional)
+            </label>
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg">
+              {ingredientDescriptorTags.map((descriptor) => (
+                <button
+                  key={descriptor}
+                  type="button"
+                  onClick={() => toggleDescriptor(descriptor)}
+                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                    formData.descriptors.includes(descriptor)
+                      ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
+                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                  }`}
+                >
+                  {descriptor}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Add descriptive characteristics</p>
+          </div>
+
+          {/* Story */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Brief description of this ingredient..."
+            />
           </div>
 
           {/* Story */}
@@ -231,6 +327,30 @@ export default function CreateIngredientPage() {
             </div>
           </div>
 
+          {/* Dietary Flags */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Dietary Flags
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {dietaryOptions.map((flag) => (
+                <button
+                  key={flag}
+                  type="button"
+                  onClick={() => toggleDietaryFlag(flag)}
+                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                    formData.dietaryFlags.includes(flag)
+                      ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                  }`}
+                >
+                  {flag}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Select dietary compatibility tags</p>
+          </div>
+
           {/* Seasonal */}
           <div>
             <label className="flex items-center gap-2">
@@ -281,20 +401,16 @@ export default function CreateIngredientPage() {
             </label>
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image URL
-            </label>
-            <input
-              type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="/uploads/ingredient.jpg"
-            />
-            <p className="text-sm text-gray-500 mt-1">Upload image first, then paste URL here</p>
-          </div>
+          {/* Image Upload */}
+          <ImageUploader
+            value={formData.image}
+            onChange={(url: string) => setFormData({ ...formData, image: url })}
+            altText={formData.imageAlt}
+            onAltTextChange={(alt: string) => setFormData({ ...formData, imageAlt: alt })}
+            aspectRatio="1:1"
+            label="Ingredient Image"
+            required={false}
+          />
         </div>
 
         <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">

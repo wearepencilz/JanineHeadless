@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import '../src/styles/index.css';
 import { CartProvider } from '@/contexts/CartContext';
 import { Providers } from './providers';
-import Header from '@/components/Header';
-import CartModal from '@/components/CartModal';
+import ConditionalHeader from '@/components/ConditionalHeader';
 
 export const metadata: Metadata = {
   title: 'Janine - Artisanal Ice Cream',
@@ -20,9 +19,8 @@ export default function RootLayout({
       <body>
         <Providers>
           <CartProvider>
-            <Header />
+            <ConditionalHeader />
             {children}
-            <CartModal />
           </CartProvider>
         </Providers>
       </body>
