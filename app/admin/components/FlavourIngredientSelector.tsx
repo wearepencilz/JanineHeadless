@@ -123,7 +123,7 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
       // Reset form
       setNewIngredient({
         name: '',
-        category: 'flavor',
+        category: 'Fruit',
         origin: '',
         allergens: [],
         dietaryFlags: [],
