@@ -187,6 +187,13 @@ export interface Flavour {
   canBeSoldAsPint: boolean;      // Available as packaged pint
   canBeUsedInSandwich: boolean;  // Suitable for sandwich filling
   
+  // Shopify Integration
+  shopifyProductId?: string;     // Shopify product ID
+  shopifyProductHandle?: string; // Shopify product handle
+  syncStatus?: SyncStatus;       // Sync status with Shopify
+  lastSyncedAt?: string;         // Last sync timestamp
+  syncError?: string;            // Last sync error message
+  
   // Admin
   sortOrder: number;             // Display order
   featured: boolean;             // Highlight in admin

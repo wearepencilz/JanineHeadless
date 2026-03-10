@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { query } from '@/lib/db-game';
+import { queryWithRetry } from '@/lib/db-game';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,7 +15,7 @@ async function rollbackMigration() {
     const sql = readFileSync(sqlPath, 'utf-8');
 
     // Execute rollback
-    await query(sql);
+    await queryWithRetry(sql);
 
     console.log('✅ Migration 002 rolled back successfully!');
   } catch (error) {

@@ -13,7 +13,6 @@ export async function generateQRCode(claimCode: string, campaignId: string): Pro
     const qrDataUrl = await QRCode.toDataURL(claimUrl, {
       errorCorrectionLevel: 'H', // High error correction
       type: 'image/png',
-      quality: 1,
       margin: 2,
       width: 300,
       color: {

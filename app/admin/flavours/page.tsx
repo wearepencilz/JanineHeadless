@@ -167,7 +167,7 @@ export default function FlavoursPage() {
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         flavour.status === 'active'
                           ? 'bg-green-100 text-green-800'
-                          : flavour.status === 'seasonal'
+                          : flavour.status === 'upcoming'
                           ? 'bg-yellow-100 text-yellow-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}
@@ -179,7 +179,7 @@ export default function FlavoursPage() {
                     {flavour.ingredients?.length || 0} ingredients
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getSyncStatusBadge(flavour.syncStatus)}
+                    {getSyncStatusBadge(flavour.syncStatus || 'not_linked')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link

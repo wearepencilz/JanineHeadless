@@ -1,4 +1,4 @@
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 
 // PostgreSQL connection pool for game database
 let pool: Pool | null = null;
@@ -40,7 +40,7 @@ export function getPool(): Pool {
 /**
  * Execute a query with automatic retry logic for transient failures
  */
-export async function queryWithRetry<T = any>(
+export async function queryWithRetry<T extends QueryResultRow = any>(
   text: string,
   params?: any[],
   options: RetryOptions = {}
@@ -179,7 +179,7 @@ export async function checkConnection(): Promise<boolean> {
 /**
  * Insert a single row and return the inserted record
  */
-export async function insertOne<T = any>(
+export async function insertOne<T extends QueryResultRow = any>(
   table: string,
   data: Record<string, any>
 ): Promise<T> {
@@ -201,7 +201,7 @@ export async function insertOne<T = any>(
 /**
  * Update a single row by ID and return the updated record
  */
-export async function updateById<T = any>(
+export async function updateById<T extends QueryResultRow = any>(
   table: string,
   id: string,
   data: Record<string, any>
@@ -227,7 +227,7 @@ export async function updateById<T = any>(
 /**
  * Find a single row by ID
  */
-export async function findById<T = any>(
+export async function findById<T extends QueryResultRow = any>(
   table: string,
   id: string
 ): Promise<T | null> {
@@ -239,7 +239,7 @@ export async function findById<T = any>(
 /**
  * Find rows with optional filtering, sorting, and pagination
  */
-export async function findMany<T = any>(
+export async function findMany<T extends QueryResultRow = any>(
   table: string,
   options: {
     where?: Record<string, any>;
@@ -319,7 +319,7 @@ export async function deleteById(table: string, id: string): Promise<boolean> {
 /**
  * Execute a raw SQL query (use with caution)
  */
-export async function raw<T = any>(
+export async function raw<T extends QueryResultRow = any>(
   query: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
@@ -469,7 +469,7 @@ export async function logAnalyticsEvent(data: {
  * Find all rows with optional ordering
  * Convenience wrapper around findMany
  */
-export async function findAll<T = any>(
+export async function findAll<T extends QueryResultRow = any>(
   table: string,
   options: {
     orderBy?: string;

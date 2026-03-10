@@ -82,6 +82,7 @@ export interface Reward {
   campaign_id: string;
   score_id: string;
   claim_code: string;
+  qr_code_url?: string;
   player_name: string;
   contact_email?: string;
   contact_phone?: string;
@@ -119,6 +120,8 @@ export interface CreateSessionRequest {
   playerName: string;
   characterId: string;
   campaignId: string;
+  contactPhone?: string;
+  contactEmail?: string;
 }
 
 export interface CreateSessionResponse {
@@ -126,6 +129,14 @@ export interface CreateSessionResponse {
   gameConfig: {
     timerDuration: number;
     levelData: LevelConfig;
+    assets?: {
+      playerSpriteUrl: string | null;
+      icecreamSpriteUrl: string | null;
+      ingredientSpriteUrl: string | null;
+      platformSpriteUrl: string | null;
+      hazardSpriteUrl: string | null;
+      backgroundUrl: string | null;
+    };
   };
 }
 
@@ -151,6 +162,7 @@ export interface SubmitScoreResponse {
 export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
   totalPlayers: number;
+  winnerCount: number;
 }
 
 export interface CampaignResponse extends Campaign {

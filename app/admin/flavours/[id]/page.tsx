@@ -385,7 +385,7 @@ export default function EditFlavourPage() {
           />
 
           <SyncStatusIndicator
-            status={formData.syncStatus}
+            status={formData.syncStatus || 'not_linked'}
             lastSyncedAt={formData.lastSyncedAt}
             syncError={formData.syncError}
             flavourId={formData.id}

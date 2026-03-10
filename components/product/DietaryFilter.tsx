@@ -6,7 +6,7 @@ import type { DietaryFlag } from '@/types';
 
 interface Props {
   availableFlags: DietaryFlag[];
-  productCounts?: Record<DietaryFlag, number>;
+  productCounts?: Partial<Record<DietaryFlag, number>>;
   className?: string;
 }
 
@@ -37,7 +37,7 @@ export default function DietaryFilter({
 
   useEffect(() => {
     // Initialize from URL params
-    const dietary = searchParams.get('dietary');
+    const dietary = searchParams?.get('dietary');
     if (dietary) {
       setSelectedFlags(new Set(dietary.split(',') as DietaryFlag[]));
     }
@@ -60,7 +60,7 @@ export default function DietaryFilter({
   };
 
   const updateURL = (flags: Set<DietaryFlag>) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     
     if (flags.size > 0) {
       params.set('dietary', Array.from(flags).join(','));

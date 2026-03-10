@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 // Dynamically import QR scanner to avoid SSR issues
+// @ts-ignore - react-qr-scanner doesn't have types
 const QrScanner = dynamic(() => import('react-qr-scanner'), { ssr: false });
 
 export default function QuickScanPage() {
@@ -124,15 +125,15 @@ export default function QuickScanPage() {
           /* QR Scanner Mode */
           <div className="space-y-4">
             <div className="bg-black rounded-lg overflow-hidden">
-              <QrScanner
-                delay={300}
-                onError={handleQRError}
-                onScan={handleQRScan}
-                style={{ width: '100%' }}
-                constraints={{
+              {React.createElement(QrScanner as any, {
+                delay: 300,
+                onError: handleQRError,
+                onScan: handleQRScan,
+                style: { width: '100%' },
+                constraints: {
                   video: { facingMode: 'environment' }
-                }}
-              />
+                }
+              })}
             </div>
             <p className="text-sm text-gray-600 text-center">
               Position the QR code within the frame

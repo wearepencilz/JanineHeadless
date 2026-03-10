@@ -112,6 +112,8 @@ export async function POST(request: NextRequest) {
       seasonal: body.seasonal || false,
       image: body.image,
       description: body.description,
+      roles: body.roles || [],
+      descriptors: body.descriptors || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

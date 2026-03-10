@@ -34,7 +34,7 @@ function calculateDietaryFlags(ingredientIds: string[], allIngredients: Ingredie
   if (!hasAnimalProducts) {
     flags.push('vegan');
     flags.push('vegetarian'); // vegan implies vegetarian
-  } else if (!ingredients.some(ing => ing.category === 'base' && ing.allergens.includes('eggs'))) {
+  } else if (!ingredients.some(ing => ing.allergens.includes('eggs'))) {
     // Vegetarian if no meat (we assume no meat category exists, so just check it's not vegan)
     flags.push('vegetarian');
   }
