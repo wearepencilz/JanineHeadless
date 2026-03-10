@@ -61,6 +61,10 @@ async function getOAuthAccessToken(): Promise<string> {
   
   console.log('✅ OAuth access token obtained');
   
+  if (!cachedAccessToken) {
+    throw new Error('Failed to cache access token');
+  }
+  
   return cachedAccessToken;
 }
 
