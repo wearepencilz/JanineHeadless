@@ -47,6 +47,17 @@ export default function GameContainer({ campaign }: GameContainerProps) {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const gameInstanceRef = useRef<Phaser.Game | null>(null);
 
+  // Load saved player details from localStorage on mount
+  useEffect(() => {
+    const savedName = localStorage.getItem('janine_player_name');
+    const savedPhone = localStorage.getItem('janine_player_phone');
+    const savedEmail = localStorage.getItem('janine_player_email');
+    
+    if (savedName) setPlayerName(savedName);
+    if (savedPhone) setContactPhone(savedPhone);
+    if (savedEmail) setContactEmail(savedEmail);
+  }, []);
+
   // Load Phaser dynamically on client side only
   useEffect(() => {
     import('phaser').then(() => {
@@ -78,6 +89,13 @@ export default function GameContainer({ campaign }: GameContainerProps) {
     setError(null);
 
     try {
+      // Save player details to localStorage for future games
+      localStorage.setItem('janine_player_name', playerName);
+      localStorage.setItem('janine_player_phone', contactPhone);
+      if (contactEmail) {
+        localStorage.setItem('janine_player_email', contactEmail);
+      }
+
       // Create game session with default character and contact info
       const response = await fetch('/api/game/sessions', {
         method: 'POST',
@@ -128,8 +146,14 @@ export default function GameContainer({ campaign }: GameContainerProps) {
 
     try {
       // Dynamically import Phaser and GameScene
-      const Phaser = await import('phaser');
+      const PhaserModule = await import('phaser');
+      const Phaser = PhaserModule.default || PhaserModule;
       const { GameScene } = await import('@/lib/game/scenes/GameScene');
+
+      // Verify Phaser loaded correctly
+      if (!Phaser || !Phaser.Game) {
+        throw new Error('Phaser failed to load');
+      }
 
       // Parse level data if it's a string
       const levelData = typeof gameConfig.levelData === 'string' 
@@ -138,15 +162,25 @@ export default function GameContainer({ campaign }: GameContainerProps) {
 
       console.log('Parsed level data:', levelData);
 
-      // Create game configuration
+      // Create game configuration with mobile-friendly settings
       const config = createGameConfig(gameContainerRef.current, [GameScene]);
 
       console.log('Creating Phaser game with config:', config);
 
-      // Create game instance
-      const game = new Phaser.Game(config);
-      gameInstanceRef.current = game;
+      // Create game instance with error handling
+      let game: any;
+      try {
+        game = new Phaser.Game(config);
+      } catch (phaserError) {
+        console.error('Phaser.Game constructor error:', phaserError);
+        throw new Error('Failed to create Phaser game instance');
+      }
 
+      if (!game) {
+        throw new Error('Game instance is null');
+      }
+
+      gameInstanceRef.current = game;
       console.log('Phaser game created:', game);
 
       // Wait for scene to be ready
@@ -185,7 +219,8 @@ export default function GameContainer({ campaign }: GameContainerProps) {
       });
     } catch (err) {
       console.error('Error initializing game:', err);
-      setError('Failed to initialize game. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to initialize game: ${errorMessage}. Please try refreshing the page.`);
       setPhase('name-entry');
     }
   };

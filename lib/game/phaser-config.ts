@@ -24,8 +24,13 @@ export function createGameConfig(
   parent: string | HTMLElement,
   scenes: Phaser.Types.Scenes.SceneType[]
 ): Phaser.Types.Core.GameConfig {
+  // Detect if we're on mobile for better compatibility
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    typeof navigator !== 'undefined' ? navigator.userAgent : ''
+  );
+
   return {
-    type: Phaser.AUTO, // Use WebGL if available, fallback to Canvas
+    type: isMobile ? Phaser.CANVAS : Phaser.AUTO, // Force Canvas on mobile for better compatibility
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     parent,
@@ -36,6 +41,11 @@ export function createGameConfig(
       pixelArt: true, // Disable anti-aliasing for crisp pixels
       antialias: false,
       roundPixels: true, // Round pixel positions to prevent sub-pixel rendering
+      transparent: false,
+      clearBeforeRender: true,
+      preserveDrawingBuffer: false,
+      premultipliedAlpha: true,
+      failIfMajorPerformanceCaveat: false, // Don't fail on mobile if WebGL is slow
     },
     
     // Physics configuration
@@ -79,6 +89,18 @@ export function createGameConfig(
     
     // Disable context menu on right-click
     disableContextMenu: true,
+    
+    // Banner configuration
+    banner: {
+      hidePhaser: true, // Hide Phaser banner in console
+      text: '#000000',
+      background: [
+        '#87CEEB',
+        '#4A90E2',
+        '#87CEEB',
+        '#4A90E2'
+      ]
+    },
   };
 }
 
