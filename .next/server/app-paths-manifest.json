@@ -1,13 +1,8 @@
 {
-  "/game/[campaignId]/page": "app/game/[campaignId]/page.js",
-  "/api/settings/route": "app/api/settings/route.js",
   "/api/game/leaderboard/[campaignId]/route": "app/api/game/leaderboard/[campaignId]/route.js",
   "/page": "app/page.js",
-  "/api/upload/route": "app/api/upload/route.js",
-  "/game-test/page": "app/game-test/page.js",
+  "/game/[campaignId]/page": "app/game/[campaignId]/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/game/campaigns/[id]/route": "app/api/game/campaigns/[id]/route.js",
-  "/api/game/migrations/add-jump-sprite/route": "app/api/game/migrations/add-jump-sprite/route.js",
-  "/api/game/sessions/route": "app/api/game/sessions/route.js",
+  "/api/settings/route": "app/api/settings/route.js",
   "/admin/games/[id]/page": "app/admin/games/[id]/page.js"
 }
