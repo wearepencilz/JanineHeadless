@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useRef } from 'react';
 import type Phaser from 'phaser';
 import { createGameConfig, getGameContainerStyles } from '@/lib/game/phaser-config';
