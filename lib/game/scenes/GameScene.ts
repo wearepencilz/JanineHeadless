@@ -24,6 +24,15 @@ interface GameSceneData {
     backgroundUrl?: string | null;
     hazardSpriteUrl?: string | null;
   };
+  spriteConfig?: {
+    idleSpriteUrl: string;
+    walkSpriteUrl: string;
+    jumpSpriteUrl: string;
+    frameWidth: number;
+    frameHeight: number;
+    walkFrameCount: number;
+    walkFrameRate: number;
+  } | null;
 }
 
 /**
@@ -42,6 +51,7 @@ export class GameScene extends Phaser.Scene {
   private timerDuration: number = 60;
   private levelConfig?: LevelConfig;
   private assets?: GameSceneData['assets'];
+  private spriteConfig?: GameSceneData['spriteConfig'];
   
   // Game objects
   private player?: Phaser.Physics.Arcade.Sprite;
@@ -92,6 +102,7 @@ export class GameScene extends Phaser.Scene {
     this.timerDuration = data.timerDuration;
     this.levelConfig = data.levelConfig;
     this.assets = data.assets;
+    this.spriteConfig = data.spriteConfig;
     this.timeRemaining = this.timerDuration;
     this.gameState = GameState.LOADING;
   }
@@ -100,13 +111,24 @@ export class GameScene extends Phaser.Scene {
    * Preload game assets
    */
   preload() {
-    // Load custom sprites if provided
-    if (this.assets?.playerSpriteUrl) {
-      this.load.image('player_custom', this.assets.playerSpriteUrl);
+    // Load walking sprite sheets if provided
+    if (this.spriteConfig) {
+      this.load.image('player_idle', this.spriteConfig.idleSpriteUrl);
+      this.load.spritesheet('player_walk', this.spriteConfig.walkSpriteUrl, {
+        frameWidth: this.spriteConfig.frameWidth,
+        frameHeight: this.spriteConfig.frameHeight,
+      });
+      this.load.image('player_jump', this.spriteConfig.jumpSpriteUrl);
+    } else {
+      // Load custom sprites if provided (legacy support)
+      if (this.assets?.playerSpriteUrl) {
+        this.load.image('player_custom', this.assets.playerSpriteUrl);
+      }
+      if (this.assets?.playerJumpSpriteUrl) {
+        this.load.image('player_jump_custom', this.assets.playerJumpSpriteUrl);
+      }
     }
-    if (this.assets?.playerJumpSpriteUrl) {
-      this.load.image('player_jump_custom', this.assets.playerJumpSpriteUrl);
-    }
+    
     if (this.assets?.icecreamSpriteUrl) {
       this.load.image('icecream_custom', this.assets.icecreamSpriteUrl);
     }
@@ -363,8 +385,22 @@ export class GameScene extends Phaser.Scene {
   private createPlayer() {
     const spawnPoint = this.levelConfig?.spawnPoint || { x: 100, y: 450 };
     
-    // Use custom sprite if available
-    if (this.assets?.playerSpriteUrl && this.textures.exists('player_custom')) {
+    // Use walking sprite if configured
+    if (this.spriteConfig && this.textures.exists('player_idle')) {
+      this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, 'player_idle');
+      
+      // Create walk animation
+      this.anims.create({
+        key: 'walk',
+        frames: this.anims.generateFrameNumbers('player_walk', { 
+          start: 0, 
+          end: this.spriteConfig.walkFrameCount - 1 
+        }),
+        frameRate: this.spriteConfig.walkFrameRate,
+        repeat: -1,
+      });
+    } else if (this.assets?.playerSpriteUrl && this.textures.exists('player_custom')) {
+      // Use custom sprite if available (legacy)
       this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, 'player_custom');
     } else {
       // Create default player as a simple rectangle
@@ -611,7 +647,7 @@ export class GameScene extends Phaser.Scene {
     }
     
     // End game
-    this.endGame(false);
+    this.endGame(false, 'hazard');
   }
 
   /**
@@ -665,16 +701,17 @@ export class GameScene extends Phaser.Scene {
     
     // Check if time is up
     if (this.timeRemaining <= 0) {
-      this.endGame(false);
+      this.endGame(false, 'timeout');
     }
   }
 
   /**
    * End game and emit results
    */
-  private endGame(completed: boolean) {
+  private endGame(completed: boolean, reason?: 'timeout' | 'fell' | 'hazard') {
     console.log('=== GameScene.endGame called ===');
     console.log('Completed:', completed);
+    console.log('Reason:', reason);
     console.log('Current game state:', this.gameState);
     
     // Prevent multiple calls
@@ -703,8 +740,10 @@ export class GameScene extends Phaser.Scene {
     if (this.scoreText) {
       if (completed) {
         this.scoreText.setText(`Score: ${this.score}\nTime: ${completionTime}s`);
-      } else {
+      } else if (reason === 'timeout') {
         this.scoreText.setText('Time\'s Up!\nTry Again');
+      } else {
+        this.scoreText.setText('Oops!\nYou Died');
       }
       this.scoreText.setVisible(true);
     }
@@ -714,6 +753,7 @@ export class GameScene extends Phaser.Scene {
       score: this.score,
       completionTime,
       sessionId: this.sessionId,
+      reason: reason || (completed ? undefined : 'timeout'),
     };
     
     console.log('Emitting gameEnd event with result:', result);
@@ -734,10 +774,10 @@ export class GameScene extends Phaser.Scene {
     // Handle player movement
     this.handlePlayerMovement();
     
-    // Check if player fell off the world (below bottom platforms at y=400)
-    // Give some buffer - if player is 60px below platforms, they fell
-    if (this.player.y > 460) {
-      this.endGame(false);
+    // Check if player fell off the world
+    // Lowest platform is at y=445, so if player is 80px below that, they fell
+    if (this.player.y > 525) {
+      this.endGame(false, 'fell');
     }
   }
 
@@ -756,30 +796,55 @@ export class GameScene extends Phaser.Scene {
     
     if (moveLeft) {
       body.setVelocityX(-PLAYER_SPEED);
-      // Flip sprite to face left
       this.player.setFlipX(true);
+      
+      // Play walk animation if using sprite config
+      if (this.spriteConfig && isOnGround && this.player.anims) {
+        this.player.anims.play('walk', true);
+      }
     } else if (moveRight) {
       body.setVelocityX(PLAYER_SPEED);
-      // Flip sprite to face right
       this.player.setFlipX(false);
+      
+      // Play walk animation if using sprite config
+      if (this.spriteConfig && isOnGround && this.player.anims) {
+        this.player.anims.play('walk', true);
+      }
     } else {
       // Decelerate when no input
       body.setVelocityX(body.velocity.x * 0.8);
       if (Math.abs(body.velocity.x) < 10) {
         body.setVelocityX(0);
       }
+      
+      // Stop walk animation and show idle
+      if (this.spriteConfig && isOnGround && this.player.anims) {
+        this.player.anims.stop();
+        this.player.setTexture('player_idle');
+      }
     }
     
-    // Switch sprite based on jump state
-    if (!isOnGround && this.assets?.playerJumpSpriteUrl && this.textures.exists('player_jump_custom')) {
+    // Handle jump state and sprite switching
+    if (!isOnGround) {
       // In air - use jump sprite
-      if (this.player.texture.key !== 'player_jump_custom') {
-        this.player.setTexture('player_jump_custom');
+      if (this.spriteConfig && this.textures.exists('player_jump')) {
+        if (this.player.texture.key !== 'player_jump') {
+          this.player.anims?.stop();
+          this.player.setTexture('player_jump');
+        }
+      } else if (this.assets?.playerJumpSpriteUrl && this.textures.exists('player_jump_custom')) {
+        if (this.player.texture.key !== 'player_jump_custom') {
+          this.player.setTexture('player_jump_custom');
+        }
       }
-    } else if (this.assets?.playerSpriteUrl && this.textures.exists('player_custom')) {
-      // On ground - use normal sprite
-      if (this.player.texture.key !== 'player_custom') {
-        this.player.setTexture('player_custom');
+    } else {
+      // On ground - use idle/walk sprite
+      if (this.spriteConfig) {
+        // Animation handled above based on movement
+      } else if (this.assets?.playerSpriteUrl && this.textures.exists('player_custom')) {
+        if (this.player.texture.key !== 'player_custom') {
+          this.player.setTexture('player_custom');
+        }
       }
     }
     

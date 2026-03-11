@@ -14,7 +14,7 @@ export default function AdminNav() {
     { href: '/admin/flavours', label: 'Flavours' },
     { href: '/admin/offerings', label: 'Offerings' },
     { href: '/admin/batches', label: 'Batches' },
-    { href: '/admin/stories', label: 'Stories' },
+    { href: '/admin/news', label: 'News' },
     { href: '/admin/games', label: 'Games' },
     { href: '/admin/settings', label: 'Settings' },
   ];
@@ -29,7 +29,10 @@ export default function AdminNav() {
             </div>
             <div className="hidden sm:ml-8 sm:flex sm:space-x-1">
               {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+                // Exact match for dashboard, prefix match for others
+                const isActive = item.href === '/admin' 
+                  ? pathname === '/admin'
+                  : pathname?.startsWith(item.href + '/') || pathname === item.href;
                 return (
                   <Link
                     key={item.href}

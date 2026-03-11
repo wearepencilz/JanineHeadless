@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Campaign } from '@/types/game';
 import AssetUploader from './AssetUploader';
@@ -17,13 +17,29 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
   const [success, setSuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Helper to convert UTC date from database to local datetime-local format
+  // The database stores dates in UTC, but datetime-local inputs need local time
+  const toLocalDateTimeString = (utcDateString: Date | string): string => {
+    // Parse the UTC date string
+    const utcDate = new Date(utcDateString);
+    
+    // Get local time components (JavaScript Date automatically converts to local timezone)
+    const year = utcDate.getFullYear();
+    const month = String(utcDate.getMonth() + 1).padStart(2, '0');
+    const day = String(utcDate.getDate()).padStart(2, '0');
+    const hours = String(utcDate.getHours()).padStart(2, '0');
+    const minutes = String(utcDate.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const [formData, setFormData] = useState({
     name: campaign.name,
     display_title: (campaign as any).display_title || '',
     description: (campaign as any).description || '',
     status: campaign.status as string,
-    start_date: new Date(campaign.start_date).toISOString().slice(0, 16),
-    end_date: new Date(campaign.end_date).toISOString().slice(0, 16),
+    start_date: toLocalDateTimeString(campaign.start_date),
+    end_date: toLocalDateTimeString(campaign.end_date),
     timer_duration: campaign.timer_duration,
     reward_total: campaign.reward_total,
     winner_count: (campaign as any).winner_count || 100,
@@ -33,12 +49,19 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
     ticket_success_message: (campaign as any).ticket_success_message || '',
     player_sprite_url: (campaign as any).player_sprite_url || '',
     player_jump_sprite_url: (campaign as any).player_jump_sprite_url || '',
+    walk_sprite_url: (campaign as any).walk_sprite_url || '',
+    sprite_frame_width: (campaign as any).sprite_frame_width || 32,
+    sprite_frame_height: (campaign as any).sprite_frame_height || 48,
+    sprite_walk_frames: (campaign as any).sprite_walk_frames || 4,
+    sprite_frame_rate: (campaign as any).sprite_frame_rate || 10,
     icecream_sprite_url: (campaign as any).icecream_sprite_url || '',
     ingredient_sprite_url: (campaign as any).ingredient_sprite_url || '',
     platform_sprite_url: (campaign as any).platform_sprite_url || '',
     background_url: (campaign as any).background_url || '',
     hazard_sprite_url: (campaign as any).hazard_sprite_url || '',
   });
+
+  const [activeTab, setActiveTab] = useState<'basic' | 'rewards' | 'assets'>('basic');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +91,11 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           ticket_success_message: formData.ticket_success_message,
           player_sprite_url: formData.player_sprite_url,
           player_jump_sprite_url: formData.player_jump_sprite_url,
+          walk_sprite_url: formData.walk_sprite_url,
+          sprite_frame_width: formData.sprite_frame_width,
+          sprite_frame_height: formData.sprite_frame_height,
+          sprite_walk_frames: formData.sprite_walk_frames,
+          sprite_frame_rate: formData.sprite_frame_rate,
           icecream_sprite_url: formData.icecream_sprite_url,
           ingredient_sprite_url: formData.ingredient_sprite_url,
           platform_sprite_url: formData.platform_sprite_url,
@@ -118,148 +146,194 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Edit Campaign Settings
-      </h2>
-
-      {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
-          Campaign updated successfully!
-        </div>
-      )}
-
-      <div className="space-y-4">
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Campaign Name (Internal)
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            Internal identifier for admin use
-          </p>
-        </div>
-
-        {/* Display Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Display Title
-          </label>
-          <input
-            type="text"
-            value={formData.display_title}
-            onChange={(e) => setFormData({ ...formData, display_title: e.target.value })}
-            placeholder="Leave empty to use campaign name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            Title shown to players (defaults to campaign name if empty)
-          </p>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Campaign description shown to players"
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            value={formData.status}
-            onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value })
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow">
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="flex -mb-px">
+          <button
+            type="button"
+            onClick={() => setActiveTab('basic')}
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'basic'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
           >
-            <option value="upcoming">Upcoming</option>
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-            <option value="ended">Ended</option>
-          </select>
-        </div>
+            Basic Settings
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('rewards')}
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'rewards'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Rewards
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('assets')}
+            className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'assets'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Game Assets
+          </button>
+        </nav>
+      </div>
 
-        {/* Dates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              value={formData.start_date}
-              onChange={(e) =>
-                setFormData({ ...formData, start_date: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+      <div className="p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Edit Campaign Settings
+        </h2>
+
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            {error}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              value={formData.end_date}
-              onChange={(e) =>
-                setFormData({ ...formData, end_date: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+        )}
+
+        {success && (
+          <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+            Campaign updated successfully!
           </div>
-        </div>
+        )}
 
-        {/* Timer Duration */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Timer Duration (seconds)
-          </label>
-          <input
-            type="number"
-            value={formData.timer_duration}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                timer_duration: parseInt(e.target.value),
-              })
-            }
-            min="10"
-            max="300"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            How long players have to complete the game
-          </p>
-        </div>
+        {/* Basic Settings Tab */}
+        {activeTab === 'basic' && (
+          <div className="space-y-4">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Campaign Name (Internal)
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Internal identifier for admin use
+              </p>
+            </div>
 
-        {/* Rewards */}
+            {/* Display Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Display Title
+              </label>
+              <input
+                type="text"
+                value={formData.display_title}
+                onChange={(e) => setFormData({ ...formData, display_title: e.target.value })}
+                placeholder="Leave empty to use campaign name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Title shown to players (defaults to campaign name if empty)
+              </p>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Campaign description shown to players"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="upcoming">Upcoming</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="ended">Ended</option>
+              </select>
+            </div>
+
+            {/* Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.start_date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, start_date: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.end_date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, end_date: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Timer Duration */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Timer Duration (seconds)
+              </label>
+              <input
+                type="number"
+                value={formData.timer_duration}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    timer_duration: parseInt(e.target.value),
+                  })
+                }
+                min="10"
+                max="300"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                How long players have to complete the game
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Rewards Tab */}
+        {activeTab === 'rewards' && (
+          <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -306,7 +380,7 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
         </div>
 
         {/* Reward Configuration */}
-        <div className="border-t border-gray-200 pt-4 mt-4">
+        <div>
           <h3 className="text-md font-semibold text-gray-900 mb-4">
             Reward Details
           </h3>
@@ -375,20 +449,21 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
             </div>
           </div>
         </div>
+      </div>
+    )}
 
-        {/* Game Assets Section */}
-        <div className="border-t border-gray-200 pt-6 mt-6">
-          <h3 className="text-md font-semibold text-gray-900 mb-4">
-            Game Assets (Sprites)
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Upload custom sprites for your game. Leave empty to use default colored shapes.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Game Assets Tab */}
+        {activeTab === 'assets' && (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-md font-semibold text-gray-900 mb-4">
+                Player Character
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AssetUploader
-              label="Player Sprite"
-              description="Character sprite - appears as the playable character"
+              label="Player Sprite (Idle/Standing)"
+              description="Character standing still - used for idle state and as fallback"
               recommendedSize="32×48px (width × height)"
               currentUrl={formData.player_sprite_url}
               onUpload={(url) => setFormData({ ...formData, player_sprite_url: url })}
@@ -396,11 +471,101 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
 
             <AssetUploader
               label="Player Jump Sprite"
-              description="Character sprite when jumping - switches automatically in air"
+              description="Character in air - switches automatically when jumping"
               recommendedSize="32×48px (width × height)"
               currentUrl={formData.player_jump_sprite_url}
               onUpload={(url) => setFormData({ ...formData, player_jump_sprite_url: url })}
             />
+          </div>
+
+          {/* Walking Animation (Optional) */}
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-blue-900 mb-2">
+              Walking Animation (Optional)
+            </h4>
+            <p className="text-sm text-blue-700 mb-4">
+              Add a sprite sheet for smooth walking animation. If not provided, the idle sprite will be used when moving.
+            </p>
+
+            <div className="mb-4">
+              <AssetUploader
+                label="Walk Sprite Sheet"
+                description="Horizontal sprite sheet with walk cycle frames"
+                recommendedSize="128×48px (4 frames @ 32×48px each)"
+                currentUrl={formData.walk_sprite_url}
+                onUpload={(url) => setFormData({ ...formData, walk_sprite_url: url })}
+              />
+            </div>
+
+            {/* Animation Configuration - only show if walk sprite is uploaded */}
+            {formData.walk_sprite_url && (
+              <div className="pt-4 border-t border-blue-200">
+                <h5 className="text-xs font-semibold text-blue-900 mb-3">Animation Settings</h5>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-blue-900 mb-1">
+                      Frame Width (px)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.sprite_frame_width}
+                      onChange={(e) => setFormData({ ...formData, sprite_frame_width: parseInt(e.target.value) || 32 })}
+                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-blue-900 mb-1">
+                      Frame Height (px)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.sprite_frame_height}
+                      onChange={(e) => setFormData({ ...formData, sprite_frame_height: parseInt(e.target.value) || 48 })}
+                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-blue-900 mb-1">
+                      Walk Frames
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.sprite_walk_frames}
+                      onChange={(e) => setFormData({ ...formData, sprite_walk_frames: parseInt(e.target.value) || 4 })}
+                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-blue-900 mb-1">
+                      Frame Rate (FPS)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.sprite_frame_rate}
+                      onChange={(e) => setFormData({ ...formData, sprite_frame_rate: parseInt(e.target.value) || 10 })}
+                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                      min="1"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+            {/* Other Game Assets */}
+            <div>
+              <h3 className="text-md font-semibold text-gray-900 mb-4">
+                Other Game Assets
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Upload custom sprites for collectibles and environment. Leave empty to use defaults.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <AssetUploader
               label="Ice Cream Sprite"
@@ -434,56 +599,58 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
               onUpload={(url) => setFormData({ ...formData, hazard_sprite_url: url })}
             />
 
-            <AssetUploader
-              label="Background Image"
-              description="Game background - displayed behind all game elements"
-              recommendedSize="1600×600px (full scrolling world)"
-              currentUrl={formData.background_url}
-              onUpload={(url) => setFormData({ ...formData, background_url: url })}
-            />
-          </div>
+              <AssetUploader
+                label="Background Image"
+                description="Game background - displayed behind all game elements"
+                recommendedSize="1600×600px (full scrolling world)"
+                currentUrl={formData.background_url}
+                onUpload={(url) => setFormData({ ...formData, background_url: url })}
+              />
+            </div>
 
-          {/* Sprite Guidelines */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">
-              📐 Sprite Guidelines
-            </h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Use PNG format with transparency for best results</li>
-              <li>• Pixel art should use nearest-neighbor scaling (no anti-aliasing)</li>
-              <li>• Keep file sizes under 2MB per sprite</li>
-              <li>• Platform textures should tile seamlessly (repeatable edges)</li>
-              <li>• All sprites will be rendered with pixel-perfect scaling</li>
-              <li>• Leave sprites empty to use default colored shapes</li>
-            </ul>
+            {/* Sprite Guidelines */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                📐 Sprite Guidelines
+              </h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Use PNG format with transparency for best results</li>
+                <li>• Pixel art should use nearest-neighbor scaling (no anti-aliasing)</li>
+                <li>• Keep file sizes under 2MB per sprite</li>
+                <li>• Platform textures should tile seamlessly (repeatable edges)</li>
+                <li>• Walk sprite sheet: horizontal layout with frames side-by-side</li>
+                <li>• All sprites will be rendered with pixel-perfect scaling</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+        )}
 
-      {/* Actions */}
-      <div className="mt-6 flex justify-between items-center">
-        <button
-          type="button"
-          onClick={() => setShowDeleteConfirm(true)}
-          className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-        >
-          Delete Campaign
-        </button>
-        <div className="flex gap-3">
+        {/* Actions - Always visible at bottom */}
+        <div className="border-t border-gray-200 mt-6 pt-6 flex justify-between items-center">
           <button
             type="button"
-            onClick={() => router.push('/admin/games')}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
           >
-            Cancel
+            Delete Campaign
           </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => router.push('/admin/games')}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       </div>
 

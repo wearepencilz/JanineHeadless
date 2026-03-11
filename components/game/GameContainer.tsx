@@ -31,6 +31,7 @@ interface GameResult {
   score: number;
   completionTime: number;
   sessionId: string;
+  reason?: 'timeout' | 'fell' | 'hazard';
 }
 
 export default function GameContainer({ campaign }: GameContainerProps) {
@@ -259,6 +260,7 @@ export default function GameContainer({ campaign }: GameContainerProps) {
           timerDuration: gameConfig.timerDuration,
           levelConfig: levelData,
           assets: gameConfig.assets || {},
+          spriteConfig: gameConfig.spriteConfig || null,
         };
         
         console.log('Starting scene with data:', sceneData);
@@ -348,14 +350,60 @@ export default function GameContainer({ campaign }: GameContainerProps) {
   };
 
   // Handle play again
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
     // Destroy existing game
     if (gameInstanceRef.current) {
       gameInstanceRef.current.destroy(true);
       gameInstanceRef.current = null;
     }
 
-    // Reset state
+    // Reset state but keep player info
+    setGameResult(null);
+    setSubmitResult(null);
+    setError(null);
+    
+    // Create new session and restart game
+    try {
+      const response = await fetch('/api/game/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerName,
+          characterId: DEFAULT_CHARACTER.id,
+          campaignId: campaign.id,
+          contactPhone: contactPhone || undefined,
+          contactEmail: contactEmail || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create session');
+      }
+
+      const data = await response.json();
+      setSessionId(data.sessionId);
+
+      // Move to playing phase
+      setPhase('playing');
+      
+      // Wait for next tick to ensure container is mounted
+      setTimeout(() => {
+        initializeGame(data.sessionId, data.gameConfig);
+      }, 100);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start game');
+    }
+  };
+
+  const handleChangeInfo = () => {
+    // Destroy existing game
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.destroy(true);
+      gameInstanceRef.current = null;
+    }
+
+    // Reset everything
     setPhase('name-entry');
     setPlayerName('');
     setContactPhone('');
@@ -524,7 +572,8 @@ export default function GameContainer({ campaign }: GameContainerProps) {
       {phase === 'results' && gameResult && (
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-3xl font-bold text-center mb-6">
-            {gameResult.completed ? '🎉 Congratulations!' : '⏰ Time\'s Up!'}
+            {gameResult.completed ? '🎉 Congratulations!' : 
+             gameResult.reason === 'timeout' ? '⏰ Time\'s Up!' : '😢 Oops, you died!'}
           </h2>
 
           {gameResult.completed && (
@@ -598,16 +647,30 @@ export default function GameContainer({ campaign }: GameContainerProps) {
           )}
 
           {!gameResult.completed && (
-            <p className="text-center text-gray-600 mb-6">
-              Better luck next time! Try again to improve your score.
-            </p>
+            <div className="text-center space-y-4 mb-6">
+              <p className="text-xl text-gray-700">
+                {gameResult.reason === 'timeout' ? 
+                  'Better luck next time!' : 
+                  'You fell off the platforms!'}
+              </p>
+              <p className="text-gray-600">
+                Playing as: <span className="font-semibold">{playerName}</span>
+              </p>
+            </div>
           )}
 
           <button
             onClick={handlePlayAgain}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-colors"
+            className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-colors mb-3"
           >
-            Play Again
+            Try Again
+          </button>
+          
+          <button
+            onClick={handleChangeInfo}
+            className="w-full text-blue-600 hover:text-blue-700 text-sm transition-colors"
+          >
+            Change email or phone
           </button>
         </div>
       )}

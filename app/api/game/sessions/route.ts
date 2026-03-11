@@ -46,6 +46,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Build sprite configuration from campaign fields
+    let spriteConfig = null;
+    if ((campaign as any).walk_sprite_url) {
+      spriteConfig = {
+        idleSpriteUrl: (campaign as any).player_sprite_url || (campaign as any).walk_sprite_url,
+        walkSpriteUrl: (campaign as any).walk_sprite_url,
+        jumpSpriteUrl: (campaign as any).player_jump_sprite_url || (campaign as any).player_sprite_url,
+        frameWidth: (campaign as any).sprite_frame_width || 32,
+        frameHeight: (campaign as any).sprite_frame_height || 48,
+        walkFrameCount: (campaign as any).sprite_walk_frames || 4,
+        walkFrameRate: (campaign as any).sprite_frame_rate || 10,
+      };
+    }
+
     // Check if campaign has started and not ended
     const now = new Date();
     const startDate = new Date(campaign.start_date);
@@ -115,6 +129,7 @@ export async function POST(request: NextRequest) {
           backgroundUrl: (campaign as any).background_url || null,
           hazardSpriteUrl: (campaign as any).hazard_sprite_url || null,
         },
+        spriteConfig,
       },
     };
 

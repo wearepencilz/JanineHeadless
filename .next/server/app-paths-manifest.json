@@ -1,8 +1,22 @@
 {
-  "/api/game/leaderboard/[campaignId]/route": "app/api/game/leaderboard/[campaignId]/route.js",
-  "/page": "app/page.js",
-  "/game/[campaignId]/page": "app/game/[campaignId]/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/ingredients/route": "app/api/ingredients/route.js",
+  "/api/formats/route": "app/api/formats/route.js",
+  "/api/flavours/route": "app/api/flavours/route.js",
+  "/api/offerings/route": "app/api/offerings/route.js",
+  "/api/batches/route": "app/api/batches/route.js",
+  "/api/news/route": "app/api/news/route.js",
   "/api/settings/route": "app/api/settings/route.js",
-  "/admin/games/[id]/page": "app/admin/games/[id]/page.js"
+  "/api/local-ip/route": "app/api/local-ip/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/admin/ingredients/page": "app/admin/ingredients/page.js",
+  "/admin/formats/page": "app/admin/formats/page.js",
+  "/admin/flavours/page": "app/admin/flavours/page.js",
+  "/admin/offerings/page": "app/admin/offerings/page.js",
+  "/admin/batches/page": "app/admin/batches/page.js",
+  "/admin/games/page": "app/admin/games/page.js",
+  "/admin/games/scan/page": "app/admin/games/scan/page.js",
+  "/admin/news/page": "app/admin/news/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js"
 }

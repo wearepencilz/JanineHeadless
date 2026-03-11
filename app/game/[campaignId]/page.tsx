@@ -190,8 +190,7 @@ export default async function GamePage({ params }: PageProps) {
             })}
           </p>
           <p className="mt-1">
-            Timer: {campaign.timer_duration} seconds | Rewards: {campaign.reward_remaining} /{' '}
-            {campaign.reward_total} remaining
+            Timer: {campaign.timer_duration} seconds | Rewards: {(campaign as any).winner_count || 100} winners
           </p>
         </div>
       </div>

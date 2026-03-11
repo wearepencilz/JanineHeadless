@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-
-// Dynamically import QR scanner to avoid SSR issues
-// @ts-ignore - react-qr-scanner doesn't have types
-const QrScanner = dynamic(() => import('react-qr-scanner'), { ssr: false });
+import { Html5Qrcode } from 'html5-qrcode';
 
 export default function QuickScanPage() {
   const router = useRouter();
@@ -16,6 +12,8 @@ export default function QuickScanPage() {
   const [error, setError] = useState<string | null>(null);
   const [scanMode, setScanMode] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isScanning = useRef(false);
 
   const handleScan = async (code: string) => {
     if (!code || loading) return;
@@ -61,15 +59,76 @@ export default function QuickScanPage() {
     await handleScan(claimCode);
   };
 
-  const handleQRScan = (data: any) => {
-    if (data?.text) {
-      handleScan(data.text);
+  const handleQRScan = (result: any, error: any) => {
+    if (result) {
+      handleScan(result?.text || result);
+    }
+    
+    if (error) {
+      console.error('QR Scanner error:', error);
+      // Only show error if it's a permission issue, not just "no QR code found"
+      if (error.name === 'NotAllowedError' || error.name === 'NotFoundError') {
+        setCameraError('Camera access denied or not available');
+      }
     }
   };
 
-  const handleQRError = (err: any) => {
-    console.error('QR Scanner error:', err);
-    setCameraError('Camera access denied or not available');
+  // Initialize scanner when scan mode is enabled
+  useEffect(() => {
+    if (scanMode && !isScanning.current) {
+      const startScanner = async () => {
+        try {
+          const scanner = new Html5Qrcode('qr-reader');
+          scannerRef.current = scanner;
+          isScanning.current = true;
+
+          await scanner.start(
+            { facingMode: 'environment' },
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 }
+            },
+            (decodedText) => {
+              // Success callback
+              handleScan(decodedText);
+              stopScanner();
+            },
+            (errorMessage) => {
+              // Error callback - ignore "No QR code found" errors
+              if (!errorMessage.includes('NotFoundException')) {
+                console.error('QR scan error:', errorMessage);
+              }
+            }
+          );
+        } catch (err: any) {
+          console.error('Failed to start scanner:', err);
+          setCameraError(
+            err.name === 'NotAllowedError' 
+              ? 'Camera access denied. Please allow camera access in your browser settings.'
+              : 'Camera not available. Please use manual entry.'
+          );
+          isScanning.current = false;
+        }
+      };
+
+      startScanner();
+    }
+
+    return () => {
+      stopScanner();
+    };
+  }, [scanMode]);
+
+  const stopScanner = async () => {
+    if (scannerRef.current && isScanning.current) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch (err) {
+        console.error('Error stopping scanner:', err);
+      }
+      isScanning.current = false;
+    }
   };
 
   return (
@@ -124,17 +183,7 @@ export default function QuickScanPage() {
         {scanMode ? (
           /* QR Scanner Mode */
           <div className="space-y-4">
-            <div className="bg-black rounded-lg overflow-hidden">
-              {React.createElement(QrScanner as any, {
-                delay: 300,
-                onError: handleQRError,
-                onScan: handleQRScan,
-                style: { width: '100%' },
-                constraints: {
-                  video: { facingMode: 'environment' }
-                }
-              })}
-            </div>
+            <div id="qr-reader" className="bg-black rounded-lg overflow-hidden"></div>
             <p className="text-sm text-gray-600 text-center">
               Position the QR code within the frame
             </p>

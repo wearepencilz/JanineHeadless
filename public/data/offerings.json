@@ -1,53 +1,5 @@
 [
   {
-    "id": "1773116438815",
-    "internalName": "Vanilla Strawberry Batch 2.3",
-    "publicName": "Vanilla Strawberry",
-    "slug": "vanilla-strawberry",
-    "status": "draft",
-    "formatId": "0fa99421-7da9-4e2c-a266-4b721210d510",
-    "primaryFlavourIds": [
-      "vanilla",
-      "strawberry-thyme"
-    ],
-    "secondaryFlavourIds": [],
-    "componentIds": [],
-    "description": "So good!",
-    "shortCardCopy": "",
-    "price": 1200,
-    "tags": [],
-    "inventoryTracked": false,
-    "onlineOrderable": true,
-    "pickupOnly": false,
-    "createdAt": "2026-03-10T04:20:38.815Z",
-    "updatedAt": "2026-03-10T04:36:35.271Z",
-    "compareAtPrice": 1300,
-    "shopifyProductId": "gid://shopify/Product/8480390086839",
-    "shopifyProductHandle": "goat-cheese-fig"
-  },
-  {
-    "id": "1773116847998",
-    "internalName": "Grilled corn",
-    "publicName": "Grilled Corn",
-    "slug": "grilled-corn",
-    "status": "draft",
-    "formatId": "c2979175-b674-4b74-96a2-86bbc7d3322f",
-    "primaryFlavourIds": [
-      "grilled-corn"
-    ],
-    "secondaryFlavourIds": [],
-    "componentIds": [],
-    "description": "Corn",
-    "shortCardCopy": "",
-    "price": 850,
-    "tags": [],
-    "inventoryTracked": false,
-    "onlineOrderable": true,
-    "pickupOnly": false,
-    "createdAt": "2026-03-10T04:27:27.998Z",
-    "updatedAt": "2026-03-10T04:27:27.998Z"
-  },
-  {
     "id": "1773116877069",
     "internalName": "Wild Tomato",
     "publicName": "Wild Tomato",
@@ -68,30 +20,5 @@
     "pickupOnly": false,
     "createdAt": "2026-03-10T04:27:57.069Z",
     "updatedAt": "2026-03-10T04:27:57.069Z"
-  },
-  {
-    "id": "1773151091597",
-    "internalName": "Basil Rasberry Batch 2 march",
-    "publicName": "Basil Rasberry",
-    "slug": "basi-rasberry",
-    "status": "active",
-    "formatId": "0fa99421-7da9-4e2c-a266-4b721210d510",
-    "primaryFlavourIds": [
-      "basil-lemon",
-      "raspberry"
-    ],
-    "secondaryFlavourIds": [],
-    "componentIds": [],
-    "description": "march launch",
-    "shortCardCopy": "",
-    "price": 700,
-    "tags": [],
-    "inventoryTracked": false,
-    "onlineOrderable": true,
-    "pickupOnly": false,
-    "createdAt": "2026-03-10T13:58:11.598Z",
-    "updatedAt": "2026-03-10T15:14:51.188Z",
-    "shopifyProductId": "gid://shopify/Product/8492881281207",
-    "shopifyProductHandle": "basil-lemon-raspberry-twist"
   }
 ]

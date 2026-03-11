@@ -3,6 +3,7 @@ import '../src/styles/index.css';
 import { CartProvider } from '@/contexts/CartContext';
 import { Providers } from './providers';
 import ConditionalHeader from '@/components/ConditionalHeader';
+import MobileDevLinkHeader from '@/components/MobileDevLinkHeader';
 
 export const metadata: Metadata = {
   title: 'Janine - Artisanal Ice Cream',
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <CartProvider>
+            <MobileDevLinkHeader />
             <ConditionalHeader />
             {children}
           </CartProvider>

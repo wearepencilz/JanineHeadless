@@ -131,6 +131,7 @@ export interface CreateSessionResponse {
     levelData: LevelConfig;
     assets?: {
       playerSpriteUrl: string | null;
+      playerWalkSpriteUrl: string | null;
       playerJumpSpriteUrl: string | null;
       icecreamSpriteUrl: string | null;
       ingredientSpriteUrl: string | null;

@@ -8,26 +8,28 @@ export default function CreateCampaignForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Set default dates: start now (EST), end in 7 days
-  const getESTDate = () => {
-    const now = new Date();
-    // Convert to EST (UTC-5)
-    const estOffset = -5 * 60; // EST is UTC-5
-    const localOffset = now.getTimezoneOffset(); // Local offset in minutes
-    const estTime = new Date(now.getTime() + (localOffset + estOffset) * 60 * 1000);
-    return estTime;
-  };
-
-  const now = getESTDate();
+  // Set default dates: start now (local time), end in 7 days
+  // datetime-local inputs work in the user's local timezone
+  const now = new Date();
   const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  // Helper to format date for datetime-local input (local timezone)
+  const toLocalDateTimeString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   const [formData, setFormData] = useState({
     name: '',
     display_title: '',
     description: '',
     status: 'active',
-    start_date: now.toISOString().slice(0, 16),
-    end_date: weekFromNow.toISOString().slice(0, 16),
+    start_date: toLocalDateTimeString(now),
+    end_date: toLocalDateTimeString(weekFromNow),
     timer_duration: 60,
     reward_total: 100,
     winner_count: 100,
@@ -202,6 +204,9 @@ export default function CreateCampaignForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Your local time (times are stored in UTC)
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -216,6 +221,9 @@ export default function CreateCampaignForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Your local time (times are stored in UTC)
+            </p>
           </div>
         </div>
 
