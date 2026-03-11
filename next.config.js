@@ -36,6 +36,18 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  webpack: (config, { isServer }) => {
+    // Fix for next-auth module resolution on mobile/different networks
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

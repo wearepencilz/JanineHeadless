@@ -43,30 +43,27 @@ export default function CreateCampaignForm() {
     setError(null);
 
     try {
-      // Default level configuration - 512x448 resolution (respects 32x48 sprite sizes)
+      // Default level configuration - 400x500 resolution with 1360x500 world
       const levelConfig = {
         platforms: [
-          // Ground level platforms (moved 16px higher)
-          { x: 0, y: 358, width: 635, height: 16 },      // Starting platform (was 374)
-          { x: 844, y: 399, width: 119, height: 16 },    // Middle platform (was 415)
-          { x: 958, y: 311, width: 259, height: 16 },    // End platform (was 327)
-          
-          // Mid-level platforms (moved 16px higher)
-          { x: 40, y: 190, width: 176, height: 16 },     // Platform 1 (was 206)
-          { x: 466, y: 205, width: 128, height: 16 },    // Platform 2 (was 221)
-          { x: 823, y: 158, width: 200, height: 16 },    // Platform 3 (was 174)
+          { x: 0, y: 400, width: 850, height: 20 },      // Ground - Start
+          { x: 942, y: 445, width: 133, height: 20 },    // Ground - Gap
+          { x: 1069, y: 368, width: 289, height: 20 },   // Ground - End (32px above Start)
+          { x: 45, y: 212, width: 196, height: 20 },     // Mid Platform 1
+          { x: 520, y: 229, width: 143, height: 20 },    // Mid Platform 2
+          { x: 918, y: 176, width: 224, height: 20 },    // Mid Platform 3 (ice cream above)
         ],
         iceCreams: [
-          { x: 915, y: 93 }, // Goal - stays same
+          { x: 1020, y: 100 },
         ],
         ingredients: [
-          { x: 128, y: 125 },   // Stays same
-          { x: 518, y: 141 },   // Stays same
-          { x: 884, y: 342 },   // Stays same
+          { x: 142, y: 140 },   // Ingredient 1 - Vanilla
+          { x: 578, y: 157 },   // Ingredient 2 - Chocolate
+          { x: 986, y: 381 },   // Ingredient 3 - Strawberry
         ],
         hazards: [],
-        spawnPoint: { x: 48, y: 286 }, // Moved 16px higher (was 302)
-        worldWidth: 1208,
+        spawnPoint: { x: 53, y: 337 },
+        worldWidth: 1360,
       };
 
       const response = await fetch('/api/game/campaigns', {
@@ -373,10 +370,10 @@ export default function CreateCampaignForm() {
             Default Game Configuration
           </h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Side-scrolling level (1600px wide - 2 screens)</li>
+            <li>• Side-scrolling level (1360px wide - 3.4 screens)</li>
             <li>• 3 ingredients to collect (50 points each)</li>
-            <li>• 1 ice cream at the end (second screen)</li>
-            <li>• 2 gaps with hazards at the bottom</li>
+            <li>• 1 ice cream at the end (goal)</li>
+            <li>• 4:5 vertical aspect ratio (400x500)</li>
             <li>• Score = 1000 + (remaining_time × 10) + (ingredients × 50)</li>
           </ul>
           <p className="text-xs text-blue-700 mt-2">

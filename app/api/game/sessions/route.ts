@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         levelData: campaign.level_config,
         assets: {
           playerSpriteUrl: (campaign as any).player_sprite_url || null,
+          playerJumpSpriteUrl: (campaign as any).player_jump_sprite_url || null,
           icecreamSpriteUrl: (campaign as any).icecream_sprite_url || null,
           ingredientSpriteUrl: (campaign as any).ingredient_sprite_url || null,
           platformSpriteUrl: (campaign as any).platform_sprite_url || null,

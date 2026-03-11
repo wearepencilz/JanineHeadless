@@ -32,6 +32,7 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
     ticket_success_title: (campaign as any).ticket_success_title || '',
     ticket_success_message: (campaign as any).ticket_success_message || '',
     player_sprite_url: (campaign as any).player_sprite_url || '',
+    player_jump_sprite_url: (campaign as any).player_jump_sprite_url || '',
     icecream_sprite_url: (campaign as any).icecream_sprite_url || '',
     ingredient_sprite_url: (campaign as any).ingredient_sprite_url || '',
     platform_sprite_url: (campaign as any).platform_sprite_url || '',
@@ -66,6 +67,7 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           ticket_success_title: formData.ticket_success_title,
           ticket_success_message: formData.ticket_success_message,
           player_sprite_url: formData.player_sprite_url,
+          player_jump_sprite_url: formData.player_jump_sprite_url,
           icecream_sprite_url: formData.icecream_sprite_url,
           ingredient_sprite_url: formData.ingredient_sprite_url,
           platform_sprite_url: formData.platform_sprite_url,
@@ -390,6 +392,14 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
               recommendedSize="32×48px (width × height)"
               currentUrl={formData.player_sprite_url}
               onUpload={(url) => setFormData({ ...formData, player_sprite_url: url })}
+            />
+
+            <AssetUploader
+              label="Player Jump Sprite"
+              description="Character sprite when jumping - switches automatically in air"
+              recommendedSize="32×48px (width × height)"
+              currentUrl={formData.player_jump_sprite_url}
+              onUpload={(url) => setFormData({ ...formData, player_jump_sprite_url: url })}
             />
 
             <AssetUploader

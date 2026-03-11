@@ -1,12 +1,13 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/game/[campaignId]/page": "app/game/[campaignId]/page.js",
+  "/api/settings/route": "app/api/settings/route.js",
   "/api/game/leaderboard/[campaignId]/route": "app/api/game/leaderboard/[campaignId]/route.js",
-  "/products/[handle]/page": "app/products/[handle]/page.js",
-  "/leaderboard/[campaignId]/page": "app/leaderboard/[campaignId]/page.js",
-  "/admin/games/[id]/page": "app/admin/games/[id]/page.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/games/page": "app/admin/games/page.js"
+  "/page": "app/page.js",
+  "/api/upload/route": "app/api/upload/route.js",
+  "/game-test/page": "app/game-test/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/game/campaigns/[id]/route": "app/api/game/campaigns/[id]/route.js",
+  "/api/game/migrations/add-jump-sprite/route": "app/api/game/migrations/add-jump-sprite/route.js",
+  "/api/game/sessions/route": "app/api/game/sessions/route.js",
+  "/admin/games/[id]/page": "app/admin/games/[id]/page.js"
 }

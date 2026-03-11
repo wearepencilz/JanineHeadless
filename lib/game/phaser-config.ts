@@ -5,15 +5,15 @@ import * as Phaser from 'phaser';
  * Optimized for pixel art rendering with 4:3 aspect ratio
  */
 
-// Game dimensions (3:4 aspect ratio - vertical like classic Mario)
-// Sized to accommodate 32x48px player sprite with room to move
-export const GAME_WIDTH = 512;
-export const GAME_HEIGHT = 448;
+// Game dimensions (4:5 aspect ratio - vertical for mobile Game Boy style)
+// 400x500 gives us a nice 4:5 ratio
+export const GAME_WIDTH = 400;
+export const GAME_HEIGHT = 500;
 
 // Physics constants
-export const GRAVITY = 700;
-export const PLAYER_SPEED = 200;
-export const PLAYER_JUMP_VELOCITY = -520; // Increased by ~33% for higher jumps
+export const GRAVITY = 2200; // Ultra-fast, snappy arcade feel
+export const PLAYER_SPEED = 250;
+export const PLAYER_JUMP_VELOCITY = -938; // Increased proportionally to maintain height
 
 /**
  * Create Phaser game configuration
@@ -136,8 +136,8 @@ export function calculateScaledDimensions(
 export function getGameContainerStyles(): React.CSSProperties {
   return {
     width: '100%',
-    maxWidth: `${GAME_WIDTH * 2}px`, // 1024px max
-    aspectRatio: '512 / 448',
+    maxWidth: `${GAME_WIDTH * 2}px`, // 800px max
+    aspectRatio: '400 / 500',
     margin: '0 auto',
     position: 'relative',
     overflow: 'hidden',

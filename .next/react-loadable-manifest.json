@@ -1,9 +1,13 @@
 {
-  "../app/admin/games/scan/page.tsx -> react-qr-scanner": {
-    "id": "../app/admin/games/scan/page.tsx -> react-qr-scanner",
+  "../app/game-test/page.tsx -> @/lib/game/scenes/GameScene": {
+    "id": "../app/game-test/page.tsx -> @/lib/game/scenes/GameScene",
     "files": [
-      "static/chunks/_app-pages-browser_node_modules_react-qr-scanner_dist_react-qr-scanner_umd_js.js"
+      "static/chunks/_app-pages-browser_lib_game_scenes_GameScene_ts.js"
     ]
+  },
+  "../app/game-test/page.tsx -> phaser": {
+    "id": "../app/game-test/page.tsx -> phaser",
+    "files": []
   },
   "../components/game/GameContainer.tsx -> @/lib/game/scenes/GameScene": {
     "id": "../components/game/GameContainer.tsx -> @/lib/game/scenes/GameScene",

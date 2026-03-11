@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import type Phaser from 'phaser';
 import { createGameConfig, getGameContainerStyles } from '@/lib/game/phaser-config';
 import type { Campaign } from '@/types/game';
+import MobileControls from './MobileControls';
 
 interface GameContainerProps {
   campaign: Campaign;
@@ -46,6 +47,52 @@ export default function GameContainer({ campaign }: GameContainerProps) {
   
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const gameInstanceRef = useRef<Phaser.Game | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile control handlers
+  const handleMobileMove = (direction: 'left' | 'right' | 'stop') => {
+    if (!gameInstanceRef.current) return;
+    const scene = gameInstanceRef.current.scene.getScene('GameScene') as any;
+    if (scene && scene.setMobileInput) {
+      scene.setMobileInput({ move: direction });
+    }
+  };
+
+  const handleMobileJump = () => {
+    if (!gameInstanceRef.current) return;
+    const scene = gameInstanceRef.current.scene.getScene('GameScene') as any;
+    if (scene && scene.setMobileInput) {
+      scene.setMobileInput({ jump: true });
+      // Reset jump after a short delay
+      setTimeout(() => {
+        if (scene && scene.setMobileInput) {
+          scene.setMobileInput({ jump: false });
+        }
+      }, 100);
+    }
+  };
+
+  const handleCloseGame = () => {
+    // Destroy game and return to name entry
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.destroy(true);
+      gameInstanceRef.current = null;
+    }
+    setPhase('name-entry');
+    setGameResult(null);
+    setSubmitResult(null);
+    setError(null);
+  };
 
   // Load saved player details from localStorage on mount
   useEffect(() => {
@@ -320,20 +367,73 @@ export default function GameContainer({ campaign }: GameContainerProps) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      {/* Game container - always mounted but hidden when not playing */}
+    <div className="w-full max-w-4xl mx-auto p-4 md:p-4 p-0">
+      {/* Game container - fullscreen on mobile, card on desktop */}
       <div style={{ display: phase === 'playing' ? 'block' : 'none' }}>
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <div
-            ref={gameContainerRef}
-            style={getGameContainerStyles()}
-            className="bg-black rounded-lg overflow-hidden"
-          />
-          <div className="mt-4 text-center text-gray-600">
-            <p>Use Arrow Keys or WASD to move, Space/Up to jump</p>
-            <p className="text-sm mt-1">Find the ice cream before time runs out!</p>
+        {/* Full modal background */}
+        <div className="fixed md:relative inset-0 md:inset-auto z-40 flex flex-col items-center justify-start p-5" style={{ backgroundColor: '#DDD9D5' }}>
+          {/* Screen with border - 4:5 aspect ratio, max-width 400px */}
+          <div className="w-full" style={{ maxWidth: '400px' }}>
+            <div style={{ 
+              aspectRatio: '4 / 5',
+              backgroundColor: '#6B696E',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {/* Game screen */}
+              <div
+                ref={gameContainerRef}
+                className="w-full overflow-hidden select-none"
+                style={{ 
+                  backgroundColor: '#9FB666',
+                  borderRadius: '4px',
+                  aspectRatio: '400 / 500',
+                  touchAction: 'none',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none',
+                  WebkitTouchCallout: 'none'
+                }}
+              />
+            </div>
+            
+            {/* Quit button - 24px below screen, centered, desktop only */}
+            {!isMobile && (
+              <div className="flex justify-center" style={{ marginTop: '24px' }}>
+                <button
+                  onClick={handleCloseGame}
+                  className="active:opacity-80 transition-opacity"
+                  aria-label="Quit Game"
+                >
+                  <img 
+                    src="/controller/quit.png" 
+                    alt="Quit" 
+                    width={48} 
+                    height={48}
+                    className="w-12 h-12"
+                    style={{ 
+                      pointerEvents: 'auto',
+                      WebkitUserSelect: 'none',
+                      userSelect: 'none',
+                      WebkitTouchCallout: 'none'
+                    }}
+                  />
+                </button>
+              </div>
+            )}
           </div>
         </div>
+        
+        {/* Mobile Controls */}
+        {isMobile && (
+          <MobileControls
+            onMove={handleMobileMove}
+            onJump={handleMobileJump}
+            onClose={handleCloseGame}
+          />
+        )}
       </div>
 
       {/* Name Entry Phase */}

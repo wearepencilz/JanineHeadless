@@ -17,6 +17,7 @@ interface GameSceneData {
   levelConfig: LevelConfig;
   assets?: {
     playerSpriteUrl?: string | null;
+    playerJumpSpriteUrl?: string | null;
     icecreamSpriteUrl?: string | null;
     ingredientSpriteUrl?: string | null;
     platformSpriteUrl?: string | null;
@@ -62,6 +63,15 @@ export class GameScene extends Phaser.Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   
+  // Mobile input
+  private mobileInput: {
+    move: 'left' | 'right' | 'stop';
+    jump: boolean;
+  } = {
+    move: 'stop',
+    jump: false,
+  };
+  
   // UI
   private timerText?: Phaser.GameObjects.Text;
   private scoreText?: Phaser.GameObjects.Text;
@@ -93,6 +103,9 @@ export class GameScene extends Phaser.Scene {
     // Load custom sprites if provided
     if (this.assets?.playerSpriteUrl) {
       this.load.image('player_custom', this.assets.playerSpriteUrl);
+    }
+    if (this.assets?.playerJumpSpriteUrl) {
+      this.load.image('player_jump_custom', this.assets.playerJumpSpriteUrl);
     }
     if (this.assets?.icecreamSpriteUrl) {
       this.load.image('icecream_custom', this.assets.icecreamSpriteUrl);
@@ -444,6 +457,22 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+   * Public method to set mobile input from external controls
+   */
+  public setMobileInput(input: { move?: 'left' | 'right' | 'stop'; jump?: boolean }) {
+    if (input.move !== undefined) {
+      this.mobileInput.move = input.move;
+    }
+    if (input.jump !== undefined) {
+      this.mobileInput.jump = input.jump;
+      // Reset jump after a frame
+      setTimeout(() => {
+        this.mobileInput.jump = false;
+      }, 100);
+    }
+  }
+
+  /**
    * Create UI elements
    */
   private createUI() {
@@ -719,22 +748,45 @@ export class GameScene extends Phaser.Scene {
     if (!this.player || !this.cursors || !this.wasdKeys) return;
     
     const body = this.player.body as Phaser.Physics.Arcade.Body;
+    const isOnGround = body.touching.down || body.blocked.down;
     
-    // Horizontal movement
-    if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
+    // Horizontal movement - check keyboard OR mobile input
+    const moveLeft = this.cursors.left.isDown || this.wasdKeys.A.isDown || this.mobileInput.move === 'left';
+    const moveRight = this.cursors.right.isDown || this.wasdKeys.D.isDown || this.mobileInput.move === 'right';
+    
+    if (moveLeft) {
       body.setVelocityX(-PLAYER_SPEED);
-    } else if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
+      // Flip sprite to face left
+      this.player.setFlipX(true);
+    } else if (moveRight) {
       body.setVelocityX(PLAYER_SPEED);
+      // Flip sprite to face right
+      this.player.setFlipX(false);
     } else {
-      body.setVelocityX(0);
+      // Decelerate when no input
+      body.setVelocityX(body.velocity.x * 0.8);
+      if (Math.abs(body.velocity.x) < 10) {
+        body.setVelocityX(0);
+      }
     }
     
-    // Jump (only if on ground) - check if touching down OR on a platform
-    const canJump = body.touching.down || body.blocked.down;
+    // Switch sprite based on jump state
+    if (!isOnGround && this.assets?.playerJumpSpriteUrl && this.textures.exists('player_jump_custom')) {
+      // In air - use jump sprite
+      if (this.player.texture.key !== 'player_jump_custom') {
+        this.player.setTexture('player_jump_custom');
+      }
+    } else if (this.assets?.playerSpriteUrl && this.textures.exists('player_custom')) {
+      // On ground - use normal sprite
+      if (this.player.texture.key !== 'player_custom') {
+        this.player.setTexture('player_custom');
+      }
+    }
     
+    // Jump - check keyboard OR mobile input
     if (
-      (this.cursors.up.isDown || this.wasdKeys.W.isDown || this.cursors.space.isDown) &&
-      canJump
+      (this.cursors.up.isDown || this.wasdKeys.W.isDown || this.cursors.space.isDown || this.mobileInput.jump) &&
+      isOnGround
     ) {
       body.setVelocityY(PLAYER_JUMP_VELOCITY);
     }

@@ -8,27 +8,24 @@ import { queryWithRetry, updateById } from '../lib/db-game';
 
 const newLayout = {
   platforms: [
-    // Ground level platforms (moved 16px higher)
-    { x: 0, y: 358, width: 635, height: 16 },      // Starting platform (was 374)
-    { x: 844, y: 399, width: 119, height: 16 },    // Middle platform (was 415)
-    { x: 958, y: 311, width: 259, height: 16 },    // End platform (was 327)
-    
-    // Mid-level platforms (moved 16px higher)
-    { x: 40, y: 190, width: 176, height: 16 },     // Platform 1 (was 206)
-    { x: 466, y: 205, width: 128, height: 16 },    // Platform 2 (was 221)
-    { x: 823, y: 158, width: 200, height: 16 },    // Platform 3 (was 174)
+    { x: 0, y: 400, width: 850, height: 20 },      // Ground - Start
+    { x: 942, y: 445, width: 133, height: 20 },    // Ground - Gap
+    { x: 1069, y: 368, width: 289, height: 20 },   // Ground - End (32px above Start)
+    { x: 45, y: 212, width: 196, height: 20 },     // Mid Platform 1
+    { x: 520, y: 229, width: 143, height: 20 },    // Mid Platform 2
+    { x: 918, y: 176, width: 224, height: 20 },    // Mid Platform 3 (ice cream above)
   ],
   iceCreams: [
-    { x: 915, y: 93 }, // Goal - stays same
+    { x: 1020, y: 100 },
   ],
   ingredients: [
-    { x: 128, y: 125 },   // Stays same
-    { x: 518, y: 141 },   // Stays same
-    { x: 884, y: 342 },   // Stays same
+    { x: 142, y: 140 },   // Ingredient 1 - Vanilla
+    { x: 578, y: 157 },   // Ingredient 2 - Chocolate
+    { x: 986, y: 381 },   // Ingredient 3 - Strawberry
   ],
   hazards: [],
-  spawnPoint: { x: 48, y: 286 }, // Moved 16px higher (was 302)
-  worldWidth: 1208,
+  spawnPoint: { x: 53, y: 337 },
+  worldWidth: 1360,
 };
 
 async function updateAllCampaigns() {
@@ -60,9 +57,10 @@ async function updateAllCampaigns() {
 
     console.log('🎉 All campaigns updated with new layout!');
     console.log('\nChanges applied:');
-    console.log('- All platforms moved 16px higher');
-    console.log('- Spawn point moved 16px higher (y=286)');
-    console.log('- Jump velocity already set to -520 for higher jumps');
+    console.log('- Updated to 400x500 viewport with 1360x500 world');
+    console.log('- New platform positions for 4:5 aspect ratio');
+    console.log('- Spawn point at (53, 337)');
+    console.log('- Physics: gravity=2200, speed=250, jump=-938');
     console.log('\nPlayers can now play existing campaigns with the new layout.');
 
   } catch (error) {

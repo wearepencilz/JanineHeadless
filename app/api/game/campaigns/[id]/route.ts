@@ -63,6 +63,7 @@ export async function PUT(
       'ticket_success_message',
       'level_config',
       'player_sprite_url',
+      'player_jump_sprite_url',
       'icecream_sprite_url',
       'ingredient_sprite_url',
       'platform_sprite_url',
