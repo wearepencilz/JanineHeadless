@@ -1,1 +1,12 @@
-{}
+{
+  "../components/game/GameContainer.tsx -> @/lib/game/scenes/GameScene": {
+    "id": 9368,
+    "files": [
+      "static/chunks/9368.c0b7a14cac3a0cf7.js"
+    ]
+  },
+  "../components/game/GameContainer.tsx -> phaser": {
+    "id": 5170,
+    "files": []
+  }
+}

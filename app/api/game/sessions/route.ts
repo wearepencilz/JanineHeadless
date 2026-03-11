@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
         levelData: campaign.level_config,
         assets: {
           playerSpriteUrl: (campaign as any).player_sprite_url || null,
+          playerWalkSpriteUrl: (campaign as any).player_walk_sprite_url || null,
           playerJumpSpriteUrl: (campaign as any).player_jump_sprite_url || null,
           icecreamSpriteUrl: (campaign as any).icecream_sprite_url || null,
           ingredientSpriteUrl: (campaign as any).ingredient_sprite_url || null,
@@ -129,7 +130,6 @@ export async function POST(request: NextRequest) {
           backgroundUrl: (campaign as any).background_url || null,
           hazardSpriteUrl: (campaign as any).hazard_sprite_url || null,
         },
-        spriteConfig,
       },
     };
 

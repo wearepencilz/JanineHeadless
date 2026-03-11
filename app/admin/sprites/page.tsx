@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { findAll } from '@/lib/db-game';
 import type { WalkingSprite } from '@/types/sprite';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Walking Sprites | Admin',
 };
