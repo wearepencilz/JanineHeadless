@@ -1,0 +1,262 @@
+import { getSettings, getIngredients, getFlavours, getFormats, getOfferings } from './db.js'
+
+// Taxonomy Validation Functions
+
+export async function validateTaxonomyUniqueness(category: string, value: string, excludeId?: string): Promise<boolean> {
+  const settings = await getSettings()
+  if (!settings.taxonomies || !settings.taxonomies[category]) {
+    return true // Category doesn't exist yet, so value is unique
+  }
+  
+  const existingValues = settings.taxonomies[category]
+  const duplicate = existingValues.find((item: any) => 
+    item.value === value && item.id !== excludeId
+  )
+  
+  return !duplicate
+}
+
+export async function validateTaxonomyDeletion(category: string, id: string): Promise<{ canDelete: boolean; usedBy: any[] }> {
+  const usedBy: any[] = []
+  
+  // Check usage based on category
+  switch (category) {
+    case 'ingredientCategories':
+      const ingredients = await getIngredients()
+      const usedInIngredients = ingredients.filter((ing: any) => ing.category === id)
+      if (usedInIngredients.length > 0) {
+        usedBy.push(...usedInIngredients.map((ing: any) => ({ type: 'ingredient', id: ing.id, name: ing.name })))
+      }
+      break
+      
+    case 'flavourTypes':
+      const flavours = await getFlavours()
+      const usedInFlavours = flavours.filter((flav: any) => flav.type === id)
+      if (usedInFlavours.length > 0) {
+        usedBy.push(...usedInFlavours.map((flav: any) => ({ type: 'flavour', id: flav.id, name: flav.name })))
+      }
+      break
+      
+    case 'formatCategories':
+      const formats = await getFormats()
+      const usedInFormats = formats.filter((fmt: any) => fmt.category === id)
+      if (usedInFormats.length > 0) {
+        usedBy.push(...usedInFormats.map((fmt: any) => ({ type: 'format', id: fmt.id, name: fmt.name })))
+      }
+      break
+      
+    case 'modifierTypes':
+      // TODO: Check modifiers when they're implemented
+      break
+      
+    case 'allergens':
+    case 'dietaryFlags':
+      // These are used in arrays, so we need to check all ingredients and flavours
+      const allIngredients = await getIngredients()
+      const allFlavours = await getFlavours()
+      
+      const ingredientsWithValue = allIngredients.filter((ing: any) => 
+        (category === 'allergens' && ing.allergens?.includes(id)) ||
+        (category === 'dietaryFlags' && ing.dietaryFlags?.includes(id))
+      )
+      
+      const flavoursWithValue = allFlavours.filter((flav: any) => 
+        (category === 'allergens' && flav.allergens?.includes(id)) ||
+        (category === 'dietaryFlags' && flav.dietaryTags?.includes(id))
+      )
+      
+      if (ingredientsWithValue.length > 0) {
+        usedBy.push(...ingredientsWithValue.map((ing: any) => ({ type: 'ingredient', id: ing.id, name: ing.name })))
+      }
+      if (flavoursWithValue.length > 0) {
+        usedBy.push(...flavoursWithValue.map((flav: any) => ({ type: 'flavour', id: flav.id, name: flav.name })))
+      }
+      break
+      
+    case 'seasons':
+      const seasonFlavours = await getFlavours()
+      const usedInSeasons = seasonFlavours.filter((flav: any) => flav.season === id)
+      if (usedInSeasons.length > 0) {
+        usedBy.push(...usedInSeasons.map((flav: any) => ({ type: 'flavour', id: flav.id, name: flav.name })))
+      }
+      break
+  }
+  
+  return {
+    canDelete: usedBy.length === 0,
+    usedBy
+  }
+}
+
+export async function checkTaxonomyValueInUse(category: string, value: string): Promise<boolean> {
+  const result = await validateTaxonomyDeletion(category, value)
+  return result.usedBy.length > 0
+}
+
+// Product Name Generation
+export function generateProductName(product: any, format: any, flavours: any[]): { internalName: string; publicName: string } {
+  if (!format || !flavours || flavours.length === 0) {
+    return { internalName: 'Untitled Product', publicName: 'Untitled Product' }
+  }
+  
+  const formatName = format.name
+  const primaryFlavour = flavours[0]
+  
+  // Handle twist format (two flavours)
+  if (format.category === 'twist' && flavours.length === 2) {
+    const internalName = `${formatName} - ${flavours[0].name} + ${flavours[1].name}`
+    const publicName = `${flavours[0].name} + ${flavours[1].name} ${formatName}`
+    return { internalName, publicName }
+  }
+  
+  // Handle sandwich format
+  if (format.category === 'sandwich') {
+    const filling = flavours.find((f: any) => f.type === 'gelato' || f.type === 'sorbet')
+    const cookie = flavours.find((f: any) => f.type === 'cookie')
+    if (filling && cookie) {
+      const internalName = `${formatName} - ${filling.name} ${cookie.name}`
+      const publicName = `${filling.name} ${cookie.name} ${formatName}`
+      return { internalName, publicName }
+    }
+  }
+  
+  // Standard format (single flavour)
+  const internalName = `${formatName} - ${primaryFlavour.name}`
+  const publicName = `${primaryFlavour.name} ${formatName}`
+  
+  return { internalName, publicName }
+}
+
+// Format Eligibility
+export async function getFormatEligibility(flavourType: string): Promise<string[]> {
+  const settings = await getSettings()
+  if (!settings.formatEligibilityRules) {
+    // Fallback to hardcoded rules if not in settings
+    const defaultRules: Record<string, string[]> = {
+      'gelato': ['scoop', 'take-home', 'twist', 'sandwich'],
+      'sorbet': ['scoop', 'take-home', 'twist'],
+      'soft-serve-base': ['soft-serve'],
+      'cookie': ['sandwich'],
+      'topping': [],
+      'sauce': []
+    }
+    return defaultRules[flavourType] || []
+  }
+  
+  return settings.formatEligibilityRules[flavourType] || []
+}
+
+export async function isEligibleForFormat(flavourType: string, formatCategory: string): Promise<boolean> {
+  const eligibleFormats = await getFormatEligibility(flavourType)
+  return eligibleFormats.includes(formatCategory)
+}
+
+export async function filterEligibleFlavours(flavours: any[], formatCategory: string): Promise<any[]> {
+  const eligibleFlavours = []
+  
+  for (const flavour of flavours) {
+    const isEligible = await isEligibleForFormat(flavour.type, formatCategory)
+    if (isEligible) {
+      eligibleFlavours.push(flavour)
+    }
+  }
+  
+  return eligibleFlavours
+}
+
+// Product Composition Validation
+export async function validateProductComposition(product: any, format: any, flavours: any[]): Promise<{ valid: boolean; errors: any[] }> {
+  const errors: any[] = []
+  
+  if (!format) {
+    errors.push({ field: 'formatId', constraint: 'required', message: 'Format is required' })
+    return { valid: false, errors }
+  }
+  
+  if (!flavours || flavours.length === 0) {
+    errors.push({ field: 'primaryFlavourIds', constraint: 'required', message: 'At least one flavour is required' })
+    return { valid: false, errors }
+  }
+  
+  // Check min/max flavour count
+  if (format.minFlavours && flavours.length < format.minFlavours) {
+    errors.push({
+      field: 'primaryFlavourIds',
+      constraint: 'min-flavours',
+      value: flavours.length,
+      expected: `At least ${format.minFlavours} flavour(s) required`
+    })
+  }
+  
+  if (format.maxFlavours && flavours.length > format.maxFlavours) {
+    errors.push({
+      field: 'primaryFlavourIds',
+      constraint: 'max-flavours',
+      value: flavours.length,
+      expected: `Maximum ${format.maxFlavours} flavour(s) allowed`
+    })
+  }
+  
+  // Check type compatibility
+  for (const flavour of flavours) {
+    const isEligible = await isEligibleForFormat(flavour.type, format.category)
+    if (!isEligible) {
+      errors.push({
+        field: 'primaryFlavourIds',
+        constraint: 'type-compatibility',
+        value: flavour.id,
+        expected: `Flavour type '${flavour.type}' is not compatible with format '${format.category}'`
+      })
+    }
+  }
+  
+  // Twist format validation
+  if (format.category === 'twist') {
+    if (flavours.length !== 2) {
+      errors.push({
+        field: 'primaryFlavourIds',
+        constraint: 'twist-flavour-count',
+        value: flavours.length,
+        expected: 'Twist format requires exactly 2 flavours'
+      })
+    }
+    
+    const validTypes = flavours.every((f: any) => f.type === 'gelato' || f.type === 'sorbet')
+    if (!validTypes) {
+      errors.push({
+        field: 'primaryFlavourIds',
+        constraint: 'twist-flavour-types',
+        expected: 'Twist format requires gelato or sorbet flavours only'
+      })
+    }
+  }
+  
+  // Sandwich format validation
+  if (format.category === 'sandwich') {
+    const fillings = flavours.filter((f: any) => f.type === 'gelato' || f.type === 'sorbet')
+    const cookies = flavours.filter((f: any) => f.type === 'cookie')
+    
+    if (fillings.length !== 1) {
+      errors.push({
+        field: 'primaryFlavourIds',
+        constraint: 'sandwich-filling-count',
+        value: fillings.length,
+        expected: 'Sandwich format requires exactly 1 filling flavour (gelato or sorbet)'
+      })
+    }
+    
+    if (cookies.length !== 2) {
+      errors.push({
+        field: 'componentIds',
+        constraint: 'sandwich-cookie-count',
+        value: cookies.length,
+        expected: 'Sandwich format requires exactly 2 cookie components'
+      })
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  }
+}
