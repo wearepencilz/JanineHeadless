@@ -21,22 +21,32 @@ This specification defines the transformation of the Janine CMS data model from 
 
 ## Requirements
 
-### Requirement 0: Non-Destructive Migration Strategy
+### Requirement 0: CMS-Managed Taxonomies
 
-**User Story:** As an Admin_User, I want the migration to the new model to be non-destructive, so that no existing content is lost and I can safely transition to the new structure.
+**User Story:** As an Admin_User, I want to manage category and type lists in Settings, so that I can customize taxonomies without code changes and add new options on-the-fly during content creation.
 
 #### Acceptance Criteria
 
-1. THE migration process SHALL NOT delete any existing database tables or records
-2. THE migration process SHALL create new tables for Launch and Modifier objects alongside existing tables
-3. THE migration process SHALL add new fields to existing tables (Ingredient, Flavour, Format, Offering) without removing existing fields
-4. THE migration process SHALL maintain all existing API endpoints during the transition period
-5. THE CMS SHALL support both legacy and new data structures simultaneously during migration
-6. THE migration process SHALL include a validation phase that verifies data integrity before committing changes
-7. THE migration process SHALL create timestamped backups of all affected tables before making any changes
-8. THE migration process SHALL log all changes with sufficient detail to enable rollback if needed
-9. THE Admin_User SHALL be able to preview migration results before applying them to production
-10. THE system SHALL provide a migration status dashboard showing progress and any issues requiring attention
+1. THE Settings SHALL include a Taxonomies section for managing all category and type lists
+2. THE Taxonomies section SHALL allow managing: Ingredient Categories, Ingredient Roles, Flavour Types, Format Categories, Modifier Types, Allergens, Dietary Flags, Seasons, and Content Block Types
+3. WHEN creating or editing content, THE CMS SHALL display taxonomy options from Settings
+4. WHEN creating or editing content, THE CMS SHALL provide an "Add New" option in taxonomy dropdowns
+5. WHEN "Add New" is selected, THE CMS SHALL display an inline form to add the new taxonomy value
+6. WHEN a new taxonomy value is added inline, THE system SHALL save it to Settings and immediately make it available in the current form
+7. THE Taxonomies section SHALL allow reordering taxonomy values for display order
+8. THE Taxonomies section SHALL allow marking taxonomy values as archived (hidden from new content but preserved in existing content)
+9. THE system SHALL validate that taxonomy values are unique within their category
+10. THE system SHALL prevent deletion of taxonomy values that are in use by existing content
+11. THE API_Layer SHALL provide GET /api/settings/taxonomies endpoint returning all taxonomies
+12. THE API_Layer SHALL provide PUT /api/settings/taxonomies/[category] endpoint for updating taxonomy values
+13. THE API_Layer SHALL provide POST /api/settings/taxonomies/[category] endpoint for adding new values
+14. THE API_Layer SHALL provide DELETE /api/settings/taxonomies/[category]/[id] endpoint with usage validation
+15. THE system SHALL store taxonomies in settings.json (dev) or Vercel KV settings:taxonomies (production)
+16. THE system SHALL load format eligibility rules from settings instead of hardcoded constants
+17. THE CMS SHALL use reusable TaxonomySelect component for all taxonomy dropdowns
+18. THE TaxonomySelect component SHALL support inline creation with "Add New" option
+19. THE TaxonomySelect component SHALL filter out archived values by default
+20. THE TaxonomySelect component SHALL follow existing selector component patterns (BaseStyleSelector, FlavourIngredientSelector)
 
 ### Requirement 1: Core Data Model Objects
 
