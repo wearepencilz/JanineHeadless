@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Format, FormatCategory, ServingStyle } from '@/types';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -158,23 +159,13 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                required
-                value={format.category}
-                onChange={(e) => setFormat({ ...format, category: e.target.value as FormatCategory })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TaxonomySelect
+              category="formatCategories"
+              value={format.category}
+              onChange={(value) => setFormat({ ...format, category: value as FormatCategory })}
+              label="Category"
+              required
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
