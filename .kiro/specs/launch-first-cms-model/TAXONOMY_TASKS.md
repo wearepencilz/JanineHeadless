@@ -338,3 +338,145 @@ These tasks implement CMS-managed taxonomies with reusable component patterns. A
 - Phase 8-9 (Testing & Migration): 2-3 days
 
 **Total: 10-15 days**
+
+
+---
+
+## Phase 10: Quick-Create Products from Launch
+
+### Overview
+
+Implement the quick-create products feature that allows admins to efficiently create multiple products from a launch's featured flavours without manually creating each one.
+
+### Tasks
+
+- [ ] T16. Quick-Create API Endpoint
+  - [ ] T16.1 Create app/api/launches/[id]/quick-create-products/route.ts
+    - Implement POST handler
+    - Accept flavourIds, formatIds, commonFields
+    - Validate flavour type compatibility with formats
+    - Generate product combinations (flavour × format)
+    - Create products using same logic as POST /api/products
+    - Auto-generate internalName and publicName
+    - Set all products to "draft" status by default
+    - Add created product IDs to launch.featuredProductIds
+    - Update launch via PUT /api/launches/[id]
+    - Return createdProducts, updatedLaunch, and any errors
+    - _Requirements: 22.1, 22.4, 22.5, 22.6, 22.7, 22.8, 22.9, 22.10, 22.11, 22.14_
+  
+  - [ ] T16.2 Write integration tests for quick-create endpoint
+    - Test creating products from single flavour + multiple formats
+    - Test creating products from multiple flavours + single format
+    - Test creating products from multiple flavours + multiple formats
+    - Test validation rejects incompatible flavour types
+    - Test auto-generated names are correct
+    - Test products are added to launch.featuredProductIds
+    - Test all products have "draft" status
+    - _Requirements: 22.14_
+
+- [ ] T17. Quick-Create Modal Component
+  - [ ] T17.1 Create app/admin/components/QuickCreateProductsModal.tsx
+    - Modal triggered by "Quick Create Products" button
+    - Step 1: Flavour selection (checkboxes for launch.featuredFlavourIds)
+    - Step 2: Format selection (reuse FormatSelector component)
+    - Step 3: Preview grid showing all combinations
+    - Step 4: Bulk details form (status, price, tags, location, etc.)
+    - Step 5: Creation progress and success message
+    - Allow removing individual combinations from preview
+    - Show validation errors inline
+    - Display success modal with links to edit products
+    - _Requirements: 22.2, 22.3, 22.4, 22.6, 22.12, 22.13, 22.15_
+  
+  - [ ] T17.2 Implement flavour type compatibility filtering
+    - Filter formats based on selected flavour types
+    - Show only formats compatible with ALL selected flavours
+    - Display warning if no compatible formats available
+    - _Requirements: 22.5_
+  
+  - [ ] T17.3 Implement preview grid
+    - Display format + flavour combinations
+    - Show auto-generated product names
+    - Allow removing individual combinations
+    - Show validation status for each combination
+    - _Requirements: 22.6, 22.8, 22.9_
+  
+  - [ ] T17.4 Implement bulk details form
+    - Form fields: status, price, tags, location, onlineOrderable, pickupOnly
+    - Default status to "draft"
+    - Apply same values to all products
+    - _Requirements: 22.10, 22.13_
+
+- [ ] T18. Launch Edit Page Integration
+  - [ ] T18.1 Add "Quick Create Products" button to app/admin/launches/[id]/page.tsx
+    - Display button in featured products section
+    - Only show if launch has featuredFlavourIds
+    - Open QuickCreateProductsModal on click
+    - _Requirements: 22.1_
+  
+  - [ ] T18.2 Refresh launch data after quick-create completes
+    - Reload launch.featuredProductIds
+    - Display newly created products in featured products list
+    - Show success toast notification
+    - _Requirements: 22.11, 22.12_
+
+- [ ] T19. Name Generation Logic
+  - [ ] T19.1 Add generateProductName function to lib/validation.ts
+    - Generate internalName: "{format.name} - {flavour.name}"
+    - Generate publicName: "{flavour.name} {format.name}"
+    - Handle twist format: "{flavour1.name} + {flavour2.name} Twist"
+    - Handle sandwich format: "{filling.name} {cookie.name} Sandwich"
+    - _Requirements: 22.8, 22.9_
+  
+  - [ ] T19.2 Write unit tests for name generation
+    - Test single flavour + format
+    - Test twist format with two flavours
+    - Test sandwich format with filling + components
+    - Test special characters and edge cases
+    - _Requirements: 22.8, 22.9_
+
+- [ ] T20. Bulk Edit Products Feature (Optional Enhancement)
+  - [ ] T20.1 Add bulk edit modal for quick-created products
+    - Select multiple products from success modal
+    - Edit common fields (price, status, tags)
+    - Apply changes to all selected products
+    - _Requirements: 22.13_
+  
+  - [ ] T20.2 Write integration tests for bulk edit
+    - Test editing multiple products at once
+    - Test validation for bulk updates
+    - _Requirements: 22.13_
+
+- [ ] T21. Testing & Documentation
+  - [ ] T21.1 Write E2E tests for quick-create workflow
+    - Test full workflow: select flavours → select formats → preview → create
+    - Test validation prevents invalid combinations
+    - Test products are created with correct data
+    - Test products are added to launch
+    - _Requirements: 22.14, 22.15_
+  
+  - [ ] T21.2 Write user documentation
+    - Document quick-create workflow
+    - Document name generation rules
+    - Document validation rules
+    - Add screenshots and examples
+    - _Requirements: 22.15_
+
+### Checkpoint: After Phase 10
+
+- [ ] Verify "Quick Create Products" button appears on launch edit page
+- [ ] Verify modal workflow works end-to-end
+- [ ] Verify products are created with correct data
+- [ ] Verify products are added to launch.featuredProductIds
+- [ ] Verify validation prevents invalid combinations
+- [ ] Run all integration and E2E tests
+
+### Updated Estimated Effort
+
+- Phase 1-3 (Foundation): 2-3 days
+- Phase 4-5 (Components): 3-4 days
+- Phase 6 (Dynamic Eligibility): 1-2 days
+- Phase 7 (Management UI): 2-3 days
+- Phase 8-9 (Testing & Migration): 2-3 days
+- Phase 10 (Quick-Create Products): 2-3 days
+
+**Total: 12-18 days**
