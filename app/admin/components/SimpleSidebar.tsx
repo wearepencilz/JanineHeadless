@@ -10,7 +10,7 @@ export default function SimpleSidebar() {
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/launches', label: 'Launches' },
-    { href: '/admin/products', label: 'Menu Items' },
+    { href: '/admin/products', label: 'Products' },
     { href: '/admin/flavours', label: 'Flavours' },
     { href: '/admin/ingredients', label: 'Ingredients' },
     { href: '/admin/formats', label: 'Formats' },

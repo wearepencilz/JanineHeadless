@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/slug';
-import { LaunchDateRangePicker } from '@/app/admin/components/LaunchDateRangePicker';
 
 interface Flavour {
   id: string;
@@ -243,12 +242,35 @@ export default function NewLaunchPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Active Period
             </label>
-            <LaunchDateRangePicker
-              startDate={formData.activeStart}
-              endDate={formData.activeEnd}
-              onStartChange={(date) => setFormData(prev => ({ ...prev, activeStart: date }))}
-              onEndChange={(date) => setFormData(prev => ({ ...prev, activeEnd: date }))}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="activeStart" className="block text-xs text-gray-600 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  id="activeStart"
+                  name="activeStart"
+                  value={formData.activeStart}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="activeEnd" className="block text-xs text-gray-600 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  id="activeEnd"
+                  name="activeEnd"
+                  value={formData.activeEnd}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                />
+              </div>
+            </div>
             <p className="mt-2 text-xs text-gray-500">
               When this launch will be active and visible to customers
             </p>
