@@ -1,24 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOfferings, saveOfferings, getFormats } from '@/lib/db';
-import { Offering } from '@/types';
+import { getProducts, getOfferings } from '@/lib/db';
 
-// GET /api/offerings/[id] - Get offering by ID
+// LEGACY API - Backward compatibility layer
+// This endpoint maps to /api/products/[id] for backward compatibility
+// New code should use /api/products/[id] directly
+
+// GET /api/offerings/[id] - Get offering by ID (maps to product)
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const offerings = await getOfferings();
-    const offering = offerings.find((o: Offering) => o.id === params.id);
+    // Try products first (new model)
+    let items = await getProducts();
+    let item = items.find((p: any) => p.id === params.id);
+    
+    // Fallback to offerings if not found (during transition)
+    if (!item) {
+      items = await getOfferings();
+      item = items.find((o: any) => o.id === params.id);
+    }
 
-    if (!offering) {
+    if (!item) {
       return NextResponse.json(
         { error: 'Offering not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(offering);
+    // Add deprecation warning header
+    const response = NextResponse.json(item);
+    response.headers.set('X-API-Deprecated', 'true');
+    response.headers.set('X-API-Deprecation-Message', 'This endpoint is deprecated. Please use /api/products/[id] instead.');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching offering:', error);
     return NextResponse.json(
@@ -28,65 +43,33 @@ export async function GET(
   }
 }
 
-// PUT /api/offerings/[id] - Update offering with validation
+// PUT /api/offerings/[id] - Update offering (deprecated, forwards to products)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json();
-    const offerings = await getOfferings();
-    const index = offerings.findIndex((o: Offering) => o.id === params.id);
 
-    if (index === -1) {
-      return NextResponse.json(
-        { error: 'Offering not found' },
-        { status: 404 }
-      );
+    // Forward to products API
+    const response = await fetch(`${request.nextUrl.origin}/api/products/${params.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
     }
 
-    // If formatId is being changed, validate the new format
-    if (body.formatId && body.formatId !== offerings[index].formatId) {
-      const formats = await getFormats();
-      const format = formats.find((f: any) => f.id === body.formatId);
-      if (!format) {
-        return NextResponse.json(
-          { error: 'Format not found' },
-          { status: 404 }
-        );
-      }
-
-      // Validate format constraints
-      const primaryFlavourIds = body.primaryFlavourIds || offerings[index].primaryFlavourIds;
-      
-      if (format.requiresFlavours) {
-        if (primaryFlavourIds.length < format.minFlavours) {
-          return NextResponse.json(
-            { error: `Format requires at least ${format.minFlavours} flavour(s)` },
-            { status: 400 }
-          );
-        }
-        if (primaryFlavourIds.length > format.maxFlavours) {
-          return NextResponse.json(
-            { error: `Format allows maximum ${format.maxFlavours} flavour(s)` },
-            { status: 400 }
-          );
-        }
-      }
-    }
-
-    // Update offering
-    const updatedOffering: Offering = {
-      ...offerings[index],
-      ...body,
-      id: params.id, // Ensure ID doesn't change
-      updatedAt: new Date().toISOString(),
-    };
-
-    offerings[index] = updatedOffering;
-    await saveOfferings(offerings);
-
-    return NextResponse.json(updatedOffering);
+    // Add deprecation warning header
+    const result = NextResponse.json(data);
+    result.headers.set('X-API-Deprecated', 'true');
+    result.headers.set('X-API-Deprecation-Message', 'This endpoint is deprecated. Please use /api/products/[id] instead.');
+    
+    return result;
   } catch (error) {
     console.error('Error updating offering:', error);
     return NextResponse.json(
@@ -96,26 +79,29 @@ export async function PUT(
   }
 }
 
-// DELETE /api/offerings/[id] - Delete offering
+// DELETE /api/offerings/[id] - Delete offering (deprecated, forwards to products)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const offerings = await getOfferings();
-    const index = offerings.findIndex((o: Offering) => o.id === params.id);
+    // Forward to products API
+    const response = await fetch(`${request.nextUrl.origin}/api/products/${params.id}`, {
+      method: 'DELETE',
+    });
 
-    if (index === -1) {
-      return NextResponse.json(
-        { error: 'Offering not found' },
-        { status: 404 }
-      );
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
     }
 
-    offerings.splice(index, 1);
-    await saveOfferings(offerings);
-
-    return NextResponse.json({ success: true });
+    // Add deprecation warning header
+    const result = NextResponse.json(data);
+    result.headers.set('X-API-Deprecated', 'true');
+    result.headers.set('X-API-Deprecation-Message', 'This endpoint is deprecated. Please use /api/products/[id] instead.');
+    
+    return result;
   } catch (error) {
     console.error('Error deleting offering:', error);
     return NextResponse.json(
