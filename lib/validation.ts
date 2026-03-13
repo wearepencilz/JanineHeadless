@@ -132,9 +132,10 @@ export async function getFormatEligibility(flavourType: string): Promise<string[
   const settings = await getSettings()
   if (!settings.formatEligibilityRules) {
     // Fallback to hardcoded rules if not in settings
+    // These rules now use servingStyle values
     const defaultRules: Record<string, string[]> = {
-      'gelato': ['scoop', 'take-home', 'twist', 'sandwich'],
-      'sorbet': ['scoop', 'take-home', 'twist'],
+      'gelato': ['scoop', 'take-home', 'twist', 'sandwich', 'pint', 'tub'],
+      'sorbet': ['scoop', 'take-home', 'twist', 'pint', 'tub'],
       'soft-serve-base': ['soft-serve'],
       'cookie': ['sandwich'],
       'topping': [],
@@ -146,9 +147,11 @@ export async function getFormatEligibility(flavourType: string): Promise<string[
   return settings.formatEligibilityRules[flavourType] || []
 }
 
-export async function isEligibleForFormat(flavourType: string, formatCategory: string): Promise<boolean> {
+export async function isEligibleForFormat(flavourType: string, formatIdentifier: string): Promise<boolean> {
   const eligibleFormats = await getFormatEligibility(flavourType)
-  return eligibleFormats.includes(formatCategory)
+  // Check against servingStyle, category, slug, or name (case-insensitive)
+  const normalizedIdentifier = formatIdentifier?.toLowerCase() || '';
+  return eligibleFormats.some(format => format.toLowerCase() === normalizedIdentifier);
 }
 
 export async function filterEligibleFlavours(flavours: any[], formatCategory: string): Promise<any[]> {
@@ -199,19 +202,25 @@ export async function validateProductComposition(product: any, format: any, flav
   
   // Check type compatibility
   for (const flavour of flavours) {
-    const isEligible = await isEligibleForFormat(flavour.type, format.category)
+    // Use servingStyle if available, otherwise fall back to category or slug
+    const formatIdentifier = format.servingStyle || format.category || format.slug;
+    const isEligible = await isEligibleForFormat(flavour.type, formatIdentifier);
     if (!isEligible) {
       errors.push({
         field: 'primaryFlavourIds',
         constraint: 'type-compatibility',
         value: flavour.id,
-        expected: `Flavour type '${flavour.type}' is not compatible with format '${format.category}'`
-      })
+        expected: `Flavour type '${flavour.type}' is not compatible with format '${formatIdentifier}'`
+      });
     }
   }
   
-  // Twist format validation
-  if (format.category === 'twist') {
+  // Twist format validation (check by servingStyle or name)
+  const isTwistFormat = format.servingStyle?.toLowerCase() === 'twist' || 
+                        format.slug?.toLowerCase() === 'twist' || 
+                        format.name?.toLowerCase().includes('twist');
+  
+  if (isTwistFormat) {
     if (flavours.length !== 2) {
       errors.push({
         field: 'primaryFlavourIds',
@@ -231,8 +240,12 @@ export async function validateProductComposition(product: any, format: any, flav
     }
   }
   
-  // Sandwich format validation
-  if (format.category === 'sandwich') {
+  // Sandwich format validation (check by servingStyle or name)
+  const isSandwichFormat = format.servingStyle?.toLowerCase() === 'sandwich' || 
+                           format.slug?.toLowerCase() === 'sandwich' || 
+                           format.name?.toLowerCase().includes('sandwich');
+  
+  if (isSandwichFormat) {
     const fillings = flavours.filter((f: any) => f.type === 'gelato' || f.type === 'sorbet')
     const cookies = flavours.filter((f: any) => f.type === 'cookie')
     
