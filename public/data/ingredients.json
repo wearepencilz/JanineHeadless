@@ -22,7 +22,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": true,
-    "vegetarian": false
+    "vegetarian": false,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "cream",
@@ -47,7 +48,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": true,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "browned-butter",
@@ -72,7 +74,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": true,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "garden-tomato-mix",
@@ -98,7 +101,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": false,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "white-peaches",
@@ -125,7 +129,8 @@
     ],
     "imageAlt": "",
     "animalDerived": false,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "ile-dorleans-strawberries",
@@ -150,7 +155,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": false,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "wild-strawberry-quebec",
@@ -169,7 +175,8 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "red-watermelon",
@@ -188,7 +195,8 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "yellow-watermelon",
@@ -207,7 +215,8 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "lime",
@@ -226,7 +235,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "lemon",
@@ -245,7 +255,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "raspberries",
@@ -265,7 +276,8 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "grilled-corn",
@@ -287,7 +299,8 @@
     "seasonal": true,
     "description": "Operationally classified as grain for consistency, even if used like a vegetable.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "nuts-seeds-grains"
   },
   {
     "id": "thyme",
@@ -306,7 +319,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "madagascar-bourbon-vanilla",
@@ -325,7 +339,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "spruce-tip",
@@ -344,7 +359,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "mint",
@@ -364,7 +380,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "basil",
@@ -384,7 +401,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "honey",
@@ -408,7 +426,8 @@
     "imageAlt": "",
     "animalDerived": true,
     "vegetarian": true,
-    "isOrganic": true
+    "isOrganic": true,
+    "taxonomyCategory": "sweeteners-syrups"
   },
   {
     "id": "sun-dried-mole",
@@ -435,7 +454,8 @@
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": false,
-    "vegetarian": true
+    "vegetarian": true,
+    "taxonomyCategory": "sweeteners-syrups"
   },
   {
     "id": "himalayan-sea-salt",
@@ -451,7 +471,8 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "tajin",
@@ -472,7 +493,8 @@
     "seasonal": false,
     "description": "Seasoning blend used as topping or add-on.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "sweeteners-syrups"
   },
   {
     "id": "1773420159139",
