@@ -44,11 +44,18 @@ export const flavourTypesSeed = [
 
 // Ingredient Categories
 export const ingredientCategoriesSeed = [
-  { value: "base", label: "Base", description: "Primary base ingredients (milk, cream, etc.)" },
-  { value: "flavor", label: "Flavor", description: "Main flavoring ingredients" },
-  { value: "mix-in", label: "Mix-in", description: "Ingredients mixed into the base" },
-  { value: "topping", label: "Topping", description: "Ingredients added on top" },
-  { value: "spice", label: "Spice", description: "Spices and seasonings" }
+  "Dairy & Bases",
+  "Fruits & Vegetables",
+  "Nuts, Seeds & Grains",
+  "Spices, Herbs & Botanicals",
+  "Sweeteners & Syrups",
+  "Chocolate, Coffee & Cacao",
+  "Floral & Aromatic",
+  "Funky, Fermented & Savoury",
+  "Salts & Minerals",
+  "Regional or Cultural Staples",
+  "Inclusions & Add-Ons",
+  "Other"
 ];
 
 // Ingredient Roles

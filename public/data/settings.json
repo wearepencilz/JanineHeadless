@@ -174,43 +174,87 @@
     ],
     "ingredientCategories": [
       {
-        "id": "base",
-        "label": "Base",
-        "value": "base",
-        "description": "Primary base ingredients (milk, cream, etc.)",
+        "id": "dairy-bases",
+        "label": "Dairy & Bases",
+        "value": "dairy-bases",
         "sortOrder": 1,
         "archived": false
       },
       {
-        "id": "flavor",
-        "label": "Flavor",
-        "value": "flavor",
-        "description": "Main flavoring ingredients",
+        "id": "fruits-vegetables",
+        "label": "Fruits & Vegetables",
+        "value": "fruits-vegetables",
         "sortOrder": 2,
         "archived": false
       },
       {
-        "id": "mix-in",
-        "label": "Mix-in",
-        "value": "mix-in",
-        "description": "Ingredients mixed into the base",
+        "id": "nuts-seeds-grains",
+        "label": "Nuts, Seeds & Grains",
+        "value": "nuts-seeds-grains",
         "sortOrder": 3,
         "archived": false
       },
       {
-        "id": "topping",
-        "label": "Topping",
-        "value": "topping",
-        "description": "Ingredients added on top",
+        "id": "spices-herbs-botanicals",
+        "label": "Spices, Herbs & Botanicals",
+        "value": "spices-herbs-botanicals",
         "sortOrder": 4,
         "archived": false
       },
       {
-        "id": "spice",
-        "label": "Seasoning",
-        "value": "spice",
-        "description": "Spices and seasonings",
+        "id": "sweeteners-syrups",
+        "label": "Sweeteners & Syrups",
+        "value": "sweeteners-syrups",
         "sortOrder": 5,
+        "archived": false
+      },
+      {
+        "id": "chocolate-coffee-cacao",
+        "label": "Chocolate, Coffee & Cacao",
+        "value": "chocolate-coffee-cacao",
+        "sortOrder": 6,
+        "archived": false
+      },
+      {
+        "id": "floral-aromatic",
+        "label": "Floral & Aromatic",
+        "value": "floral-aromatic",
+        "sortOrder": 7,
+        "archived": false
+      },
+      {
+        "id": "funky-fermented-savoury",
+        "label": "Funky, Fermented & Savoury",
+        "value": "funky-fermented-savoury",
+        "sortOrder": 8,
+        "archived": false
+      },
+      {
+        "id": "salts-minerals",
+        "label": "Salts & Minerals",
+        "value": "salts-minerals",
+        "sortOrder": 9,
+        "archived": false
+      },
+      {
+        "id": "regional-cultural-staples",
+        "label": "Regional or Cultural Staples",
+        "value": "regional-cultural-staples",
+        "sortOrder": 10,
+        "archived": false
+      },
+      {
+        "id": "inclusions-add-ons",
+        "label": "Inclusions & Add-Ons",
+        "value": "inclusions-add-ons",
+        "sortOrder": 11,
+        "archived": false
+      },
+      {
+        "id": "other",
+        "label": "Other",
+        "value": "other",
+        "sortOrder": 12,
         "archived": false
       }
     ],
