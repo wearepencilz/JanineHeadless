@@ -219,7 +219,7 @@ export async function validateProductComposition(product: any, format: any, flav
       field: 'primaryFlavourIds',
       constraint: 'min-flavours',
       value: flavours.length,
-      expected: `At least ${format.minFlavours} flavour(s) required`
+      message: `At least ${format.minFlavours} flavour(s) required for ${format.name}`
     })
   }
   
@@ -228,22 +228,22 @@ export async function validateProductComposition(product: any, format: any, flav
       field: 'primaryFlavourIds',
       constraint: 'max-flavours',
       value: flavours.length,
-      expected: `Maximum ${format.maxFlavours} flavour(s) allowed`
+      message: `Maximum ${format.maxFlavours} flavour(s) allowed for ${format.name}`
     })
   }
   
-  // Check type compatibility
-  for (const flavour of flavours) {
-    // Use servingStyle if available, otherwise fall back to category or slug
-    const formatIdentifier = format.servingStyle || format.category || format.slug;
-    const isEligible = await isEligibleForFormat(flavour.type, formatIdentifier);
-    if (!isEligible) {
-      errors.push({
-        field: 'primaryFlavourIds',
-        constraint: 'type-compatibility',
-        value: flavour.id,
-        expected: `Flavour type '${flavour.type}' is not compatible with format '${formatIdentifier}'`
-      });
+  // Check type compatibility using format's eligibleFlavourTypes
+  // If eligibleFlavourTypes is empty or undefined, all flavour types are allowed
+  if (format.eligibleFlavourTypes && format.eligibleFlavourTypes.length > 0) {
+    for (const flavour of flavours) {
+      if (!format.eligibleFlavourTypes.includes(flavour.type)) {
+        errors.push({
+          field: 'primaryFlavourIds',
+          constraint: 'type-compatibility',
+          value: flavour.id,
+          message: `Flavour type '${flavour.type}' is not eligible for format '${format.name}'. Allowed types: ${format.eligibleFlavourTypes.join(', ')}`
+        });
+      }
     }
   }
   
