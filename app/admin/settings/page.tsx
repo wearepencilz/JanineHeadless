@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Settings {
   logo: string;
@@ -110,6 +111,17 @@ export default function SettingsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
         <p className="text-gray-600 mt-2">Configure your site settings</p>
+      </div>
+
+      {/* Quick Links */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+          href="/admin/settings/taxonomies"
+          className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+        >
+          <h3 className="font-medium text-gray-900 mb-1">Taxonomy Management</h3>
+          <p className="text-sm text-gray-600">Manage categories, types, and tags used throughout the CMS</p>
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl">
