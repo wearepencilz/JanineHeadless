@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ShopifyProduct {
   id: string;
@@ -95,6 +95,20 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
       searchProducts();
     }
   };
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowModal(false);
+      }
+    };
+    
+    if (showModal) {
+      document.addEventListener('keydown', handleEsc);
+      return () => document.removeEventListener('keydown', handleEsc);
+    }
+  }, [showModal]);
 
   return (
     <div className="space-y-2">

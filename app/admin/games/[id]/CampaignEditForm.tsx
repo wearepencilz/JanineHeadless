@@ -67,6 +67,18 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
 
   const [activeTab, setActiveTab] = useState<'basic' | 'rewards' | 'assets'>('basic');
 
+  // Handle ESC key to close delete confirmation modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDeleteConfirm) {
+        setShowDeleteConfirm(false);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showDeleteConfirm]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);

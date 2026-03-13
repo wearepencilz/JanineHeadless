@@ -37,6 +37,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     fetchData();
   }, [params.id]);
 
+  // Handle ESC key to close delete confirmation modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDeleteConfirm) {
+        setShowDeleteConfirm(false);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showDeleteConfirm]);
+
   async function fetchData() {
     try {
       const [offeringRes, flavoursRes] = await Promise.all([

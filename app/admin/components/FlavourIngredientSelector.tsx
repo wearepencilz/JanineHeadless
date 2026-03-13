@@ -35,6 +35,21 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
     calculateMetadata();
   }, [selectedIngredients, allIngredients]);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowModal(false);
+        setShowCreateForm(false);
+      }
+    };
+    
+    if (showModal) {
+      document.addEventListener('keydown', handleEsc);
+      return () => document.removeEventListener('keydown', handleEsc);
+    }
+  }, [showModal]);
+
   const fetchIngredients = async () => {
     setLoading(true);
     try {

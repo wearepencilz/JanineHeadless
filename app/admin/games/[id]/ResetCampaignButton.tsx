@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface ResetCampaignButtonProps {
@@ -16,6 +16,19 @@ export default function ResetCampaignButton({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Handle ESC key to close confirmation modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showConfirm) {
+        setShowConfirm(false);
+        setError(null);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showConfirm]);
 
   const handleReset = async () => {
     setIsResetting(true);
