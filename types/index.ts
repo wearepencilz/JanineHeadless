@@ -108,6 +108,9 @@ export type DietaryClaim =
   | 'vegan'
   | 'vegetarian';
 
+// Legacy alias - some components use DietaryFlag instead of DietaryClaim
+export type DietaryFlag = DietaryClaim;
+
 export interface Ingredient {
   id: string;                       // UUID
   name: string;                     // Display name (unique)
@@ -195,9 +198,12 @@ export interface Flavour {
   
   // Availability
   status: Status;                // Current availability status
+  season?: string;               // Seasonal availability
   
-  // Availability
-  status: Status;                // Current availability status
+  // Format eligibility flags
+  canBeUsedInTwist?: boolean;    // Eligible for twist format
+  canBeSoldAsPint?: boolean;     // Eligible for pint format
+  canBeUsedInSandwich?: boolean; // Eligible for sandwich format
   
   // Shopify Integration
   shopifyProductId?: string;     // Shopify product ID

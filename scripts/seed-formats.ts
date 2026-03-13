@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { saveFormats } from '../lib/db.js';
 import type { Format } from '../types/index.js';
 
-const defaultFormats: Omit<Format, 'id' | 'createdAt' | 'updatedAt'>[] = [
+const defaultFormats: Record<string, any>[] = [
   {
     name: 'Soft Serve',
     slug: 'soft-serve',
@@ -93,12 +93,12 @@ async function seedFormats() {
   console.log('🌱 Seeding default formats...');
   
   const now = new Date().toISOString();
-  const formats: Format[] = defaultFormats.map(format => ({
+  const formats = defaultFormats.map(format => ({
     ...format,
     id: randomUUID(),
     createdAt: now,
     updatedAt: now,
-  }));
+  })) as Format[];
 
   try {
     await saveFormats(formats);

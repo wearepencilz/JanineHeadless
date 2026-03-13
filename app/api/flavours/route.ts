@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       shortDescription: body.shortDescription || '',
       ingredients: body.ingredients || [],
       allergens: body.allergens || [],
-      dietaryTags: body.dietaryTags || [],
+      dietaryClaims: body.dietaryTags || body.dietaryClaims || [],
       
       // New Phase 3 fields
       type: body.type || 'gelato',

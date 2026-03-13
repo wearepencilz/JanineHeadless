@@ -278,7 +278,7 @@ export function transformSeedToFlavour(seed: FlavourSeed): Flavour {
     
     // Allergens & dietary (empty for now, should be calculated from ingredients)
     allergens: [],
-    dietaryTags: [],
+    dietaryClaims: [],
     
     // Display
     colour,

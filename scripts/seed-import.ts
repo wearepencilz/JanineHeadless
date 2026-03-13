@@ -148,13 +148,12 @@ function mapIngredient(legacy: LegacyIngredient): Ingredient {
     descriptors: (legacy.tags || []) as any[],
     origin: legacy.origin || 'Unknown',
     allergens: inferAllergens(legacy),
-    dietaryFlags: inferDietaryFlags(legacy),
     seasonal: legacy.tags?.includes('Seasonal') || false,
     image: undefined,
     description: legacy.notes,
     createdAt: now,
     updatedAt: now,
-  };
+  } as Ingredient;
 }
 
 function mapFlavour(legacy: LegacyFlavour, ingredients: Ingredient[]): Flavour {
@@ -168,15 +167,13 @@ function mapFlavour(legacy: LegacyFlavour, ingredients: Ingredient[]): Flavour {
     notes: undefined,
   }));
   
-  // Calculate allergens and dietary flags from ingredients
+  // Calculate allergens from ingredients
   const allergens = new Set<string>();
-  const dietaryFlags = new Set<string>();
   
   legacy.ingredientIds.forEach(id => {
     const ing = ingredients.find(i => i.id === id);
     if (ing) {
       ing.allergens.forEach(a => allergens.add(a));
-      ing.dietaryFlags.forEach(d => dietaryFlags.add(d));
     }
   });
   
@@ -193,7 +190,7 @@ function mapFlavour(legacy: LegacyFlavour, ingredients: Ingredient[]): Flavour {
     ingredients: flavourIngredients,
     keyNotes: legacy.tags || [],
     allergens: Array.from(allergens) as any[],
-    dietaryTags: Array.from(dietaryFlags) as any[],
+    dietaryClaims: [],
     colour: '#FFFFFF',
     image: undefined,
     season: inferSeason(legacy.tags),
@@ -208,7 +205,7 @@ function mapFlavour(legacy: LegacyFlavour, ingredients: Ingredient[]): Flavour {
     featured: false,
     createdAt: now,
     updatedAt: now,
-  };
+  } as Flavour;
 }
 
 function mapFormat(legacy: LegacyFormat): Format {
@@ -227,12 +224,9 @@ function mapFormat(legacy: LegacyFormat): Format {
     canIncludeAddOns: legacy.allowsOptionalAddOns,
     defaultSizes: ['regular'],
     servingStyle: inferServingStyle(legacy),
-    menuSection: legacy.itemCategory,
-    image: undefined,
-    icon: undefined,
     createdAt: now,
     updatedAt: now,
-  };
+  } as Format;
 }
 
 // ============================================================================

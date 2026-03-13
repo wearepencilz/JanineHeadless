@@ -250,7 +250,6 @@ export function transformSeedToIngredient(seed: IngredientSeed): Ingredient {
     descriptors,
     origin: seed.origin || "Unknown",
     allergens: [],
-    dietaryFlags: [],
     seasonal: seed.tags?.includes("Seasonal") || false,
     description: seed.notes,
     createdAt: now,

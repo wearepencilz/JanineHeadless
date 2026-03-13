@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-const dietaryLabels: Record<DietaryFlag, string> = {
+const dietaryLabels: Partial<Record<DietaryFlag, string>> = {
   vegan: 'Vegan',
   vegetarian: 'Vegetarian',
   'gluten-free': 'Gluten-Free',
@@ -18,7 +18,7 @@ const dietaryLabels: Record<DietaryFlag, string> = {
   'nut-free': 'Nut-Free'
 };
 
-const dietaryIcons: Record<DietaryFlag, string> = {
+const dietaryIcons: Partial<Record<DietaryFlag, string>> = {
   vegan: '🌱',
   vegetarian: '🥬',
   'gluten-free': '🌾',
@@ -114,10 +114,10 @@ export default function DietaryFilter({
                   className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                 />
                 <span className="text-sm" aria-hidden="true">
-                  {dietaryIcons[flag]}
+                  {dietaryIcons[flag] || '🏷️'}
                 </span>
                 <span className="text-sm font-medium text-gray-900">
-                  {dietaryLabels[flag]}
+                  {dietaryLabels[flag] || flag}
                 </span>
               </div>
               {count > 0 && (

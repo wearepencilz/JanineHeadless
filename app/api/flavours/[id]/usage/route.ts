@@ -22,7 +22,7 @@ export async function GET(
         offering.primaryFlavourIds?.includes(flavourId)
       )
       .map((offering: any) => {
-        const format = formatMap.get(offering.formatId);
+        const format: any = formatMap.get(offering.formatId);
         return {
           id: offering.id,
           name: offering.publicName || offering.internalName,

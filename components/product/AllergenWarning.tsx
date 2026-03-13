@@ -9,8 +9,9 @@ interface Props {
 
 const allergenLabels: Record<Allergen, string> = {
   dairy: 'Dairy',
-  eggs: 'Eggs',
-  nuts: 'Tree Nuts',
+  egg: 'Eggs',
+  'tree-nuts': 'Tree Nuts',
+  peanuts: 'Peanuts',
   soy: 'Soy',
   gluten: 'Gluten',
   sesame: 'Sesame'
@@ -18,8 +19,9 @@ const allergenLabels: Record<Allergen, string> = {
 
 const allergenIcons: Record<Allergen, string> = {
   dairy: '🥛',
-  eggs: '🥚',
-  nuts: '🌰',
+  egg: '🥚',
+  'tree-nuts': '🌰',
+  peanuts: '🥜',
   soy: '🫘',
   gluten: '🌾',
   sesame: '🫘'

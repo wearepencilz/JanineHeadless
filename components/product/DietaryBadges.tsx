@@ -8,7 +8,7 @@ interface Props {
   className?: string;
 }
 
-const dietaryLabels: Record<DietaryFlag, string> = {
+const dietaryLabels: Partial<Record<DietaryFlag, string>> = {
   vegan: 'Vegan',
   vegetarian: 'Vegetarian',
   'gluten-free': 'Gluten-Free',
@@ -16,7 +16,7 @@ const dietaryLabels: Record<DietaryFlag, string> = {
   'nut-free': 'Nut-Free'
 };
 
-const dietaryIcons: Record<DietaryFlag, string> = {
+const dietaryIcons: Partial<Record<DietaryFlag, string>> = {
   vegan: '🌱',
   vegetarian: '🥬',
   'gluten-free': '🌾',
@@ -24,7 +24,7 @@ const dietaryIcons: Record<DietaryFlag, string> = {
   'nut-free': '🌰'
 };
 
-const dietaryColors: Record<DietaryFlag, string> = {
+const dietaryColors: Partial<Record<DietaryFlag, string>> = {
   vegan: 'bg-green-100 text-green-800 border-green-300',
   vegetarian: 'bg-green-100 text-green-800 border-green-300',
   'gluten-free': 'bg-amber-100 text-amber-800 border-amber-300',
@@ -54,14 +54,14 @@ export default function DietaryBadges({
           key={flag}
           className={`
             inline-flex items-center gap-1 rounded-full font-medium border
-            ${dietaryColors[flag]}
+            ${dietaryColors[flag] || 'bg-gray-100 text-gray-800 border-gray-300'}
             ${sizeClasses[size]}
           `}
           role="img"
-          aria-label={dietaryLabels[flag]}
+          aria-label={dietaryLabels[flag] || flag}
         >
-          <span aria-hidden="true">{dietaryIcons[flag]}</span>
-          <span>{dietaryLabels[flag]}</span>
+          <span aria-hidden="true">{dietaryIcons[flag] || '🏷️'}</span>
+          <span>{dietaryLabels[flag] || flag}</span>
         </span>
       ))}
     </div>

@@ -256,6 +256,22 @@ export async function getProduct(productId: string) {
 }
 
 
+export interface CreateProductInput {
+  title: string;
+  descriptionHtml?: string;
+  productType?: string;
+  vendor?: string;
+  tags?: string[];
+  status?: string;
+  variants?: {
+    price: string;
+    sku?: string;
+    inventoryQuantities?: { availableQuantity: number; locationId: string }[];
+  }[];
+  images?: { src: string; altText?: string }[];
+  metafields?: { namespace: string; key: string; value: string; type: string }[];
+}
+
 export async function createProduct(input: CreateProductInput) {
   // Create product without variants first
   const createMutation = `
