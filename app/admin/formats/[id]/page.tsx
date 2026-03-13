@@ -131,93 +131,85 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={format.name}
-              onChange={(e) => setFormat({ ...format, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Slug *
-            </label>
-            <input
-              type="text"
-              required
-              value={format.slug}
-              onChange={(e) => setFormat({ ...format, slug: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <TaxonomySelect
-              category="formatCategories"
-              value={format.category}
-              onChange={(value) => setFormat({ ...format, category: value as FormatCategory })}
-              label="Category"
-              required
-            />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={format.name}
+                onChange={(e) => setFormat({ ...format, name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Serving Style *
+                Slug *
               </label>
-              <select
+              <input
+                type="text"
                 required
-                value={format.servingStyle}
-                onChange={(e) => setFormat({ ...format, servingStyle: e.target.value as ServingStyle })}
+                value={format.slug}
+                onChange={(e) => setFormat({ ...format, slug: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {servingStyles.map((style) => (
-                  <option key={style} value={style}>
-                    {style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                  </option>
-                ))}
-              </select>
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
+              <textarea
+                required
+                value={format.description}
+                onChange={(e) => setFormat({ ...format, description: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <TaxonomySelect
+                category="formatCategories"
+                value={format.category}
+                onChange={(value) => setFormat({ ...format, category: value as FormatCategory })}
+                label="Category"
+                required
+              />
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Serving Style *
+                </label>
+                <select
+                  required
+                  value={format.servingStyle}
+                  onChange={(e) => setFormat({ ...format, servingStyle: e.target.value as ServingStyle })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {servingStyles.map((style) => (
+                    <option key={style} value={style}>
+                      {style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <textarea
-              required
-              value={format.description}
-              onChange={(e) => setFormat({ ...format, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Menu Section
-            </label>
-            <input
-              type="text"
-              value={format.menuSection}
-              onChange={(e) => setFormat({ ...format, menuSection: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Flavour Requirements */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Flavour Requirements</h3>
-            
-            <div className="mb-4">
+        {/* Flavour Requirements */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Flavour Requirements</h3>
+          <div className="space-y-6">
+            <div>
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -227,11 +219,14 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                 />
                 <span className="text-sm font-medium text-gray-700">Requires Flavours</span>
               </label>
+              <p className="text-sm text-gray-500 mt-1 ml-6">
+                Check this if products using this format must include flavours
+              </p>
             </div>
 
             {format.requiresFlavours && (
               <>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Minimum Flavours *
@@ -260,56 +255,49 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <TaxonomyMultiSelect
+                    category="flavourTypes"
+                    values={format.eligibleFlavourTypes || []}
+                    onChange={(values) => setFormat({ 
+                      ...format, 
+                      eligibleFlavourTypes: values 
+                    })}
+                    label="Eligible Flavour Types"
+                    description="Select which flavour types this format accepts. Leave empty to accept all types."
+                  />
+                  
+                  {(!format.eligibleFlavourTypes || format.eligibleFlavourTypes.length === 0) && (
+                    <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-sm text-amber-800">
+                        ⚠️ This format requires flavours but accepts all types. 
+                        Consider specifying eligible types for better control.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
+        </div>
 
-          {/* Format Eligibility */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Format Eligibility
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Select which flavour types this format accepts. Leave empty to accept all types.
+        {/* Additional Options */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Options</h3>
+          <div>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={format.canIncludeAddOns}
+                onChange={(e) => setFormat({ ...format, canIncludeAddOns: e.target.checked })}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">Can Include Add-ons</span>
+            </label>
+            <p className="text-sm text-gray-500 mt-1 ml-6">
+              Allow toppings, sauces, and other modifiers for this format
             </p>
-            
-            <TaxonomyMultiSelect
-              category="flavourTypes"
-              values={format.eligibleFlavourTypes || []}
-              onChange={(values) => setFormat({ 
-                ...format, 
-                eligibleFlavourTypes: values 
-              })}
-              label="Eligible Flavour Types"
-              description=""
-            />
-            
-            {format.requiresFlavours && 
-             (!format.eligibleFlavourTypes || format.eligibleFlavourTypes.length === 0) && (
-              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-sm text-amber-800">
-                  ⚠️ This format requires flavours but accepts all types. 
-                  Consider specifying eligible types for better control.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Additional Options */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Options</h3>
-            
-            <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={format.canIncludeAddOns}
-                  onChange={(e) => setFormat({ ...format, canIncludeAddOns: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">Can Include Add-ons (toppings, sauces)</span>
-              </label>
-            </div>
           </div>
         </div>
       </form>

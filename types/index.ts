@@ -252,7 +252,6 @@ export interface Format {
   canIncludeAddOns: boolean;     // Supports toppings/add-ons?
   defaultSizes: string[];        // e.g., ["small", "medium", "large"]
   servingStyle: ServingStyle;    // How it's served
-  menuSection: string;           // Where it appears on menu
   
   // Display
   image?: string;                // Format image URL
