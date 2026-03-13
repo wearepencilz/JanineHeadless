@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
 
 interface EditPageLayoutProps {
   title: string;
@@ -73,15 +74,17 @@ export default function EditPageLayout({
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
           
           {onDelete && (
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="sm"
               onClick={handleDeleteClick}
-              disabled={deleting || deleteDisabled}
-              className="px-4 py-2 border border-red-300 rounded-lg text-sm text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              isDisabled={deleting || deleteDisabled}
+              isLoading={deleting}
               title={deleteDisabled ? deleteDisabledReason : 'Delete'}
             >
-              {deleting ? 'Deleting...' : 'Delete'}
-            </button>
+              Delete
+            </Button>
           )}
         </div>
       </div>
@@ -108,21 +111,25 @@ export default function EditPageLayout({
 
       {/* Action Buttons */}
       <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-        <button
+        <Button
           type="button"
+          variant="primary"
+          size="lg"
           onClick={onSave}
-          disabled={saving}
-          className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+          isLoading={saving}
+          isDisabled={saving}
+          className="flex-1"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-        <button
+          Save Changes
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
+          size="lg"
           onClick={onCancel}
-          className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { useToast } from '@/app/admin/components/ToastContainer';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -139,41 +141,32 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
           <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name *
-              </label>
-              <input
+              <Input
+                label="Name *"
                 type="text"
-                required
+                isRequired
                 value={format.name}
-                onChange={(e) => setFormat({ ...format, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(value) => setFormat({ ...format, name: value })}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Slug *
-              </label>
-              <input
+              <Input
+                label="Slug *"
                 type="text"
-                required
+                isRequired
                 value={format.slug}
-                onChange={(e) => setFormat({ ...format, slug: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(value) => setFormat({ ...format, slug: value })}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
-              </label>
-              <textarea
-                required
+              <Textarea
+                label="Description *"
+                isRequired
                 value={format.description}
-                onChange={(e) => setFormat({ ...format, description: e.target.value })}
+                onChange={(value) => setFormat({ ...format, description: value })}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -220,30 +213,22 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Minimum Flavours *
-                    </label>
-                    <input
+                    <Input
+                      label="Minimum Flavours *"
                       type="number"
-                      required
-                      min="0"
-                      value={format.minFlavours}
-                      onChange={(e) => setFormat({ ...format, minFlavours: parseInt(e.target.value) })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      isRequired
+                      value={String(format.minFlavours)}
+                      onChange={(value) => setFormat({ ...format, minFlavours: parseInt(value) })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Maximum Flavours *
-                    </label>
-                    <input
+                    <Input
+                      label="Maximum Flavours *"
                       type="number"
-                      required
-                      min="1"
-                      value={format.maxFlavours}
-                      onChange={(e) => setFormat({ ...format, maxFlavours: parseInt(e.target.value) })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      isRequired
+                      value={String(format.maxFlavours)}
+                      onChange={(value) => setFormat({ ...format, maxFlavours: parseInt(value) })}
                     />
                   </div>
                 </div>

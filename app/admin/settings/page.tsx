@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
 
 interface Settings {
   logo: string;
@@ -171,28 +173,22 @@ export default function SettingsPage() {
       <form onSubmit={handleSubmit} className="max-w-2xl">
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Company Name
-            </label>
-            <input
+            <Input
+              label="Company Name"
               type="text"
               value={formData.companyName}
-              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              onChange={(value) => setFormData({ ...formData, companyName: value })}
+              isRequired
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Email
-            </label>
-            <input
+            <Input
+              label="Email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              onChange={(value) => setFormData({ ...formData, email: value })}
+              isRequired
             />
           </div>
 
@@ -229,13 +225,14 @@ export default function SettingsPage() {
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
             type="submit"
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm disabled:opacity-50"
+            variant="primary"
+            isLoading={saving}
+            isDisabled={saving}
           >
-            {saving ? 'Saving...' : 'Save Settings'}
-          </button>
+            Save Settings
+          </Button>
         </div>
       </form>
     </div>

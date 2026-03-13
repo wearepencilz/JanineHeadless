@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 interface Flavour {
   id: string;
@@ -91,15 +94,12 @@ export default function CreateBatchPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Batch Number *
-          </label>
-          <input
+          <Input
+            label="Batch Number *"
             type="text"
-            required
+            isRequired
             value={formData.batchNumber}
-            onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(value) => setFormData({ ...formData, batchNumber: value })}
             placeholder="e.g., B001, 2024-03-001"
           />
         </div>
@@ -135,40 +135,31 @@ export default function CreateBatchPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Recipe Notes
-          </label>
-          <textarea
+          <Textarea
+            label="Recipe Notes"
             rows={4}
             value={formData.recipe}
-            onChange={(e) => setFormData({ ...formData, recipe: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(value) => setFormData({ ...formData, recipe: value })}
             placeholder="Recipe adjustments, ingredient ratios..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tasting Notes
-          </label>
-          <textarea
+          <Textarea
+            label="Tasting Notes"
             rows={3}
             value={formData.tastingNotes}
-            onChange={(e) => setFormData({ ...formData, tastingNotes: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(value) => setFormData({ ...formData, tastingNotes: value })}
             placeholder="Flavor profile, texture, improvements needed..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            General Notes
-          </label>
-          <textarea
+          <Textarea
+            label="General Notes"
             rows={3}
             value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(value) => setFormData({ ...formData, notes: value })}
             placeholder="Process notes, observations, next steps..."
           />
         </div>
@@ -180,13 +171,14 @@ export default function CreateBatchPage() {
           >
             Cancel
           </Link>
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            variant="primary"
+            isLoading={loading}
+            isDisabled={loading}
           >
-            {loading ? 'Creating...' : 'Create Batch'}
-          </button>
+            Create Batch
+          </Button>
         </div>
       </form>
     </div>

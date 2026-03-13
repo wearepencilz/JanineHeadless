@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 interface Modifier {
   id: string;
@@ -176,31 +178,23 @@ export default function EditModifierPage({ params }: { params: { id: string } })
         <div className="bg-white shadow rounded-lg px-6 py-4 space-y-6">
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
+            <Input
+              label="Name *"
               type="text"
-              id="name"
               name="name"
-              required
+              isRequired
               value={modifier.name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setModifier({ ...modifier, name: value })}
             />
           </div>
 
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
-              Slug
-            </label>
-            <input
+            <Input
+              label="Slug"
               type="text"
-              id="slug"
               name="slug"
               value={modifier.slug}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setModifier({ ...modifier, slug: value })}
             />
           </div>
 
@@ -225,50 +219,34 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
+            <Textarea
+              label="Description"
               name="description"
               rows={3}
               value={modifier.description || ''}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setModifier({ ...modifier, description: value })}
             />
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-              Price (in cents) *
-            </label>
-            <input
+            <Input
+              label="Price (in cents) *"
               type="number"
-              id="price"
               name="price"
-              required
-              min="0"
-              step="1"
-              value={modifier.price}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              isRequired
+              value={String(modifier.price)}
+              onChange={(value) => setModifier({ ...modifier, price: parseFloat(value) || 0 })}
+              helperText={`Current price: $${(modifier.price / 100).toFixed(2)}`}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Current price: ${(modifier.price / 100).toFixed(2)}
-            </p>
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-              Image URL
-            </label>
-            <input
+            <Input
+              label="Image URL"
               type="text"
-              id="image"
               name="image"
               value={modifier.image || ''}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setModifier({ ...modifier, image: value })}
             />
             {modifier.image && (
               <img src={modifier.image} alt="Modifier preview" className="mt-2 h-32 w-auto rounded" />

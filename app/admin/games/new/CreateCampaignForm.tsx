@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function CreateCampaignForm() {
   const router = useRouter();
@@ -117,54 +120,39 @@ export default function CreateCampaignForm() {
       <div className="space-y-4">
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Campaign Name (Internal) *
-          </label>
-          <input
+          <Input
+            label="Campaign Name (Internal) *"
             type="text"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(value) => setFormData({ ...formData, name: value })}
             placeholder="e.g., Ice Cream Hunt - Spring 2026"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
+            isRequired
+            helperText="Internal identifier for admin use"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            Internal identifier for admin use
-          </p>
         </div>
 
         {/* Display Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Display Title
-          </label>
-          <input
+          <Input
+            label="Display Title"
             type="text"
             value={formData.display_title}
-            onChange={(e) => setFormData({ ...formData, display_title: e.target.value })}
+            onChange={(value) => setFormData({ ...formData, display_title: value })}
             placeholder="e.g., Spring Ice Cream Hunt"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            helperText="Title shown to players (defaults to campaign name if empty)"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            Title shown to players (defaults to campaign name if empty)
-          </p>
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
+          <Textarea
+            label="Description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(value) => setFormData({ ...formData, description: value })}
             placeholder="e.g., Find the hidden ice cream before time runs out!"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            helperText="Campaign description shown to players"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            Campaign description shown to players
-          </p>
         </div>
 
         {/* Status */}
@@ -229,72 +217,38 @@ export default function CreateCampaignForm() {
 
         {/* Timer Duration */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Timer Duration (seconds) *
-          </label>
-          <input
+          <Input
+            label="Timer Duration (seconds) *"
             type="number"
-            value={formData.timer_duration}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                timer_duration: parseInt(e.target.value),
-              })
-            }
-            min="10"
-            max="300"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
+            value={String(formData.timer_duration)}
+            onChange={(value) => setFormData({ ...formData, timer_duration: parseInt(value) })}
+            isRequired
+            helperText="How long players have to complete the game (10-300 seconds)"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            How long players have to complete the game (10-300 seconds)
-          </p>
         </div>
 
         {/* Winner Count */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Winner Count *
-          </label>
-          <input
+          <Input
+            label="Winner Count *"
             type="number"
-            value={formData.winner_count}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                winner_count: parseInt(e.target.value),
-              })
-            }
-            min="1"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
+            value={String(formData.winner_count)}
+            onChange={(value) => setFormData({ ...formData, winner_count: parseInt(value) })}
+            isRequired
+            helperText="First X players to complete get rewards (e.g., 100 = first 100 winners)"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            First X players to complete get rewards (e.g., 100 = first 100 winners)
-          </p>
         </div>
 
         {/* Total Rewards */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Total Rewards *
-          </label>
-          <input
+          <Input
+            label="Total Rewards *"
             type="number"
-            value={formData.reward_total}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                reward_total: parseInt(e.target.value),
-              })
-            }
-            min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
+            value={String(formData.reward_total)}
+            onChange={(value) => setFormData({ ...formData, reward_total: parseInt(value) })}
+            isRequired
+            helperText="Number of rewards available for top 100 players"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            Number of rewards available for top 100 players
-          </p>
         </div>
 
         {/* Reward Configuration */}
@@ -306,68 +260,52 @@ export default function CreateCampaignForm() {
           <div className="space-y-4">
             {/* Reward Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reward Type *
-              </label>
-              <input
+              <Input
+                label="Reward Type *"
                 type="text"
                 value={formData.reward_type}
-                onChange={(e) => setFormData({ ...formData, reward_type: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, reward_type: value })}
                 placeholder="e.g., Free Scoop, 10% Off, Free Topping"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                isRequired
               />
             </div>
 
             {/* Reward Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reward Description *
-              </label>
-              <textarea
+              <Textarea
+                label="Reward Description *"
                 value={formData.reward_description}
-                onChange={(e) => setFormData({ ...formData, reward_description: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, reward_description: value })}
                 placeholder="e.g., Redeem for one free scoop of any flavour"
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                isRequired
               />
             </div>
 
             {/* Ticket Success Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ticket Success Title *
-              </label>
-              <input
+              <Input
+                label="Ticket Success Title *"
                 type="text"
                 value={formData.ticket_success_title}
-                onChange={(e) => setFormData({ ...formData, ticket_success_title: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, ticket_success_title: value })}
                 placeholder="e.g., 🎉 You Won!"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                isRequired
+                helperText="Title shown when player wins a reward"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Title shown when player wins a reward
-              </p>
             </div>
 
             {/* Ticket Success Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ticket Success Message *
-              </label>
-              <textarea
+              <Textarea
+                label="Ticket Success Message *"
                 value={formData.ticket_success_message}
-                onChange={(e) => setFormData({ ...formData, ticket_success_message: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, ticket_success_message: value })}
                 placeholder="e.g., Show this code at the counter to claim your reward!"
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                isRequired
+                helperText="Instructions shown with the claim code"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Instructions shown with the claim code
-              </p>
             </div>
           </div>
         </div>
@@ -392,20 +330,21 @@ export default function CreateCampaignForm() {
 
       {/* Actions */}
       <div className="mt-6 flex justify-end gap-3">
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => router.push('/admin/games')}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          variant="primary"
+          isLoading={saving}
+          isDisabled={saving}
         >
-          {saving ? 'Creating...' : 'Create Campaign'}
-        </button>
+          Create Campaign
+        </Button>
       </div>
     </form>
   );

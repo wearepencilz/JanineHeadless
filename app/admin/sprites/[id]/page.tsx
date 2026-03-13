@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { WalkingSprite } from '@/types/sprite';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function EditSpritePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -155,26 +158,20 @@ export default function EditSpritePage({ params }: { params: { id: string } }) {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Name *
-          </label>
-          <input
+          <Input
+            label="Name *"
             type="text"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            onChange={(value) => setFormData({ ...formData, name: value })}
+            isRequired
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
+          <Textarea
+            label="Description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(value) => setFormData({ ...formData, description: value })}
             rows={3}
           />
         </div>
@@ -193,58 +190,42 @@ export default function EditSpritePage({ params }: { params: { id: string } }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Frame Width (px) *
-            </label>
-            <input
+            <Input
+              label="Frame Width (px) *"
               type="number"
-              value={formData.frame_width}
-              onChange={(e) => setFormData({ ...formData, frame_width: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              min="1"
+              value={String(formData.frame_width)}
+              onChange={(value) => setFormData({ ...formData, frame_width: parseInt(value) })}
+              isRequired
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Frame Height (px) *
-            </label>
-            <input
+            <Input
+              label="Frame Height (px) *"
               type="number"
-              value={formData.frame_height}
-              onChange={(e) => setFormData({ ...formData, frame_height: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              min="1"
+              value={String(formData.frame_height)}
+              onChange={(value) => setFormData({ ...formData, frame_height: parseInt(value) })}
+              isRequired
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Walk Frame Count *
-            </label>
-            <input
+            <Input
+              label="Walk Frame Count *"
               type="number"
-              value={formData.walk_frame_count}
-              onChange={(e) => setFormData({ ...formData, walk_frame_count: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              min="1"
+              value={String(formData.walk_frame_count)}
+              onChange={(value) => setFormData({ ...formData, walk_frame_count: parseInt(value) })}
+              isRequired
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Walk Frame Rate (fps) *
-            </label>
-            <input
+            <Input
+              label="Walk Frame Rate (fps) *"
               type="number"
-              value={formData.walk_frame_rate}
-              onChange={(e) => setFormData({ ...formData, walk_frame_rate: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              min="1"
+              value={String(formData.walk_frame_rate)}
+              onChange={(value) => setFormData({ ...formData, walk_frame_rate: parseInt(value) })}
+              isRequired
             />
           </div>
         </div>
@@ -300,21 +281,23 @@ export default function EditSpritePage({ params }: { params: { id: string } }) {
         </div>
 
         <div className="flex gap-4">
-          <button
+          <Button
             type="submit"
-            disabled={saving || !!uploading}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+            variant="primary"
+            isLoading={saving}
+            isDisabled={saving || !!uploading}
           >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <button
+            Save Changes
+          </Button>
+          <Button
             type="button"
+            variant="danger"
             onClick={handleDelete}
-            disabled={deleting}
-            className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 disabled:bg-gray-400"
+            isLoading={deleting}
+            isDisabled={deleting}
           >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
+            Delete
+          </Button>
           <Link
             href="/admin/sprites"
             className="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300"

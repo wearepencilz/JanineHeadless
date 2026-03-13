@@ -8,6 +8,8 @@ import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import type { Flavour, FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function EditFlavourPage() {
   const router = useRouter();
@@ -98,15 +100,12 @@ export default function EditFlavourPage() {
           <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
+            <Input
+              label="Name *"
               type="text"
-              required
+              isRequired
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData({ ...formData, name: value })}
             />
           </div>
 
@@ -137,29 +136,23 @@ export default function EditFlavourPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Short Notes *
-            </label>
-            <input
+            <Input
+              label="Short Notes *"
               type="text"
-              required
+              isRequired
               value={formData.shortDescription || ''}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData({ ...formData, shortDescription: value })}
               placeholder="Brief, merchandisable descriptor (e.g., Browned butter, grilled corn, honey)"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <textarea
-              required
+            <Textarea
+              label="Description *"
+              isRequired
               rows={4}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData({ ...formData, description: value })}
               placeholder="Longer editorial description (e.g., A sweet, savoury gelato built around grilled corn, browned butter, and honey)"
             />
           </div>
@@ -194,14 +187,11 @@ export default function EditFlavourPage() {
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tasting Notes
-            </label>
-            <textarea
+            <Textarea
+              label="Tasting Notes"
               rows={3}
               value={formData.tastingNotes || ''}
-              onChange={(e) => setFormData({ ...formData, tastingNotes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData({ ...formData, tastingNotes: value })}
               placeholder="Sweet, creamy, hints of vanilla..."
             />
           </div>
@@ -225,40 +215,34 @@ export default function EditFlavourPage() {
                     onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
                     className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
                   />
-                  <input
+                  <Input
                     type="text"
                     value={formData.colour || '#FFFFFF'}
-                    onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(value) => setFormData({ ...formData, colour: value })}
                     placeholder="#FFFFFF"
+                    className="flex-1"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Archive Note
-              </label>
-              <textarea
+              <Textarea
+                label="Archive Note"
                 rows={4}
                 value={formData.story || ''}
-                onChange={(e) => setFormData({ ...formData, story: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(value) => setFormData({ ...formData, story: value })}
                 placeholder="Context about this flavour (e.g., Served alongside Wild Tomatoes)"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sort Order
-                </label>
-                <input
+                <Input
+                  label="Sort Order"
                   type="number"
-                  value={formData.sortOrder ?? 0}
-                  onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={String(formData.sortOrder ?? 0)}
+                  onChange={(value) => setFormData({ ...formData, sortOrder: parseInt(value) || 0 })}
                 />
               </div>
 

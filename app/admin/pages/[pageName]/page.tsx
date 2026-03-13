@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 interface PageContent {
   title?: string;
@@ -80,50 +83,43 @@ export default function PageEditPage() {
       <form onSubmit={handleSubmit} className="max-w-2xl">
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Page Title
-            </label>
-            <input
+            <Input
+              label="Page Title"
               type="text"
               value={formData.title || ''}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData({ ...formData, title: value })}
               placeholder="Enter page title"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Content
-            </label>
-            <textarea
+            <Textarea
+              label="Content"
               value={formData.content || ''}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, content: value })}
               rows={12}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter page content"
+              helperText="You can use HTML or Markdown formatting"
             />
-            <p className="text-xs text-gray-500 mt-2">
-              You can use HTML or Markdown formatting
-            </p>
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
             type="submit"
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm disabled:opacity-50"
+            variant="primary"
+            isLoading={saving}
+            isDisabled={saving}
           >
-            {saving ? 'Saving...' : 'Save Page'}
-          </button>
-          <button
+            Save Page
+          </Button>
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => router.back()}
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 h-10 px-4 text-sm"
           >
             Back
-          </button>
+          </Button>
         </div>
       </form>
     </div>

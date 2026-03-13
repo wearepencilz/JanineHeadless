@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 interface Format {
   id: string;
@@ -108,32 +111,24 @@ export default function NewModifierPage() {
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
+            <Input
+              label="Name *"
               type="text"
-              id="name"
               name="name"
-              required
+              isRequired
               value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
             />
           </div>
 
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
-              Slug
-            </label>
-            <input
+            <Input
+              label="Slug"
               type="text"
-              id="slug"
               name="slug"
               value={formData.slug}
-              onChange={handleChange}
+              onChange={(value) => setFormData(prev => ({ ...prev, slug: value }))}
               placeholder="Auto-generated from name if left empty"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -158,50 +153,34 @@ export default function NewModifierPage() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
+            <Textarea
+              label="Description"
               name="description"
               rows={3}
               value={formData.description}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
             />
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-              Price (in cents) *
-            </label>
-            <input
+            <Input
+              label="Price (in cents) *"
               type="number"
-              id="price"
               name="price"
-              required
-              min="0"
-              step="1"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              isRequired
+              value={String(formData.price)}
+              onChange={(value) => setFormData(prev => ({ ...prev, price: parseFloat(value) || 0 }))}
+              helperText="Enter price in cents (e.g., 150 for $1.50)"
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Enter price in cents (e.g., 150 for $1.50)
-            </p>
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-              Image URL
-            </label>
-            <input
+            <Input
+              label="Image URL"
               type="text"
-              id="image"
               name="image"
               value={formData.image}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(value) => setFormData(prev => ({ ...prev, image: value }))}
             />
           </div>
 
@@ -241,13 +220,15 @@ export default function NewModifierPage() {
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+              variant="primary"
+              isLoading={loading}
+              isDisabled={loading}
+              className="flex-1"
             >
-              {loading ? 'Creating...' : 'Create Modifier'}
-            </button>
+              Create Modifier
+            </Button>
             <Link
               href="/admin/modifiers"
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"

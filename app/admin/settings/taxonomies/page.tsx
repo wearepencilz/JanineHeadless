@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
 
 interface TaxonomyValue {
   id: string;
@@ -236,12 +238,13 @@ export default function TaxonomiesPage() {
               {TAXONOMY_CATEGORIES.find(c => c.key === activeTab)?.description}
             </p>
           </div>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setShowAddForm(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
           >
             + Add Value
-          </button>
+          </Button>
         </div>
 
         {/* Add Form */}
@@ -249,39 +252,38 @@ export default function TaxonomiesPage() {
           <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="text-sm font-medium text-gray-900 mb-3">Add New Value</h3>
             <div className="space-y-3">
-              <input
-                type="text"
+              <Input
                 placeholder="Label *"
                 value={addForm.label}
-                onChange={(e) => setAddForm({ ...addForm, label: e.target.value })}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(value) => setAddForm({ ...addForm, label: value })}
               />
-              <input
-                type="text"
+              <Input
                 placeholder="Description (optional)"
                 value={addForm.description}
-                onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(value) => setAddForm({ ...addForm, description: value })}
               />
               <div className="flex gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={handleAdd}
-                  disabled={saving || !addForm.label.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 text-sm font-medium"
+                  isLoading={saving}
+                  isDisabled={saving || !addForm.label.trim()}
                 >
-                  {saving ? 'Adding...' : 'Add'}
-                </button>
-                <button
+                  Add
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setShowAddForm(false);
                     setAddForm({ label: '', description: '' });
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -302,33 +304,32 @@ export default function TaxonomiesPage() {
               >
                 {editingId === value.id ? (
                   <div className="flex-1 space-y-2">
-                    <input
-                      type="text"
+                    <Input
                       value={editForm.label}
-                      onChange={(e) => setEditForm({ ...editForm, label: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(value) => setEditForm({ ...editForm, label: value })}
                     />
-                    <input
-                      type="text"
+                    <Input
                       value={editForm.description}
-                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      onChange={(value) => setEditForm({ ...editForm, description: value })}
                       placeholder="Description (optional)"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <div className="flex gap-2">
-                      <button
+                      <Button
+                        variant="primary"
+                        size="sm"
                         onClick={() => handleUpdate(value.id)}
-                        disabled={saving}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:bg-gray-400"
+                        isLoading={saving}
+                        isDisabled={saving}
                       >
                         Save
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={cancelEdit}
-                        className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -341,26 +342,29 @@ export default function TaxonomiesPage() {
                       <div className="text-xs text-gray-400 mt-1">Value: {value.value}</div>
                     </div>
                     <div className="flex gap-2">
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => startEdit(value)}
-                        className="text-sm text-blue-600 hover:text-blue-700"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleToggleArchive(value.id, value.archived)}
-                        disabled={saving}
-                        className="text-sm text-gray-600 hover:text-gray-700"
+                        isDisabled={saving}
                       >
                         Archive
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
                         onClick={() => handleDelete(value.id)}
-                        disabled={saving}
-                        className="text-sm text-red-600 hover:text-red-700"
+                        isDisabled={saving}
                       >
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </>
                 )}
@@ -387,13 +391,14 @@ export default function TaxonomiesPage() {
                       <div className="text-sm text-gray-500">{value.description}</div>
                     )}
                   </div>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleToggleArchive(value.id, value.archived)}
-                    disabled={saving}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    isDisabled={saving}
                   >
                     Restore
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>

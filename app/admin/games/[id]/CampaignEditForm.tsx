@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Campaign } from '@/types/game';
 import AssetUploader from './AssetUploader';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 interface CampaignEditFormProps {
   campaign: Campaign;
@@ -228,49 +231,36 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           <div className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Campaign Name (Internal)
-              </label>
-              <input
+              <Input
+                label="Campaign Name (Internal)"
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                onChange={(value) => setFormData({ ...formData, name: value })}
+                isRequired
+                helperText="Internal identifier for admin use"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Internal identifier for admin use
-              </p>
             </div>
 
             {/* Display Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Display Title
-              </label>
-              <input
+              <Input
+                label="Display Title"
                 type="text"
                 value={formData.display_title}
-                onChange={(e) => setFormData({ ...formData, display_title: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, display_title: value })}
                 placeholder="Leave empty to use campaign name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                helperText="Title shown to players (defaults to campaign name if empty)"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Title shown to players (defaults to campaign name if empty)
-              </p>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
+              <Textarea
+                label="Description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, description: value })}
                 placeholder="Campaign description shown to players"
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -327,26 +317,14 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
 
             {/* Timer Duration */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Timer Duration (seconds)
-              </label>
-              <input
+              <Input
+                label="Timer Duration (seconds)"
                 type="number"
-                value={formData.timer_duration}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    timer_duration: parseInt(e.target.value),
-                  })
-                }
-                min="10"
-                max="300"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
+                value={String(formData.timer_duration)}
+                onChange={(value) => setFormData({ ...formData, timer_duration: parseInt(value) })}
+                isRequired
+                helperText="How long players have to complete the game"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                How long players have to complete the game
-              </p>
             </div>
           </div>
         )}
@@ -356,46 +334,24 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Winner Count
-            </label>
-            <input
+            <Input
+              label="Winner Count"
               type="number"
-              value={formData.winner_count}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  winner_count: parseInt(e.target.value),
-                })
-              }
-              min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
+              value={String(formData.winner_count)}
+              onChange={(value) => setFormData({ ...formData, winner_count: parseInt(value) })}
+              isRequired
+              helperText="First X players to complete get rewards"
             />
-            <p className="text-sm text-gray-500 mt-1">
-              First X players to complete get rewards
-            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Total Rewards
-            </label>
-            <input
+            <Input
+              label="Total Rewards"
               type="number"
-              value={formData.reward_total}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  reward_total: parseInt(e.target.value),
-                })
-              }
-              min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
+              value={String(formData.reward_total)}
+              onChange={(value) => setFormData({ ...formData, reward_total: parseInt(value) })}
+              isRequired
+              helperText="Number of physical rewards available"
             />
-            <p className="text-sm text-gray-500 mt-1">
-              Number of physical rewards available
-            </p>
           </div>
         </div>
 
@@ -408,64 +364,48 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           <div className="space-y-4">
             {/* Reward Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reward Type
-              </label>
-              <input
+              <Input
+                label="Reward Type"
                 type="text"
                 value={formData.reward_type}
-                onChange={(e) => setFormData({ ...formData, reward_type: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, reward_type: value })}
                 placeholder="e.g., Free Scoop, 10% Off"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Reward Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reward Description
-              </label>
-              <textarea
+              <Textarea
+                label="Reward Description"
                 value={formData.reward_description}
-                onChange={(e) => setFormData({ ...formData, reward_description: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, reward_description: value })}
                 placeholder="e.g., Redeem for one free scoop of any flavour"
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Ticket Success Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ticket Success Title
-              </label>
-              <input
+              <Input
+                label="Ticket Success Title"
                 type="text"
                 value={formData.ticket_success_title}
-                onChange={(e) => setFormData({ ...formData, ticket_success_title: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, ticket_success_title: value })}
                 placeholder="e.g., 🎉 You Won!"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                helperText="Title shown when player wins a reward"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Title shown when player wins a reward
-              </p>
             </div>
 
             {/* Ticket Success Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ticket Success Message
-              </label>
-              <textarea
+              <Textarea
+                label="Ticket Success Message"
                 value={formData.ticket_success_message}
-                onChange={(e) => setFormData({ ...formData, ticket_success_message: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, ticket_success_message: value })}
                 placeholder="e.g., Show this code at the counter to claim your reward!"
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                helperText="Instructions shown with the claim code"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Instructions shown with the claim code
-              </p>
             </div>
           </div>
         </div>
@@ -523,51 +463,39 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
                 <h5 className="text-xs font-semibold text-blue-900 mb-3">Animation Settings</h5>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-blue-900 mb-1">
-                      Frame Width (px)
-                    </label>
-                    <input
+                    <Input
+                      label="Frame Width (px)"
                       type="number"
-                      value={formData.sprite_frame_width}
-                      onChange={(e) => setFormData({ ...formData, sprite_frame_width: parseInt(e.target.value) || 32 })}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                      min="1"
+                      value={String(formData.sprite_frame_width)}
+                      onChange={(value) => setFormData({ ...formData, sprite_frame_width: parseInt(value) || 32 })}
+                      size="sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-900 mb-1">
-                      Frame Height (px)
-                    </label>
-                    <input
+                    <Input
+                      label="Frame Height (px)"
                       type="number"
-                      value={formData.sprite_frame_height}
-                      onChange={(e) => setFormData({ ...formData, sprite_frame_height: parseInt(e.target.value) || 48 })}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                      min="1"
+                      value={String(formData.sprite_frame_height)}
+                      onChange={(value) => setFormData({ ...formData, sprite_frame_height: parseInt(value) || 48 })}
+                      size="sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-900 mb-1">
-                      Walk Frames
-                    </label>
-                    <input
+                    <Input
+                      label="Walk Frames"
                       type="number"
-                      value={formData.sprite_walk_frames}
-                      onChange={(e) => setFormData({ ...formData, sprite_walk_frames: parseInt(e.target.value) || 4 })}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                      min="1"
+                      value={String(formData.sprite_walk_frames)}
+                      onChange={(value) => setFormData({ ...formData, sprite_walk_frames: parseInt(value) || 4 })}
+                      size="sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-900 mb-1">
-                      Frame Rate (FPS)
-                    </label>
-                    <input
+                    <Input
+                      label="Frame Rate (FPS)"
                       type="number"
-                      value={formData.sprite_frame_rate}
-                      onChange={(e) => setFormData({ ...formData, sprite_frame_rate: parseInt(e.target.value) || 10 })}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                      min="1"
+                      value={String(formData.sprite_frame_rate)}
+                      onChange={(value) => setFormData({ ...formData, sprite_frame_rate: parseInt(value) || 10 })}
+                      size="sm"
                     />
                   </div>
                 </div>
@@ -688,28 +616,29 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
 
         {/* Actions - Always visible at bottom */}
         <div className="border-t border-gray-200 mt-6 pt-6 flex justify-between items-center">
-          <button
+          <Button
             type="button"
+            variant="danger"
             onClick={() => setShowDeleteConfirm(true)}
-            className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
           >
             Delete Campaign
-          </button>
+          </Button>
           <div className="flex gap-3">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => router.push('/admin/games')}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              variant="primary"
+              isLoading={saving}
+              isDisabled={saving}
             >
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+              Save Changes
+            </Button>
           </div>
         </div>
       </div>
@@ -726,20 +655,21 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
               associated game sessions, scores, and rewards. This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                isDisabled={deleting}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
                 onClick={handleDelete}
-                disabled={deleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                isLoading={deleting}
+                isDisabled={deleting}
               >
-                {deleting ? 'Deleting...' : 'Delete Campaign'}
-              </button>
+                Delete Campaign
+              </Button>
             </div>
           </div>
         </div>
