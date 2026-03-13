@@ -4,6 +4,7 @@ import { CartProvider } from '@/contexts/CartContext';
 import { Providers } from './providers';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import MobileDevLinkHeader from '@/components/MobileDevLinkHeader';
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: 'Janine - Artisanal Ice Cream',

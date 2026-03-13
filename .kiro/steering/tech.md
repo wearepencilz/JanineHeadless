@@ -89,6 +89,22 @@ npm run deploy
 
 **CRITICAL**: All CMS components MUST follow Untitled UI design patterns (https://github.com/untitleduico).
 
+**Use Untitled UI React Components**: When building UI elements, always check if an appropriate Untitled UI React component exists first:
+- Date Pickers: https://www.untitledui.com/react/components/date-pickers
+- Form Inputs: https://www.untitledui.com/react/components/inputs
+- Buttons: https://www.untitledui.com/react/components/buttons
+- Selects: https://www.untitledui.com/react/components/selects
+- Modals: https://www.untitledui.com/react/components/modals
+- Tables: https://www.untitledui.com/react/components/tables
+- Full component library: https://www.untitledui.com/react/components
+
+**Implementation Approach**:
+1. Check Untitled UI React components library first
+2. Copy the component code into `app/admin/components/ui/` directory
+3. Adapt TypeScript to JSX by removing type annotations
+4. Use the component throughout the CMS for consistency
+5. Only build custom components if no suitable Untitled UI component exists
+
 Reference `.kiro/steering/untitled-ui-reference.md` for:
 - Component structure and styling patterns
 - Color system and semantic tokens
