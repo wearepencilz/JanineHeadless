@@ -37,10 +37,10 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
 
   const checkUsage = async () => {
     try {
-      const response = await fetch('/api/offerings');
+      const response = await fetch('/api/products');
       if (response.ok) {
-        const offerings = await response.json();
-        const count = offerings.filter((o: any) => o.formatId === params.id).length;
+        const products = await response.json();
+        const count = products.filter((p: any) => p.formatId === params.id).length;
         setUsageCount(count);
       }
     } catch (error) {

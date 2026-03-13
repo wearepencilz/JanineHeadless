@@ -24,9 +24,9 @@ export default function AdminDashboard() {
           icon: '🍦',
         },
         {
-          title: 'Offerings',
-          description: 'Product offerings and bundles',
-          href: '/admin/offerings',
+          title: 'Products',
+          description: 'Menu items and product catalog',
+          href: '/admin/products',
           icon: '🎁',
         },
       ],

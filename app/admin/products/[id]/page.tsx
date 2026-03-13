@@ -503,7 +503,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             <div className="flex space-x-3">
               <button
                 type="button"
-                onClick={() => router.push('/admin/offerings')}
+                onClick={() => router.push('/admin/products')}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
               >
                 Cancel
