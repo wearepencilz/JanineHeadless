@@ -1,13 +1,13 @@
 {
-  "/api/ingredients/route": "app/api/ingredients/route.js",
-  "/api/flavours/route": "app/api/flavours/route.js",
   "/api/flavours/[id]/route": "app/api/flavours/[id]/route.js",
-  "/api/flavours/[id]/usage/route": "app/api/flavours/[id]/usage/route.js",
-  "/api/settings/taxonomies/[category]/route": "app/api/settings/taxonomies/[category]/route.js",
+  "/api/launches/route": "app/api/launches/route.js",
+  "/api/products/route": "app/api/products/route.js",
+  "/api/formats/route": "app/api/formats/route.js",
   "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js",
-  "/admin/ingredients/[id]/page": "app/admin/ingredients/[id]/page.js",
-  "/admin/formats/page": "app/admin/formats/page.js",
-  "/admin/ingredients/page": "app/admin/ingredients/page.js",
   "/admin/products/[id]/page": "app/admin/products/[id]/page.js",
-  "/admin/flavours/page": "app/admin/flavours/page.js"
+  "/admin/formats/page": "app/admin/formats/page.js",
+  "/admin/ingredients/[id]/page": "app/admin/ingredients/[id]/page.js",
+  "/admin/launches/page": "app/admin/launches/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
+  "/admin/page": "app/admin/page.js"
 }
