@@ -6,7 +6,7 @@ import {
   Home05, 
   Rocket01, 
   ShoppingCart01, 
-  IceCream02, 
+  Heart, 
   Package, 
   Settings01,
   BarChart03,
@@ -50,7 +50,7 @@ export default function MobileSidebar() {
     { 
       label: 'Flavours', 
       href: '/admin/flavours', 
-      icon: IceCream02 
+      icon: Heart 
     },
     { 
       label: 'Ingredients', 
@@ -96,7 +96,7 @@ export default function MobileSidebar() {
     <AriaDialogTrigger>
       <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white py-3 pr-2 pl-4 lg:hidden">
         <div className="flex items-center">
-          <IceCream02 className="h-8 w-8 text-blue-600" />
+          <Heart className="h-8 w-8 text-blue-600" />
           <span className="ml-3 text-xl font-semibold text-gray-900">Janine CMS</span>
         </div>
 
@@ -134,7 +134,7 @@ export default function MobileSidebar() {
                 <div className="flex flex-col h-full bg-white">
                   {/* Logo in mobile sidebar */}
                   <div className="flex items-center px-6 py-4 border-b border-gray-200">
-                    <IceCream02 className="h-8 w-8 text-blue-600" />
+                    <Heart className="h-8 w-8 text-blue-600" />
                     <span className="ml-3 text-xl font-semibold text-gray-900">Janine CMS</span>
                   </div>
 

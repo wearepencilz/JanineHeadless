@@ -6,7 +6,7 @@ import {
   Home05, 
   Rocket01, 
   ShoppingCart01, 
-  IceCream02, 
+  Heart, 
   Package, 
   Settings01,
   BarChart03,
@@ -40,7 +40,7 @@ export default function Sidebar() {
     { 
       label: 'Flavours', 
       href: '/admin/flavours', 
-      icon: IceCream02 
+      icon: Heart 
     },
     { 
       label: 'Ingredients', 
@@ -87,7 +87,7 @@ export default function Sidebar() {
       <div className="flex flex-col flex-1 min-h-0">
         {/* Logo */}
         <div className="flex items-center h-16 px-6 border-b border-gray-200">
-          <IceCream02 className="h-8 w-8 text-blue-600" />
+          <Heart className="h-8 w-8 text-blue-600" />
           <span className="ml-3 text-xl font-semibold text-gray-900">Janine CMS</span>
         </div>
 
