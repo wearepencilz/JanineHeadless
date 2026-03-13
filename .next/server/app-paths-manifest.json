@@ -1,10 +1,14 @@
 {
-  "/api/local-ip/route": "app/api/local-ip/route.js",
-  "/api/batches/route": "app/api/batches/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/page": "app/page.js",
-  "/admin/batches/page": "app/admin/batches/page.js",
+  "/api/formats/route": "app/api/formats/route.js",
+  "/api/flavours/route": "app/api/flavours/route.js",
+  "/api/ingredients/route": "app/api/ingredients/route.js",
+  "/api/products/route": "app/api/products/route.js",
+  "/admin/formats/page": "app/admin/formats/page.js",
+  "/admin/flavours/page": "app/admin/flavours/page.js",
   "/admin/ingredients/page": "app/admin/ingredients/page.js",
-  "/admin/launches/page": "app/admin/launches/page.js",
+  "/admin/batches/page": "app/admin/batches/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
   "/admin/games/page": "app/admin/games/page.js"
 }
