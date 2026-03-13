@@ -22,6 +22,87 @@
         "sortOrder": 3,
         "archived": false
       }
+    ],
+    "allergens": [
+      {
+        "id": "dairy",
+        "label": "Dairy",
+        "value": "dairy",
+        "sortOrder": 1,
+        "archived": false
+      },
+      {
+        "id": "eggs",
+        "label": "Eggs",
+        "value": "eggs",
+        "sortOrder": 2,
+        "archived": false
+      },
+      {
+        "id": "nuts",
+        "label": "Nuts",
+        "value": "nuts",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "sesame",
+        "label": "Sesame",
+        "value": "sesame",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "gluten",
+        "label": "Gluten",
+        "value": "gluten",
+        "sortOrder": 5,
+        "archived": false
+      },
+      {
+        "id": "soy",
+        "label": "Soy",
+        "value": "soy",
+        "sortOrder": 6,
+        "archived": false
+      }
+    ],
+    "dietaryFlags": [
+      {
+        "id": "vegan",
+        "label": "Vegan",
+        "value": "vegan",
+        "sortOrder": 1,
+        "archived": false
+      },
+      {
+        "id": "vegetarian",
+        "label": "Vegetarian",
+        "value": "vegetarian",
+        "sortOrder": 2,
+        "archived": false
+      },
+      {
+        "id": "gluten-free",
+        "label": "Gluten-Free",
+        "value": "gluten-free",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "dairy-free",
+        "label": "Dairy-Free",
+        "value": "dairy-free",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "nut-free",
+        "label": "Nut-Free",
+        "value": "nut-free",
+        "sortOrder": 5,
+        "archived": false
+      }
     ]
   }
 }
