@@ -85,8 +85,8 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Verify buttons and inputs are consistent across all migrated pages
   - Run `npm run build` to confirm no compilation errors
 
-- [ ] 4. Phase 2 - Select and Date Picker Components
-  - [ ] 4.1 Add Untitled UI Select and MultiSelect components via CLI
+- [-] 4. Phase 2 - Select and Date Picker Components
+  - [-] 4.1 Add Untitled UI Select and MultiSelect components via CLI
     - Run `npx untitledui@latest add select` and `npx untitledui@latest add multi-select`
     - Verify or create Select wrapper supporting search/filter, option groups, custom option rendering
     - Verify or create MultiSelect wrapper supporting removable tags, search, option groups
