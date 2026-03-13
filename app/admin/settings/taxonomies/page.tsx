@@ -25,7 +25,6 @@ const TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
   { key: 'formatCategories', label: 'Format Categories', description: 'Categories for product formats' },
   { key: 'modifierTypes', label: 'Modifier Types', description: 'Types of modifiers (toppings, sauces, etc.)' },
   { key: 'allergens', label: 'Allergens', description: 'Common allergen tags' },
-  { key: 'dietaryFlags', label: 'Dietary Flags', description: 'Dietary compatibility tags' },
   { key: 'contentBlockTypes', label: 'Content Block Types', description: 'Types of content blocks for launches' },
 ];
 

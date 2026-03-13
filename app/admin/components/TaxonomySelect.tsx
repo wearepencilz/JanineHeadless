@@ -9,7 +9,6 @@ export type TaxonomyCategory =
   | 'formatCategories'
   | 'modifierTypes'
   | 'allergens'
-  | 'dietaryFlags'
   | 'contentBlockTypes';
 
 interface TaxonomyValue {
