@@ -221,19 +221,6 @@ export function buildGenerationReport(results: {
     message = `Generated ${created} product${created !== 1 ? 's' : ''}. Skipped ${skipped} combination${skipped !== 1 ? 's' : ''} due to eligibility rules.`;
   }
   
-  // Add format breakdown to message if products were created
-  if (created > 0) {
-    const formatCounts = Object.entries(byFormat)
-      .filter(([_, data]) => data.created > 0)
-      .map(([name, data]) => `${data.created} ${name.toLowerCase()}`)
-      .join(', ');
-    
-    if (formatCounts) {
-      message = message.replace('Generated', `Generated ${formatCounts} -`);
-      message = message.replace(` product${created !== 1 ? 's' : ''}.`, '.');
-    }
-  }
-  
   return {
     success: true,
     created,

@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isFormatEligibleForFlavour, isFormatEligibleForFlavours } from '@/lib/product-generation';
+import { isFormatEligibleForFlavour, isFormatEligibleForFlavours, buildGenerationReport } from '@/lib/product-generation';
 
 describe('isFormatEligibleForFlavour', () => {
   describe('backward compatibility - formats without eligibility rules', () => {
@@ -266,6 +266,255 @@ describe('isFormatEligibleForFlavours', () => {
       const softServe = { type: 'soft-serve-base' };
 
       expect(isFormatEligibleForFlavours(format, [vanillaGelato, lemonSorbet, softServe])).toBe(false);
+    });
+  });
+});
+
+describe('buildGenerationReport', () => {
+  describe('empty results', () => {
+    it('should handle no products created and no skipped combinations', () => {
+      const report = buildGenerationReport({
+        createdProducts: [],
+        skippedCombinations: [],
+        totalProducts: 0
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(0);
+      expect(report.skipped).toBe(0);
+      expect(report.total).toBe(0);
+      expect(report.message).toBe('No products to generate.');
+      expect(report.details).toBeUndefined();
+    });
+  });
+
+  describe('only created products', () => {
+    it('should generate report for single product created', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' }
+        ],
+        skippedCombinations: [],
+        totalProducts: 1
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(1);
+      expect(report.skipped).toBe(0);
+      expect(report.total).toBe(1);
+      expect(report.message).toContain('Generated 1 product');
+      expect(report.breakdown.byFormat['Scoop']).toEqual({
+        created: 1,
+        skipped: 0,
+        flavourTypes: ['gelato']
+      });
+      expect(report.breakdown.byFlavourType['gelato']).toBe(1);
+      expect(report.details).toBeUndefined();
+    });
+
+    it('should generate report for multiple products created', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' },
+          { formatName: 'Scoop', flavourType: 'sorbet', flavourName: 'Lemon' },
+          { formatName: 'Sandwich', flavourType: 'gelato', flavourName: 'Chocolate' }
+        ],
+        skippedCombinations: [],
+        totalProducts: 3
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(3);
+      expect(report.skipped).toBe(0);
+      expect(report.total).toBe(3);
+      expect(report.message).toContain('Generated');
+      expect(report.message).toContain('3');
+      expect(report.breakdown.byFormat['Scoop']).toEqual({
+        created: 2,
+        skipped: 0,
+        flavourTypes: ['gelato', 'sorbet']
+      });
+      expect(report.breakdown.byFormat['Sandwich']).toEqual({
+        created: 1,
+        skipped: 0,
+        flavourTypes: ['gelato']
+      });
+      expect(report.breakdown.byFlavourType['gelato']).toBe(2);
+      expect(report.breakdown.byFlavourType['sorbet']).toBe(1);
+    });
+  });
+
+  describe('only skipped combinations', () => {
+    it('should generate report for only skipped combinations', () => {
+      const report = buildGenerationReport({
+        createdProducts: [],
+        skippedCombinations: [
+          { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Flavour type sorbet not eligible' }
+        ],
+        totalProducts: 0
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(0);
+      expect(report.skipped).toBe(1);
+      expect(report.total).toBe(0);
+      expect(report.message).toContain('No products created');
+      expect(report.message).toContain('1 combination skipped');
+      expect(report.breakdown.byFormat['Sandwich']).toEqual({
+        created: 0,
+        skipped: 1,
+        flavourTypes: []
+      });
+      expect(report.details).toBeDefined();
+      expect(report.details?.skippedCombinations).toHaveLength(1);
+    });
+  });
+
+  describe('mixed results', () => {
+    it('should generate report with both created and skipped products', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' },
+          { formatName: 'Scoop', flavourType: 'sorbet', flavourName: 'Lemon' }
+        ],
+        skippedCombinations: [
+          { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Flavour type sorbet not eligible' }
+        ],
+        totalProducts: 2
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(2);
+      expect(report.skipped).toBe(1);
+      expect(report.total).toBe(2);
+      expect(report.message).toContain('Generated 2 products');
+      expect(report.message).toContain('Skipped 1 combination');
+      expect(report.breakdown.byFormat['Scoop']).toEqual({
+        created: 2,
+        skipped: 0,
+        flavourTypes: ['gelato', 'sorbet']
+      });
+      expect(report.breakdown.byFormat['Sandwich']).toEqual({
+        created: 0,
+        skipped: 1,
+        flavourTypes: []
+      });
+      expect(report.details).toBeDefined();
+      expect(report.details?.skippedCombinations).toHaveLength(1);
+    });
+  });
+
+  describe('real-world scenarios', () => {
+    it('should handle launch with mixed types and eligibility rules', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla Bean' },
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Dark Chocolate' },
+          { formatName: 'Scoop', flavourType: 'sorbet', flavourName: 'Lemon' },
+          { formatName: 'Sandwich', flavourType: 'gelato', flavourName: 'Vanilla Bean' },
+          { formatName: 'Sandwich', flavourType: 'gelato', flavourName: 'Dark Chocolate' },
+          { formatName: 'Twist', flavourType: 'gelato', flavourName: 'Vanilla Bean + Dark Chocolate' },
+          { formatName: 'Twist', flavourType: 'gelato', flavourName: 'Vanilla Bean + Lemon' },
+          { formatName: 'Twist', flavourType: 'gelato', flavourName: 'Dark Chocolate + Lemon' }
+        ],
+        skippedCombinations: [
+          { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Flavour type sorbet not eligible for this format' }
+        ],
+        totalProducts: 8
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(8);
+      expect(report.skipped).toBe(1);
+      expect(report.total).toBe(8);
+      expect(report.breakdown.byFormat['Scoop'].created).toBe(3);
+      expect(report.breakdown.byFormat['Sandwich'].created).toBe(2);
+      expect(report.breakdown.byFormat['Sandwich'].skipped).toBe(1);
+      expect(report.breakdown.byFormat['Twist'].created).toBe(3);
+      expect(report.breakdown.byFlavourType['gelato']).toBe(7);
+      expect(report.breakdown.byFlavourType['sorbet']).toBe(1);
+    });
+
+    it('should handle soft-serve launch with specific eligibility', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Soft Serve', flavourType: 'soft-serve-base', flavourName: 'Vanilla Soft Serve' },
+          { formatName: 'Soft Serve', flavourType: 'soft-serve-base', flavourName: 'Chocolate Soft Serve' },
+          { formatName: 'Sundae', flavourType: 'soft-serve-base', flavourName: 'Vanilla Soft Serve Sundae' },
+          { formatName: 'Sundae', flavourType: 'soft-serve-base', flavourName: 'Chocolate Soft Serve Sundae' }
+        ],
+        skippedCombinations: [
+          { formatName: 'Scoop', flavourName: 'Vanilla Soft Serve', reason: 'Flavour type soft-serve-base not eligible for this format' },
+          { formatName: 'Scoop', flavourName: 'Chocolate Soft Serve', reason: 'Flavour type soft-serve-base not eligible for this format' }
+        ],
+        totalProducts: 4
+      });
+
+      expect(report.success).toBe(true);
+      expect(report.created).toBe(4);
+      expect(report.skipped).toBe(2);
+      expect(report.breakdown.byFormat['Soft Serve'].created).toBe(2);
+      expect(report.breakdown.byFormat['Sundae'].created).toBe(2);
+      expect(report.breakdown.byFormat['Scoop'].skipped).toBe(2);
+      expect(report.breakdown.byFlavourType['soft-serve-base']).toBe(4);
+    });
+  });
+
+  describe('message generation', () => {
+    it('should use singular form for 1 product', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' }
+        ],
+        skippedCombinations: [],
+        totalProducts: 1
+      });
+
+      expect(report.message).toContain('1 product');
+      expect(report.message).not.toContain('products');
+    });
+
+    it('should use plural form for multiple products', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' },
+          { formatName: 'Scoop', flavourType: 'sorbet', flavourName: 'Lemon' }
+        ],
+        skippedCombinations: [],
+        totalProducts: 2
+      });
+
+      expect(report.message).toContain('2 products');
+    });
+
+    it('should use singular form for 1 skipped combination', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' }
+        ],
+        skippedCombinations: [
+          { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Not eligible' }
+        ],
+        totalProducts: 1
+      });
+
+      expect(report.message).toContain('1 combination');
+      expect(report.message).not.toContain('combinations');
+    });
+
+    it('should use plural form for multiple skipped combinations', () => {
+      const report = buildGenerationReport({
+        createdProducts: [
+          { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' }
+        ],
+        skippedCombinations: [
+          { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Not eligible' },
+          { formatName: 'Sandwich', flavourName: 'Strawberry', reason: 'Not eligible' }
+        ],
+        totalProducts: 1
+      });
+
+      expect(report.message).toContain('2 combinations');
     });
   });
 });
