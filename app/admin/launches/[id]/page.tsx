@@ -65,13 +65,14 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
 
   const fetchFlavours = async () => {
     try {
-      const response = await fetch('/api/flavours');
+      const response = await fetch('/api/flavours?pageSize=1000');
       if (response.ok) {
-        const data = await response.json();
-        setFlavours(data);
+        const result = await response.json();
+        // Flavours API returns paginated response: { data: [], total, page, pageSize }
+        setFlavours(Array.isArray(result.data) ? result.data : []);
       }
     } catch (err) {
-      console.error('Failed to load flavours');
+      console.error('Failed to load flavours', err);
     }
   };
 
@@ -80,10 +81,11 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        setProducts(data);
+        // Products API returns plain array
+        setProducts(Array.isArray(data) ? data : []);
       }
     } catch (err) {
-      console.error('Failed to load products');
+      console.error('Failed to load products', err);
     }
   };
 
