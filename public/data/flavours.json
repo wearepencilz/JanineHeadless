@@ -1,5 +1,21 @@
 [
   {
+    "id": "flavour-4",
+    "name": "Archived Gelato",
+    "slug": "archived-gelato",
+    "type": "gelato",
+    "ingredients": [],
+    "keyNotes": [
+      "test"
+    ],
+    "allergens": [],
+    "dietaryTags": [],
+    "status": "archived",
+    "featured": false,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
     "id": "grilled-corn",
     "name": "Grilled Corn",
     "slug": "grilled-corn",
@@ -44,12 +60,12 @@
     "status": "archived",
     "canBeUsedInTwist": true,
     "canBeSoldAsPint": true,
-    "canBeUsedInSandwich": true,
+    "canBeUsedInSandwich": false,
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:47:05.395Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "wild-tomatoes",
@@ -92,8 +108,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "basil-lemon",
@@ -140,8 +156,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "raspberry",
@@ -180,8 +196,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "mint-lime",
@@ -228,8 +244,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "melon",
@@ -272,8 +288,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "spruce-tip",
@@ -316,8 +332,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "wild-blueberry",
@@ -356,8 +372,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "vanilla",
@@ -398,8 +414,8 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "strawberry-thyme",
@@ -442,7 +458,7 @@
     "sortOrder": 0,
     "featured": false,
     "syncStatus": "not_linked",
-    "createdAt": "2026-03-13T02:46:29.921Z",
-    "updatedAt": "2026-03-13T02:46:29.921Z"
+    "createdAt": "2026-03-13T14:00:07.254Z",
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   }
 ]
