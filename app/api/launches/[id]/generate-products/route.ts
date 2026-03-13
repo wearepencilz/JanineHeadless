@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getFlavours, getFormats, getProducts, saveProducts, getLaunches, saveLaunches } from '@/lib/db';
 import { generateProductName } from '@/lib/validation';
+import { isFormatEligibleForFlavour, isFormatEligibleForFlavours } from '@/lib/product-generation';
 
 export async function POST(
   request: NextRequest,
@@ -41,10 +42,6 @@ export async function POST(
       );
     }
 
-    // Separate flavours by type
-    const gelatoFlavours = selectedFlavours.filter((f: any) => f.type === 'gelato');
-    const sorbetFlavours = selectedFlavours.filter((f: any) => f.type === 'sorbet');
-
     // Get all formats
     const formats = await getFormats();
     const activeFormats = formats.filter((f: any) => f.status === 'active');
@@ -59,168 +56,152 @@ export async function POST(
       );
     }
 
-    // Find specific format serving styles
-    // Try to find scoop format, or use the first available format
-    const scoopFormat = availableFormats.find((f: any) => 
-      f.servingStyle?.toLowerCase() === 'scoop' || f.category?.toLowerCase() === 'scoop'
-    ) || availableFormats[0];
-    const twistFormat = availableFormats.find((f: any) => 
-      f.servingStyle?.toLowerCase() === 'twist' || f.category?.toLowerCase() === 'twist'
-    );
-
-    if (!scoopFormat) {
-      return NextResponse.json(
-        { error: 'No formats available for single-flavour products. Please create at least one format.' },
-        { status: 400 }
-      );
-    }
-
     const products = await getProducts();
     let created = 0;
+    let skipped = 0;
     const newProductIds: string[] = [];
+    const skippedCombinations: Array<{
+      formatName: string;
+      flavourName: string;
+      reason: string;
+    }> = [];
 
-    // Generate single-flavour gelato products (scoop format)
-    for (const flavour of gelatoFlavours) {
-      const productData = {
-        formatId: scoopFormat.id,
-        primaryFlavourIds: [flavour.id],
-        secondaryFlavourIds: [],
-        componentIds: [],
-        toppingIds: []
-      };
+    // Separate single-flavour and multi-flavour formats
+    const singleFlavourFormats = availableFormats.filter(
+      (f: any) => f.requiresFlavours && f.minFlavours === 1 && f.maxFlavours === 1
+    );
+    const multiFlavourFormats = availableFormats.filter(
+      (f: any) => f.requiresFlavours && f.minFlavours > 1
+    );
 
-      const names = generateProductName(productData, scoopFormat, [flavour]);
-      
-      // Check if product already exists
-      const existingProduct = products.find(
-        (p: any) => 
-          p.formatId === scoopFormat.id && 
-          p.primaryFlavourIds?.length === 1 &&
-          p.primaryFlavourIds[0] === flavour.id
-      );
+    // Generate single-flavour products
+    for (const format of singleFlavourFormats) {
+      for (const flavour of selectedFlavours) {
+        // Check eligibility using the new function
+        if (!isFormatEligibleForFlavour(format, flavour)) {
+          skipped++;
+          skippedCombinations.push({
+            formatName: format.name,
+            flavourName: flavour.name,
+            reason: `Flavour type '${flavour.type}' not eligible for this format`
+          });
+          continue;
+        }
 
-      if (!existingProduct) {
-        const newProduct = {
-          id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          internalName: names.internalName,
-          publicName: names.publicName,
-          slug: `${scoopFormat.slug}-${flavour.slug || flavour.name.toLowerCase().replace(/\s+/g, '-')}`,
-          status: 'draft',
-          formatId: scoopFormat.id,
+        const productData = {
+          formatId: format.id,
           primaryFlavourIds: [flavour.id],
           secondaryFlavourIds: [],
           componentIds: [],
-          toppingIds: [],
-          description: `${flavour.name} gelato`,
-          price: scoopFormat.basePrice || 0,
-          onlineOrderable: false,
-          pickupOnly: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          toppingIds: []
         };
 
-        products.push(newProduct);
-        created++;
-        newProductIds.push(newProduct.id);
-      } else {
-        newProductIds.push(existingProduct.id);
-      }
-    }
+        const names = generateProductName(productData, format, [flavour]);
+        
+        // Check if product already exists
+        const existingProduct = products.find(
+          (p: any) => 
+            p.formatId === format.id && 
+            p.primaryFlavourIds?.length === 1 &&
+            p.primaryFlavourIds[0] === flavour.id
+        );
 
-    // Generate single-flavour sorbet products (scoop format)
-    for (const flavour of sorbetFlavours) {
-      const productData = {
-        formatId: scoopFormat.id,
-        primaryFlavourIds: [flavour.id],
-        secondaryFlavourIds: [],
-        componentIds: [],
-        toppingIds: []
-      };
-
-      const names = generateProductName(productData, scoopFormat, [flavour]);
-      
-      const existingProduct = products.find(
-        (p: any) => 
-          p.formatId === scoopFormat.id && 
-          p.primaryFlavourIds?.length === 1 &&
-          p.primaryFlavourIds[0] === flavour.id
-      );
-
-      if (!existingProduct) {
-        const newProduct = {
-          id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          internalName: names.internalName,
-          publicName: names.publicName,
-          slug: `${scoopFormat.slug}-${flavour.slug || flavour.name.toLowerCase().replace(/\s+/g, '-')}`,
-          status: 'draft',
-          formatId: scoopFormat.id,
-          primaryFlavourIds: [flavour.id],
-          secondaryFlavourIds: [],
-          componentIds: [],
-          toppingIds: [],
-          description: `${flavour.name} sorbet`,
-          price: scoopFormat.basePrice || 0,
-          onlineOrderable: false,
-          pickupOnly: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-
-        products.push(newProduct);
-        created++;
-        newProductIds.push(newProduct.id);
-      } else {
-        newProductIds.push(existingProduct.id);
-      }
-    }
-
-    // Generate twist products (if we have both gelato and sorbet, and twist format exists)
-    if (twistFormat && gelatoFlavours.length > 0 && sorbetFlavours.length > 0) {
-      for (const gelatoFlavour of gelatoFlavours) {
-        for (const sorbetFlavour of sorbetFlavours) {
-          const productData = {
-            formatId: twistFormat.id,
-            primaryFlavourIds: [gelatoFlavour.id, sorbetFlavour.id],
+        if (!existingProduct) {
+          const newProduct = {
+            id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            internalName: names.internalName,
+            publicName: names.publicName,
+            slug: `${format.slug}-${flavour.slug || flavour.name.toLowerCase().replace(/\s+/g, '-')}`,
+            status: 'draft',
+            formatId: format.id,
+            primaryFlavourIds: [flavour.id],
             secondaryFlavourIds: [],
             componentIds: [],
-            toppingIds: []
+            toppingIds: [],
+            description: `${flavour.name} ${flavour.type}`,
+            price: format.basePrice || 0,
+            onlineOrderable: false,
+            pickupOnly: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           };
 
-          const names = generateProductName(productData, twistFormat, [gelatoFlavour, sorbetFlavour]);
-          
-          const existingProduct = products.find(
-            (p: any) => 
-              p.formatId === twistFormat.id && 
-              p.primaryFlavourIds?.length === 2 &&
-              p.primaryFlavourIds.includes(gelatoFlavour.id) &&
-              p.primaryFlavourIds.includes(sorbetFlavour.id)
-          );
+          products.push(newProduct);
+          created++;
+          newProductIds.push(newProduct.id);
+        } else {
+          newProductIds.push(existingProduct.id);
+        }
+      }
+    }
 
-          if (!existingProduct) {
-            const newProduct = {
-              id: `product-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-              internalName: names.internalName,
-              publicName: names.publicName,
-              slug: `${twistFormat.slug}-${gelatoFlavour.slug || gelatoFlavour.name.toLowerCase().replace(/\s+/g, '-')}-${sorbetFlavour.slug || sorbetFlavour.name.toLowerCase().replace(/\s+/g, '-')}`,
-              status: 'draft',
-              formatId: twistFormat.id,
-              primaryFlavourIds: [gelatoFlavour.id, sorbetFlavour.id],
+    // Generate multi-flavour products (e.g., twist products)
+    for (const format of multiFlavourFormats) {
+      const requiredFlavours = format.minFlavours || 2;
+      
+      // Generate all combinations of flavours for this format
+      if (requiredFlavours === 2 && selectedFlavours.length >= 2) {
+        for (let i = 0; i < selectedFlavours.length; i++) {
+          for (let j = i + 1; j < selectedFlavours.length; j++) {
+            const flavourPair = [selectedFlavours[i], selectedFlavours[j]];
+            
+            // Check eligibility using the new function
+            if (!isFormatEligibleForFlavours(format, flavourPair)) {
+              skipped++;
+              skippedCombinations.push({
+                formatName: format.name,
+                flavourName: `${flavourPair[0].name} + ${flavourPair[1].name}`,
+                reason: format.allowMixedTypes === false && flavourPair[0].type !== flavourPair[1].type
+                  ? 'Mixed types not allowed for this format'
+                  : `One or more flavour types not eligible for this format`
+              });
+              continue;
+            }
+
+            const productData = {
+              formatId: format.id,
+              primaryFlavourIds: [flavourPair[0].id, flavourPair[1].id],
               secondaryFlavourIds: [],
               componentIds: [],
-              toppingIds: [],
-              description: `${gelatoFlavour.name} and ${sorbetFlavour.name} twist`,
-              price: twistFormat.basePrice || 0,
-              onlineOrderable: false,
-              pickupOnly: false,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
+              toppingIds: []
             };
 
-            products.push(newProduct);
-            created++;
-            newProductIds.push(newProduct.id);
-          } else {
-            newProductIds.push(existingProduct.id);
+            const names = generateProductName(productData, format, flavourPair);
+            
+            const existingProduct = products.find(
+              (p: any) => 
+                p.formatId === format.id && 
+                p.primaryFlavourIds?.length === 2 &&
+                p.primaryFlavourIds.includes(flavourPair[0].id) &&
+                p.primaryFlavourIds.includes(flavourPair[1].id)
+            );
+
+            if (!existingProduct) {
+              const newProduct = {
+                id: `product-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+                internalName: names.internalName,
+                publicName: names.publicName,
+                slug: `${format.slug}-${flavourPair[0].slug || flavourPair[0].name.toLowerCase().replace(/\s+/g, '-')}-${flavourPair[1].slug || flavourPair[1].name.toLowerCase().replace(/\s+/g, '-')}`,
+                status: 'draft',
+                formatId: format.id,
+                primaryFlavourIds: [flavourPair[0].id, flavourPair[1].id],
+                secondaryFlavourIds: [],
+                componentIds: [],
+                toppingIds: [],
+                description: `${flavourPair[0].name} and ${flavourPair[1].name} ${format.name.toLowerCase()}`,
+                price: format.basePrice || 0,
+                onlineOrderable: false,
+                pickupOnly: false,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+
+              products.push(newProduct);
+              created++;
+              newProductIds.push(newProduct.id);
+            } else {
+              newProductIds.push(existingProduct.id);
+            }
           }
         }
       }
@@ -242,20 +223,27 @@ export async function POST(
 
     await saveLaunches(updatedLaunches);
 
-    const twistCount = twistFormat && gelatoFlavours.length > 0 && sorbetFlavours.length > 0 
-      ? gelatoFlavours.length * sorbetFlavours.length 
-      : 0;
+    // Build response message
+    const formatBreakdown: Record<string, number> = {};
+    for (const product of products.filter((p: any) => newProductIds.includes(p.id))) {
+      const format = availableFormats.find((f: any) => f.id === product.formatId);
+      if (format) {
+        formatBreakdown[format.name] = (formatBreakdown[format.name] || 0) + 1;
+      }
+    }
+
+    const breakdownMessage = Object.entries(formatBreakdown)
+      .map(([name, count]) => `${count} ${name.toLowerCase()}`)
+      .join(', ');
 
     return NextResponse.json({
       success: true,
       created,
+      skipped,
       total: newProductIds.length,
-      breakdown: {
-        gelato: gelatoFlavours.length,
-        sorbet: sorbetFlavours.length,
-        twist: twistCount
-      },
-      message: `Generated ${created} new product(s): ${gelatoFlavours.length} gelato, ${sorbetFlavours.length} sorbet${twistCount > 0 ? `, ${twistCount} twist` : ''}`,
+      breakdown: formatBreakdown,
+      message: `Generated ${created} new product(s)${breakdownMessage ? `: ${breakdownMessage}` : ''}${skipped > 0 ? `. Skipped ${skipped} combination(s) due to eligibility rules` : ''}`,
+      details: skipped > 0 ? { skippedCombinations } : undefined
     });
   } catch (error) {
     console.error('Error generating products:', error);
