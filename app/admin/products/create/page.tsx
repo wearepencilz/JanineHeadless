@@ -141,6 +141,19 @@ export default function CreateProductPage() {
     if (step === 1 && validateStep1()) {
       setStep(2);
     } else if (step === 2 && validateStep2()) {
+      // Auto-populate internal name with selected flavour names
+      const selectedFlavours = flavours.filter(f => selectedFlavourIds.includes(f.id));
+      const autoInternalName = selectedFlavours.map(f => f.name).join(' & ');
+      
+      // Set default price to $7.00 for ice cream products
+      const defaultPrice = '7.00';
+      
+      setFormData(prev => ({
+        ...prev,
+        internalName: autoInternalName,
+        price: defaultPrice,
+      }));
+      
       setStep(3);
     }
   }
