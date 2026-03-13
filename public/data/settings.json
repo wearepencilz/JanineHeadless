@@ -32,124 +32,45 @@
         "archived": false
       },
       {
-        "id": "eggs",
-        "label": "Eggs",
-        "value": "eggs",
+        "id": "egg",
+        "label": "Egg",
+        "value": "egg",
         "sortOrder": 2,
-        "archived": false
-      },
-      {
-        "id": "nuts",
-        "label": "Nuts",
-        "value": "nuts",
-        "sortOrder": 3,
-        "archived": false
-      },
-      {
-        "id": "sesame",
-        "label": "Sesame",
-        "value": "sesame",
-        "sortOrder": 4,
         "archived": false
       },
       {
         "id": "gluten",
         "label": "Gluten",
         "value": "gluten",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "tree-nuts",
+        "label": "Tree Nuts",
+        "value": "tree-nuts",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "peanuts",
+        "label": "Peanuts",
+        "value": "peanuts",
         "sortOrder": 5,
+        "archived": false
+      },
+      {
+        "id": "sesame",
+        "label": "Sesame",
+        "value": "sesame",
+        "sortOrder": 6,
         "archived": false
       },
       {
         "id": "soy",
         "label": "Soy",
         "value": "soy",
-        "sortOrder": 6,
-        "archived": false
-      }
-    ],
-    "dietaryFlags": [
-      {
-        "id": "contains-dairy",
-        "label": "Contains Dairy",
-        "value": "contains-dairy",
-        "sortOrder": 1,
-        "archived": false
-      },
-      {
-        "id": "contains-egg",
-        "label": "Contains Egg",
-        "value": "contains-egg",
-        "sortOrder": 2,
-        "archived": false
-      },
-      {
-        "id": "contains-gluten",
-        "label": "Contains Gluten",
-        "value": "contains-gluten",
-        "sortOrder": 3,
-        "archived": false
-      },
-      {
-        "id": "contains-nuts",
-        "label": "Contains Nuts",
-        "value": "contains-nuts",
-        "sortOrder": 4,
-        "archived": false
-      },
-      {
-        "id": "contains-peanuts",
-        "label": "Contains Peanuts",
-        "value": "contains-peanuts",
-        "sortOrder": 5,
-        "archived": false
-      },
-      {
-        "id": "contains-sesame",
-        "label": "Contains Sesame",
-        "value": "contains-sesame",
-        "sortOrder": 6,
-        "archived": false
-      },
-      {
-        "id": "contains-soy",
-        "label": "Contains Soy",
-        "value": "contains-soy",
         "sortOrder": 7,
-        "archived": false
-      },
-      {
-        "id": "vegan",
-        "label": "Vegan",
-        "value": "vegan",
-        "sortOrder": 8,
-        "archived": false
-      },
-      {
-        "id": "vegetarian",
-        "label": "Vegetarian",
-        "value": "vegetarian",
-        "sortOrder": 9,
-        "archived": false
-      },
-      {
-        "id": "dairy-free",
-        "label": "Dairy Free",
-        "value": "dairy-free",
-        "sortOrder": 10,
-        "archived": false
-      },
-      {
-        "id": "gluten-free",
-        "label": "Gluten Free",
-        "value": "gluten-free",
-        "sortOrder": 11,
-        "archived": false
-      },
-      {
-        "id": "nut-free",
-        "label": "Nut Free",
-        "value": "nut-free",
-        "sortOrder": 12,
         "archived": false
       }
     ]

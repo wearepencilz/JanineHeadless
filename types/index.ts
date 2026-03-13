@@ -89,18 +89,24 @@ export type IngredientDescriptor = typeof ingredientDescriptorTags[number];
 
 export type Allergen = 
   | 'dairy' 
-  | 'eggs' 
-  | 'nuts' 
-  | 'soy' 
+  | 'egg' 
   | 'gluten' 
-  | 'sesame';
+  | 'tree-nuts' 
+  | 'peanuts' 
+  | 'sesame' 
+  | 'soy';
 
-export type DietaryFlag = 
-  | 'vegan' 
-  | 'vegetarian' 
-  | 'gluten-free' 
-  | 'dairy-free' 
-  | 'nut-free';
+// Dietary claims are computed from ingredient facts, not stored
+export type DietaryClaim = 
+  | 'contains-dairy'
+  | 'contains-egg'
+  | 'contains-gluten'
+  | 'contains-nuts'
+  | 'dairy-free'
+  | 'gluten-free'
+  | 'nut-free'
+  | 'vegan'
+  | 'vegetarian';
 
 export interface Ingredient {
   id: string;                       // UUID
@@ -110,8 +116,9 @@ export interface Ingredient {
   roles: IngredientRole[];          // Usage roles (multi-select)
   descriptors: IngredientDescriptor[]; // Descriptor tags (optional multi-select)
   origin: string;                   // Source/origin location
-  allergens: Allergen[];            // Allergen tags
-  dietaryFlags: DietaryFlag[];      // Dietary compatibility
+  allergens: Allergen[];            // Allergen flags (source of truth)
+  animalDerived?: boolean;          // Contains animal products
+  vegetarian?: boolean;             // Suitable for vegetarians
   seasonal: boolean;                // Seasonal availability
   image?: string;                   // Image URL (Vercel Blob or local)
   description?: string;             // Additional information
