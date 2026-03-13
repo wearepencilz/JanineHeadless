@@ -54,10 +54,6 @@ export default function TaxonomySelect({
   // Ensure value is always a string
   const safeValue = value ?? '';
 
-  useEffect(() => {
-    fetchTaxonomyValues();
-  }, [category]);
-
   const fetchTaxonomyValues = async () => {
     setLoading(true);
     try {
@@ -71,6 +67,10 @@ export default function TaxonomySelect({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTaxonomyValues();
+  }, [category]);
 
   const createNewValue = async () => {
     if (!newValue.label.trim()) {

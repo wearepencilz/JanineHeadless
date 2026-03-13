@@ -40,10 +40,6 @@ export default function TaxonomyMultiSelect({
   // Ensure values is always an array
   const safeValues = Array.isArray(values) ? values : [];
 
-  useEffect(() => {
-    fetchTaxonomyValues();
-  }, [category]);
-
   const fetchTaxonomyValues = async () => {
     setLoading(true);
     try {
@@ -57,6 +53,10 @@ export default function TaxonomyMultiSelect({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTaxonomyValues();
+  }, [category]);
 
   const createNewValue = async () => {
     if (!newValue.label.trim()) {
