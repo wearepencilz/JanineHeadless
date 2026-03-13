@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { generateSlug } from '@/lib/slug';
 
 interface Launch {
   id: string;
@@ -40,6 +41,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const [launch, setLaunch] = useState<Launch | null>(null);
   const [flavours, setFlavours] = useState<Flavour[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [slugTouched, setSlugTouched] = useState(false);
 
   useEffect(() => {
     fetchLaunch();
@@ -198,10 +200,26 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     if (!launch) return;
     const { name, value, type } = e.target;
-    setLaunch({
-      ...launch,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    });
+    
+    // Auto-generate slug from title if slug hasn't been manually edited
+    if (name === 'title' && !slugTouched) {
+      setLaunch({
+        ...launch,
+        title: value,
+        slug: generateSlug(value)
+      });
+    } else if (name === 'slug') {
+      setSlugTouched(true);
+      setLaunch({
+        ...launch,
+        slug: generateSlug(value)
+      });
+    } else {
+      setLaunch({
+        ...launch,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      });
+    }
   };
 
   if (loading) {
@@ -279,6 +297,9 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Auto-generated from title, but you can edit it
+            </p>
           </div>
 
           <div>
@@ -327,34 +348,42 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="activeStart" className="block text-sm font-medium text-gray-700 mb-2">
-                Active Start Date
-              </label>
-              <input
-                type="date"
-                id="activeStart"
-                name="activeStart"
-                value={launch.activeStart || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Active Period
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="activeStart" className="block text-xs text-gray-600 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  id="activeStart"
+                  name="activeStart"
+                  value={launch.activeStart || ''}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="activeEnd" className="block text-sm font-medium text-gray-700 mb-2">
-                Active End Date
-              </label>
-              <input
-                type="date"
-                id="activeEnd"
-                name="activeEnd"
-                value={launch.activeEnd || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div>
+                <label htmlFor="activeEnd" className="block text-xs text-gray-600 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  id="activeEnd"
+                  name="activeEnd"
+                  value={launch.activeEnd || ''}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
+            <p className="mt-1 text-xs text-gray-500">
+              When this launch will be active and visible to customers
+            </p>
           </div>
 
           <div>
