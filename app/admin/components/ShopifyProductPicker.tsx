@@ -43,6 +43,12 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
       
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Check for configuration errors
+        if (errorData.code === 'MISSING_STORE_DOMAIN' || errorData.code === 'MISSING_CREDENTIALS') {
+          throw new Error('Shopify is not configured. Please add Shopify credentials to your environment variables.');
+        }
+        
         throw new Error(errorData.error || 'Failed to load products');
       }
       
@@ -50,7 +56,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
       setProducts(data.products || []);
       
       if (data.products.length === 0) {
-        setError('No products found');
+        setError('No products found in your Shopify store');
       }
     } catch (err: any) {
       console.error('Error loading products:', err);
