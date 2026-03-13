@@ -193,7 +193,8 @@ export default function IngredientsPage() {
                 {filteredIngredients.map((ingredient) => (
                   <tr 
                     key={ingredient.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    onClick={() => router.push(`/admin/ingredients/${ingredient.id}`)}
+                    className="hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -259,12 +260,16 @@ export default function IngredientsPage() {
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/admin/ingredients/${ingredient.id}`}
+                          onClick={(e) => e.stopPropagation()}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDelete(ingredient.id, ingredient.name)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(ingredient.id, ingredient.name);
+                          }}
                           className="text-red-600 hover:text-red-900"
                         >
                           Delete

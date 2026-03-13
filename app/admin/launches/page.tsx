@@ -22,6 +22,11 @@ export default function LaunchesPage() {
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; title: string }>({
+    show: false,
+    id: '',
+    title: '',
+  });
 
   useEffect(() => {
     fetchLaunches();
@@ -45,6 +50,17 @@ export default function LaunchesPage() {
       setLoading(false);
     }
   };
+  // Handle ESC key to close delete confirmation
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && deleteConfirm.show) {
+        setDeleteConfirm({ show: false, id: '', title: '' });
+      }
+    };
+
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [deleteConfirm.show]);
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -63,6 +79,29 @@ export default function LaunchesPage() {
       month: 'short',
       day: 'numeric',
     });
+  };
+  const handleDeleteClick = (e: React.MouseEvent, id: string, title: string) => {
+    e.stopPropagation();
+    setDeleteConfirm({ show: true, id, title });
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/launches/${deleteConfirm.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setLaunches(launches.filter((l) => l.id !== deleteConfirm.id));
+        setDeleteConfirm({ show: false, id: '', title: '' });
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete launch');
+      }
+    } catch (error) {
+      console.error('Error deleting launch:', error);
+      alert('Failed to delete launch');
+    }
   };
 
   if (loading) {
@@ -179,13 +218,21 @@ export default function LaunchesPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                        href={`/admin/launches/${launch.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
-                        Edit
-                      </Link>
+                      <div className="flex items-center justify-end space-x-3">
+                        <Link
+                          href={`/admin/launches/${launch.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, launch.id, launch.title)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -194,6 +241,32 @@ export default function LaunchesPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Launch</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete "{deleteConfirm.title}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, id: '', title: '' })}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

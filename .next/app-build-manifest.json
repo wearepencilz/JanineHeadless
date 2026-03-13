@@ -136,6 +136,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/ingredients/[id]/page.js"
     ],
+    "/admin/ingredients/create/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/ingredients/create/page.js"
+    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

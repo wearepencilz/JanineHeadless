@@ -429,5 +429,25 @@
     "description": "Seasoning blend used as topping or add-on.",
     "createdAt": "2026-03-13T02:44:47.109Z",
     "updatedAt": "2026-03-13T02:44:47.109Z"
+  },
+  {
+    "id": "1773420159139",
+    "name": "Test ingredient",
+    "latinName": "",
+    "category": "new",
+    "origin": "new",
+    "allergens": [],
+    "dietaryFlags": [],
+    "seasonal": false,
+    "image": "",
+    "description": "",
+    "roles": [],
+    "descriptors": [
+      "Local",
+      "Seasonal",
+      "Caramelized"
+    ],
+    "createdAt": "2026-03-13T16:42:39.139Z",
+    "updatedAt": "2026-03-13T16:42:39.139Z"
   }
 ]

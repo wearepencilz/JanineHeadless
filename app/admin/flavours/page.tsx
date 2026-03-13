@@ -155,7 +155,11 @@ export default function FlavoursPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {flavours.map((flavour) => (
-                <tr key={flavour.id} className="hover:bg-gray-50">
+                <tr 
+                  key={flavour.id} 
+                  onClick={() => router.push(`/admin/flavours/${flavour.id}`)}
+                  className="hover:bg-gray-50 cursor-pointer"
+                >
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{flavour.name}</div>
                     <div className="text-sm text-gray-500 truncate max-w-md">
@@ -184,12 +188,16 @@ export default function FlavoursPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link
                       href={`/admin/flavours/${flavour.id}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(flavour.id, flavour.name)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(flavour.id, flavour.name);
+                      }}
                       className="text-red-600 hover:text-red-900"
                     >
                       Delete

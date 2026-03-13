@@ -34,6 +34,11 @@ export default function ProductsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [formatFilter, setFormatFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
+    show: false,
+    id: '',
+    name: '',
+  });
 
   useEffect(() => {
     fetchData();
@@ -69,6 +74,17 @@ export default function ProductsPage() {
       setLoading(false);
     }
   }
+  // Handle ESC key to close delete confirmation
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && deleteConfirm.show) {
+        setDeleteConfirm({ show: false, id: '', name: '' });
+      }
+    };
+
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [deleteConfirm.show]);
 
   // Filter by search query
   const filteredProducts = products.filter(product =>
@@ -95,6 +111,30 @@ export default function ProductsPage() {
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+  const handleDeleteClick = (e: React.MouseEvent, id: string, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeleteConfirm({ show: true, id, name });
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/products/${deleteConfirm.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setProducts(products.filter((p) => p.id !== deleteConfirm.id));
+        setDeleteConfirm({ show: false, id: '', name: '' });
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product');
     }
   };
 
@@ -193,12 +233,11 @@ export default function ProductsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Link
-              key={product.id}
-              href={`/admin/products/${product.id}`}
-              className="block bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-            >
-              <div className="p-6">
+            <div key={product.id} className="relative block bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all">
+              <Link
+                href={`/admin/products/${product.id}`}
+                className="block p-6"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-lg font-semibold text-gray-900">
                     {product.publicName}
@@ -255,9 +294,43 @@ export default function ProductsPage() {
                     </div>
                   )}
                 </div>
+              </Link>
+              <div className="px-6 pb-4 flex justify-end">
+                <button
+                  onClick={(e) => handleDeleteClick(e, product.id, product.publicName)}
+                  className="text-sm text-red-600 hover:text-red-900"
+                >
+                  Delete
+                </button>
               </div>
-            </Link>
+            </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Product</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

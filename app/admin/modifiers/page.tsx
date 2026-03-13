@@ -21,10 +21,27 @@ export default function ModifiersPage() {
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
+    show: false,
+    id: '',
+    name: '',
+  });
 
   useEffect(() => {
     fetchModifiers();
   }, [typeFilter, statusFilter]);
+
+  // Handle ESC key to close delete confirmation
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && deleteConfirm.show) {
+        setDeleteConfirm({ show: false, id: '', name: '' });
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [deleteConfirm.show]);
 
   const fetchModifiers = async () => {
     try {
@@ -58,6 +75,29 @@ export default function ModifiersPage() {
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
+  };
+  const handleDeleteClick = (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
+    setDeleteConfirm({ show: true, id, name });
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/modifiers/${deleteConfirm.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setModifiers(modifiers.filter((m) => m.id !== deleteConfirm.id));
+        setDeleteConfirm({ show: false, id: '', name: '' });
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete modifier');
+      }
+    } catch (error) {
+      console.error('Error deleting modifier:', error);
+      alert('Failed to delete modifier');
+    }
   };
 
   if (loading) {
@@ -195,13 +235,21 @@ export default function ModifiersPage() {
                       {modifier.availableForFormatIds.length} format(s)
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                        href={`/admin/modifiers/${modifier.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Edit
-                      </Link>
+                      <div className="flex items-center justify-end space-x-3">
+                        <Link
+                          href={`/admin/modifiers/${modifier.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, modifier.id, modifier.name)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -210,6 +258,32 @@ export default function ModifiersPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Modifier</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
