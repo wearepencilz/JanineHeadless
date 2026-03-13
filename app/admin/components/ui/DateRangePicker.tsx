@@ -122,20 +122,22 @@ export default function DateRangePicker({
                 <ChevronRight className="w-5 h-5" />
               </Button>
             </header>
-            <CalendarGrid className="border-spacing-1">
+            <CalendarGrid className="w-full border-separate border-spacing-1">
               <CalendarGridHeader>
                 {(day) => (
-                  <CalendarHeaderCell className="text-xs font-medium text-gray-600">
+                  <CalendarHeaderCell className="text-xs font-medium text-gray-600 w-9 h-9">
                     {day}
                   </CalendarHeaderCell>
                 )}
               </CalendarGridHeader>
-              {(date) => (
-                <CalendarCell
-                  date={date}
-                  className="w-9 h-9 text-sm outline-none cursor-pointer rounded-lg flex items-center justify-center hover:bg-gray-100 selected:bg-blue-600 selected:text-white selection-start:rounded-l-lg selection-end:rounded-r-lg disabled:text-gray-300 disabled:cursor-not-allowed outside-month:text-gray-400"
-                />
-              )}
+              <tbody>
+                {(date) => (
+                  <CalendarCell
+                    date={date}
+                    className="w-9 h-9 text-sm outline-none cursor-pointer rounded-lg flex items-center justify-center hover:bg-gray-100 selected:bg-blue-600 selected:text-white selection-start:rounded-l-lg selection-end:rounded-r-lg disabled:text-gray-300 disabled:cursor-not-allowed outside-month:text-gray-400"
+                  />
+                )}
+              </tbody>
             </CalendarGrid>
           </RangeCalendar>
         </Dialog>
