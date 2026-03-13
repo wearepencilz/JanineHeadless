@@ -179,7 +179,6 @@ export interface Flavour {
   image?: string;                // Flavour image URL
   
   // Availability
-  season?: string;               // e.g., "Spring", "Summer"
   status: Status;                // Current availability status
   
   // Format eligibility flags

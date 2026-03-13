@@ -1,5 +1,21 @@
 [
   {
+    "id": "flavour-4",
+    "name": "Archived Gelato",
+    "slug": "archived-gelato",
+    "type": "gelato",
+    "ingredients": [],
+    "keyNotes": [
+      "test"
+    ],
+    "allergens": [],
+    "dietaryTags": [],
+    "status": "archived",
+    "featured": false,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
     "id": "grilled-corn",
     "name": "Grilled Corn",
     "slug": "grilled-corn",
@@ -32,6 +48,7 @@
       }
     ],
     "keyNotes": [
+      "seasonal",
       "smoky",
       "sweet",
       "summer"
@@ -48,7 +65,7 @@
     "featured": false,
     "syncStatus": "not_linked",
     "createdAt": "2026-03-13T14:00:07.254Z",
-    "updatedAt": "2026-03-13T16:57:27.226Z"
+    "updatedAt": "2026-03-13T14:00:07.254Z"
   },
   {
     "id": "wild-tomatoes",

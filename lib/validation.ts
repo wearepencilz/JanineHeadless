@@ -115,14 +115,6 @@ export async function validateTaxonomyDeletion(category: string, id: string): Pr
         usedBy.push(...flavoursWithValue.map((flav: any) => ({ type: 'flavour', id: flav.id, name: flav.name })))
       }
       break
-      
-    case 'seasons':
-      const seasonFlavours = await getFlavours()
-      const usedInSeasons = seasonFlavours.filter((flav: any) => flav.season === id)
-      if (usedInSeasons.length > 0) {
-        usedBy.push(...usedInSeasons.map((flav: any) => ({ type: 'flavour', id: flav.id, name: flav.name })))
-      }
-      break
   }
   
   return {

@@ -26,7 +26,6 @@ export default function CreateFlavourPage() {
     baseStyle: 'dairy' as BaseStyle,
     keyNotes: [] as string[],
     colour: '#FFFFFF',
-    season: '',
     status: 'active' as Status,
     
     // Format eligibility
@@ -185,14 +184,6 @@ export default function CreateFlavourPage() {
                 />
               </div>
             </div>
-
-            <TaxonomySelect
-              category="seasons"
-              value={formData.season}
-              onChange={(value) => setFormData({ ...formData, season: value })}
-              label="Season"
-              placeholder="Select season"
-            />
           </div>
 
           <div>

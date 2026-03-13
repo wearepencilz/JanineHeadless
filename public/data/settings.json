@@ -14,23 +14,12 @@
         "value": "sorbet",
         "sortOrder": 2,
         "archived": false
-      }
-    ],
-    "ingredientCategories": [
+      },
       {
-        "id": "new",
-        "label": "New",
-        "value": "new",
-        "sortOrder": 1,
-        "archived": false
-      }
-    ],
-    "formatCategories": [
-      {
-        "id": "ice-cream",
-        "label": "Ice Cream",
-        "value": "ice-cream",
-        "sortOrder": 1,
+        "id": "soft-serve-base",
+        "label": "Soft Serve Base",
+        "value": "soft-serve-base",
+        "sortOrder": 3,
         "archived": false
       }
     ]

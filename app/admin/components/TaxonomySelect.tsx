@@ -10,7 +10,6 @@ export type TaxonomyCategory =
   | 'modifierTypes'
   | 'allergens'
   | 'dietaryFlags'
-  | 'seasons'
   | 'contentBlockTypes';
 
 interface TaxonomyValue {
