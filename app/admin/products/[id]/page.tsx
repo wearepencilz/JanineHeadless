@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Offering, Format, Flavour } from '@/types';
+import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
+import { computeProductAllergens, formatAllergen, formatDietaryClaim, getAllergenBadgeColor, getDietaryClaimBadgeColor } from '@/lib/product-allergens';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [offering, setOffering] = useState<Offering | null>(null);
   const [format, setFormat] = useState<Format | null>(null);
   const [flavours, setFlavours] = useState<Flavour[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -51,17 +53,20 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   async function fetchData() {
     try {
-      const [offeringRes, flavoursRes] = await Promise.all([
+      const [offeringRes, flavoursRes, ingredientsRes] = await Promise.all([
         fetch(`/api/products/${params.id}`),
         fetch('/api/flavours'),
+        fetch('/api/ingredients'),
       ]);
 
-      if (offeringRes.ok && flavoursRes.ok) {
+      if (offeringRes.ok && flavoursRes.ok && ingredientsRes.ok) {
         const offeringData = await offeringRes.json();
         const flavoursData = await flavoursRes.json();
+        const ingredientsData = await ingredientsRes.json();
         
         setOffering(offeringData);
         setFlavours(flavoursData.data || flavoursData);
+        setIngredients(ingredientsData.data || ingredientsData);
 
         // Fetch format
         const formatRes = await fetch(`/api/formats/${offeringData.formatId}`);
@@ -257,6 +262,16 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   const primaryFlavours = flavours.filter(f => offering.primaryFlavourIds.includes(f.id));
 
+  // Compute allergens and dietary claims from flavours and their ingredients
+  const flavourIngredientIds = primaryFlavours.flatMap(f => 
+    f.ingredients?.map(fi => fi.ingredientId) || []
+  );
+  const flavourIngredients = ingredients.filter(ing => 
+    flavourIngredientIds.includes(ing.id)
+  );
+  
+  const allergenData = computeProductAllergens(primaryFlavours, flavourIngredients, []);
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
@@ -287,15 +302,98 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         </div>
       )}
 
-      {/* Format & Flavours Info */}
+      {/* Product Composition Section */}
       {format && (
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-          <h3 className="text-sm font-medium text-blue-900 mb-2">Format & Flavours</h3>
-          <div className="text-sm text-blue-800">
-            <p><span className="font-medium">Format:</span> {format.name}</p>
-            <p><span className="font-medium">Flavours:</span> {primaryFlavours.map(f => f.name).join(', ')}</p>
-            <p className="text-xs text-blue-600 mt-1">
-              Note: Format and flavours cannot be changed after creation. Create a new offering to use different format/flavours.
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Composition</h2>
+          
+          {/* Format */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Format</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+              <p className="text-sm text-gray-900 font-medium">{format.name}</p>
+              <p className="text-xs text-gray-600 mt-1">{format.description}</p>
+            </div>
+          </div>
+
+          {/* Flavours */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Flavours</h3>
+            <div className="space-y-2">
+              {primaryFlavours.map((flavour) => (
+                <div key={flavour.id} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900 font-medium">{flavour.name}</p>
+                      <p className="text-xs text-gray-600 mt-1">{flavour.shortDescription}</p>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
+                          {flavour.type}
+                        </span>
+                        <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">
+                          {flavour.baseStyle}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Allergens & Dietary Claims - Computed */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Allergens & Dietary Information</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <p className="text-xs text-gray-600 mb-3">
+                ℹ️ Computed from flavour ingredients
+              </p>
+              
+              {/* Allergens */}
+              {allergenData.allergens.length > 0 ? (
+                <div className="mb-3">
+                  <p className="text-xs font-medium text-gray-700 mb-2">Contains Allergens:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {allergenData.allergens.map(allergen => (
+                      <span
+                        key={allergen}
+                        className={`px-2 py-1 text-xs font-medium rounded ${getAllergenBadgeColor(allergen)}`}
+                      >
+                        {formatAllergen(allergen)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-600">No allergens detected</p>
+                </div>
+              )}
+              
+              {/* Dietary Claims */}
+              {allergenData.dietaryClaims.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-700 mb-2">Dietary Claims:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {allergenData.dietaryClaims
+                      .filter(claim => !claim.startsWith('contains-')) // Show only positive claims
+                      .map(claim => (
+                        <span
+                          key={claim}
+                          className={`px-2 py-1 text-xs font-medium rounded ${getDietaryClaimBadgeColor(claim)}`}
+                        >
+                          {formatDietaryClaim(claim)}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs text-blue-800">
+              💡 Format and flavours cannot be changed after creation. Create a new product to use different format/flavours.
             </p>
           </div>
         </div>
