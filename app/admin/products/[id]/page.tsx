@@ -117,7 +117,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       });
 
       if (response.ok) {
-        router.push('/admin/products');
+        // Stay on the same page and show success message
+        const updatedProduct = await response.json();
+        setOffering(updatedProduct);
+        alert('Product updated successfully');
       } else {
         const error = await response.json();
         setErrors([error.error || 'Failed to update product']);

@@ -62,7 +62,9 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        router.push('/admin/formats');
+        const updatedFormat = await response.json();
+        setFormat(updatedFormat);
+        alert('Format updated successfully');
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to update format');
