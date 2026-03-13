@@ -25,7 +25,6 @@ export default function CreateProductPage() {
     price: '',
     compareAtPrice: '',
     status: 'draft',
-    tags: '',
     inventoryTracked: false,
     inventoryQuantity: '',
     onlineOrderable: true,
@@ -141,16 +140,17 @@ export default function CreateProductPage() {
     if (step === 1 && validateStep1()) {
       setStep(2);
     } else if (step === 2 && validateStep2()) {
-      // Auto-populate internal name with selected flavour names
+      // Auto-populate both internal and public names with selected flavour names
       const selectedFlavours = flavours.filter(f => selectedFlavourIds.includes(f.id));
-      const autoInternalName = selectedFlavours.map(f => f.name).join(' & ');
+      const autoName = selectedFlavours.map(f => f.name).join(' & ');
       
       // Set default price to $7.00 for ice cream products
       const defaultPrice = '7.00';
       
       setFormData(prev => ({
         ...prev,
-        internalName: autoInternalName,
+        internalName: autoName,
+        publicName: autoName,
         price: defaultPrice,
       }));
       
@@ -187,7 +187,6 @@ export default function CreateProductPage() {
         price,
         compareAtPrice,
         status: formData.status,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
         inventoryTracked: formData.inventoryTracked,
         inventoryQuantity: formData.inventoryQuantity ? parseInt(formData.inventoryQuantity) : undefined,
         onlineOrderable: formData.onlineOrderable,
@@ -422,19 +421,6 @@ export default function CreateProductPage() {
                   <option value="sold-out">Sold Out</option>
                   <option value="archived">Archived</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tags (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="seasonal, featured, limited"
-                />
               </div>
 
               <div className="flex items-center space-x-6">
