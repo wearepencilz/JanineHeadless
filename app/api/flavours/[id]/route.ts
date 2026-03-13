@@ -31,12 +31,12 @@ function calculateDietaryClaims(ingredientIds: string[], allIngredients: Ingredi
   
   // Check if vegan (no dairy, eggs, or animal products)
   const hasAnimalProducts = ingredients.some(ing => 
-    ing.allergens.includes('dairy') || ing.allergens.includes('eggs')
+    ing.allergens.includes('dairy') || ing.allergens.includes('egg')
   );
   if (!hasAnimalProducts) {
     flags.push('vegan');
     flags.push('vegetarian'); // vegan implies vegetarian
-  } else if (!ingredients.some(ing => ing.allergens.includes('eggs'))) {
+  } else if (!ingredients.some(ing => ing.allergens.includes('egg'))) {
     // Vegetarian if no meat (we assume no meat category exists, so just check it's not vegan)
     flags.push('vegetarian');
   }
