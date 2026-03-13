@@ -1,18 +1,25 @@
 [
   {
-    "id": "modifier-1773410285279",
-    "name": "Dried Tajin",
-    "slug": "dried-tajin",
-    "type": "topping",
-    "description": null,
-    "image": null,
-    "price": 0,
-    "allergens": [],
-    "dietaryFlags": [],
-    "availableForFormatIds": [],
+    "id": "mod-4",
+    "name": "Premium Nuts",
+    "slug": "premium-nuts",
+    "type": "premium-addon",
+    "description": "Roasted premium nuts",
+    "image": "/images/nuts.jpg",
+    "price": 200,
+    "allergens": [
+      "tree-nuts"
+    ],
+    "dietaryFlags": [
+      "vegan"
+    ],
+    "availableForFormatIds": [
+      "fmt-1",
+      "fmt-2"
+    ],
     "status": "active",
-    "sortOrder": 1,
-    "createdAt": "2026-03-13T13:58:05.279Z",
-    "updatedAt": "2026-03-13T13:58:05.279Z"
+    "sortOrder": 5,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 ]

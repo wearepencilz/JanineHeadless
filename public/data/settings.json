@@ -23,24 +23,5 @@
         "archived": false
       }
     ]
-  },
-  "formatEligibilityRules": {
-    "gelato": [
-      "scoop",
-      "take-home",
-      "twist",
-      "sandwich"
-    ],
-    "sorbet": [
-      "scoop",
-      "take-home",
-      "twist"
-    ],
-    "soft-serve-base": [
-      "soft-serve"
-    ],
-    "cookie": [
-      "sandwich"
-    ]
   }
 }

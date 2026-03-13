@@ -1,12 +1,14 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/launches/route": "app/api/launches/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js",
+  "/api/modifiers/route": "app/api/modifiers/route.js",
+  "/api/ingredients/route": "app/api/ingredients/route.js",
+  "/api/settings/taxonomies/[category]/route": "app/api/settings/taxonomies/[category]/route.js",
+  "/api/ingredients/[id]/route": "app/api/ingredients/[id]/route.js",
+  "/admin/modifiers/page": "app/admin/modifiers/page.js",
+  "/admin/settings/taxonomies/page": "app/admin/settings/taxonomies/page.js",
+  "/admin/modifiers/[id]/page": "app/admin/modifiers/[id]/page.js",
   "/admin/games/page": "app/admin/games/page.js",
-  "/admin/formats/page": "app/admin/formats/page.js",
-  "/admin/launches/new/page": "app/admin/launches/new/page.js",
+  "/admin/games/[id]/page": "app/admin/games/[id]/page.js",
   "/admin/ingredients/page": "app/admin/ingredients/page.js",
-  "/admin/launches/page": "app/admin/launches/page.js",
-  "/admin/modifiers/page": "app/admin/modifiers/page.js"
+  "/admin/ingredients/[id]/page": "app/admin/ingredients/[id]/page.js"
 }

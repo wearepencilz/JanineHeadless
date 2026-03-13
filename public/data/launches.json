@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "launch-1",
+    "title": "Test",
+    "slug": "test",
+    "status": "active",
+    "featuredFlavourIds": [],
+    "featuredSellableIds": [],
+    "featured": false,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]

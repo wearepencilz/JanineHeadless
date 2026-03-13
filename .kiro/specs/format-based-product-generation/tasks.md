@@ -6,7 +6,7 @@ This feature transforms product generation from hardcoded type checking to a fle
 
 ## Tasks
 
-- [ ] 1. Add eligibleFlavourTypes field to Format UI
+- [x] 1. Add eligibleFlavourTypes field to Format UI
   - [x] 1.1 Add TaxonomyMultiSelect component to format edit page
     - Import and integrate TaxonomyMultiSelect component in format edit page
     - Add "Format Eligibility" section after "Flavour Requirements" section
@@ -20,8 +20,8 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test state updates when eligibility changes
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2. Update Format API to handle eligibleFlavourTypes
-  - [~] 2.1 Add eligibleFlavourTypes validation to format API
+- [x] 2. Update Format API to handle eligibleFlavourTypes
+  - [x] 2.1 Add eligibleFlavourTypes validation to format API
     - Update PUT /api/formats/[id] to accept eligibleFlavourTypes field
     - Validate that selected types exist in flavourTypes taxonomy
     - Handle empty array as "accept all types"
@@ -35,15 +35,15 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test backward compatibility (no eligibleFlavourTypes field)
     - _Requirements: 2.2, 2.3, 2.4, 6.1, 6.2, 6.3_
 
-- [ ] 3. Implement eligibility checking functions
-  - [~] 3.1 Create isFormatEligibleForFlavour function
+- [x] 3. Implement eligibility checking functions
+  - [x] 3.1 Create isFormatEligibleForFlavour function
     - Implement eligibility check for single flavour
     - Handle formats without eligibility rules (accept all)
     - Handle empty eligibleFlavourTypes array (accept all)
     - Return true if flavour type is in format's eligible types
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 6.1, 6.2_
   
-  - [~] 3.2 Create isFormatEligibleForFlavours function for multi-flavour products
+  - [x] 3.2 Create isFormatEligibleForFlavours function for multi-flavour products
     - Check all flavours individually for eligibility
     - Validate mixed type restrictions (allowMixedTypes flag)
     - Return false if any flavour is ineligible
@@ -63,15 +63,15 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test multi-flavour with mixed types not allowed
     - _Requirements: 3.4, 4.1, 4.2, 4.3, 4.4, 6.1, 6.2_
 
-- [ ] 4. Update product generation logic
-  - [~] 4.1 Refactor generate-products API to use eligibility functions
+- [x] 4. Update product generation logic
+  - [x] 4.1 Refactor generate-products API to use eligibility functions
     - Replace hardcoded type checking with isFormatEligibleForFlavour calls
     - Filter format-flavour combinations based on eligibility
     - Track skipped combinations with reasons
     - Maintain backward compatibility for formats without eligibility rules
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 6.1, 6.2, 6.3_
   
-  - [~] 4.2 Update multi-flavour product generation (twist products)
+  - [x] 4.2 Update multi-flavour product generation (twist products)
     - Use isFormatEligibleForFlavours for multi-flavour formats
     - Skip combinations where any flavour is ineligible
     - Track skipped twist combinations separately
@@ -85,8 +85,8 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test generation creates all eligible combinations
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4, 6.1, 6.2, 6.3_
 
-- [ ] 5. Implement generation reporting
-  - [~] 5.1 Create GenerationReport interface and builder function
+- [x] 5. Implement generation reporting
+  - [x] 5.1 Create GenerationReport interface and builder function
     - Define GenerationReport TypeScript interface
     - Create buildGenerationReport function
     - Calculate breakdown by format (created, skipped, flavourTypes)
@@ -95,7 +95,7 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Include skipped combinations with reasons in details
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
   
-  - [~] 5.2 Update generate-products API response to use GenerationReport
+  - [x] 5.2 Update generate-products API response to use GenerationReport
     - Replace simple response with detailed GenerationReport
     - Include all breakdown information
     - Return skipped combinations in details section
@@ -108,14 +108,14 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test skipped combinations tracking
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 6. Add formatEligibilityRules to settings
-  - [~] 6.1 Update settings.json schema with formatEligibilityRules
+- [x] 6. Add formatEligibilityRules to settings
+  - [x] 6.1 Update settings.json schema with formatEligibilityRules
     - Add formatEligibilityRules field to settings.json
     - Define default mappings (gelato, sorbet, soft-serve-base)
     - Document the structure in comments
     - _Requirements: 7.1, 7.2, 7.5_
   
-  - [~] 6.2 Update settings UI to display eligibility rules
+  - [x] 6.2 Update settings UI to display eligibility rules
     - Add "Format Eligibility Rules" section to settings page
     - Display current mappings in read-only format
     - Add help text explaining the purpose
@@ -127,10 +127,10 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test backward compatibility (missing formatEligibilityRules)
     - _Requirements: 7.1, 7.2, 7.5_
 
-- [~] 7. Checkpoint - Ensure all tests pass
+- [-] 7. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Update TypeScript types
+- [~] 8. Update TypeScript types
   - [~] 8.1 Add eligibleFlavourTypes to Format type definition
     - Update Format interface in types file
     - Add JSDoc comments explaining the field
