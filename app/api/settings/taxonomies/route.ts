@@ -6,7 +6,7 @@ import { auth } from '@/lib/auth'
 export async function GET() {
   try {
     const settings = await getSettings()
-    return NextResponse.json(settings.taxonomies || {})
+    return NextResponse.json({ taxonomies: settings.taxonomies || {} })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
