@@ -62,16 +62,21 @@ export async function POST(
       );
     }
 
-    // Find specific format categories
-    const scoopFormat = availableFormats.find((f: any) => f.category === 'scoop');
-    const twistFormat = availableFormats.find((f: any) => f.category === 'twist');
+    // Find specific format serving styles
+    // Try to find scoop format, or use the first available format
+    const scoopFormat = availableFormats.find((f: any) => 
+      f.servingStyle?.toLowerCase() === 'scoop' || f.category?.toLowerCase() === 'scoop'
+    ) || availableFormats[0];
+    const twistFormat = availableFormats.find((f: any) => 
+      f.servingStyle?.toLowerCase() === 'twist' || f.category?.toLowerCase() === 'twist'
+    );
     
     console.log('Scoop format:', scoopFormat);
     console.log('Twist format:', twistFormat);
 
     if (!scoopFormat) {
       return NextResponse.json(
-        { error: 'No scoop format found. Please create a scoop format first.' },
+        { error: 'No formats available for single-flavour products. Please create at least one format.' },
         { status: 400 }
       );
     }
