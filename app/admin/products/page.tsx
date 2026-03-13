@@ -2,10 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Offering, Format } from '@/types';
 
-export default function OfferingsPage() {
-  const [offerings, setOfferings] = useState<Offering[]>([]);
+interface Product {
+  id: string;
+  internalName: string;
+  publicName: string;
+  slug: string;
+  status: string;
+  formatId: string;
+  primaryFlavourIds: string[];
+  secondaryFlavourIds?: string[];
+  componentIds?: string[];
+  toppingIds?: string[];
+  description?: string;
+  shortCardCopy?: string;
+  image?: string;
+  price: number;
+  tags?: string[];
+  onlineOrderable: boolean;
+}
+
+interface Format {
+  id: string;
+  name: string;
+}
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [formats, setFormats] = useState<Format[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -29,15 +52,15 @@ export default function OfferingsPage() {
         params.append('formatId', formatFilter);
       }
 
-      const [offeringsRes, formatsRes] = await Promise.all([
-        fetch(`/api/offerings?${params.toString()}`),
+      const [productsRes, formatsRes] = await Promise.all([
+        fetch(`/api/products?${params.toString()}`),
         fetch('/api/formats'),
       ]);
 
-      if (offeringsRes.ok && formatsRes.ok) {
-        const offeringsData = await offeringsRes.json();
+      if (productsRes.ok && formatsRes.ok) {
+        const productsData = await productsRes.json();
         const formatsData = await formatsRes.json();
-        setOfferings(offeringsData.data || offeringsData);
+        setProducts(productsData);
         setFormats(formatsData.data || formatsData);
       }
     } catch (error) {
@@ -48,9 +71,9 @@ export default function OfferingsPage() {
   }
 
   // Filter by search query
-  const filteredOfferings = offerings.filter(offering =>
-    offering.publicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    offering.internalName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter(product =>
+    product.publicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.internalName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getFormatName = (formatId: string) => {
@@ -88,16 +111,16 @@ export default function OfferingsPage() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Offerings</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Menu Items</h1>
             <p className="mt-2 text-sm text-gray-600">
-              Manage sellable menu items by combining formats with flavours
+              Manage sellable products by combining formats with flavours and modifiers
             </p>
           </div>
           <Link
-            href="/admin/offerings/create"
+            href="/admin/products/create"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Create Offering
+            Create Product
           </Link>
         </div>
 
@@ -162,54 +185,61 @@ export default function OfferingsPage() {
         </div>
       </div>
 
-      {/* Offerings Grid */}
-      {filteredOfferings.length === 0 ? (
+      {/* Products Grid */}
+      {filteredProducts.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">No offerings found. Create your first offering to get started.</p>
+          <p className="text-gray-500">No products found. Create your first product to get started.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredOfferings.map((offering) => (
+          {filteredProducts.map((product) => (
             <Link
-              key={offering.id}
-              href={`/admin/offerings/${offering.id}`}
+              key={product.id}
+              href={`/admin/products/${product.id}`}
               className="block bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {offering.publicName}
+                    {product.publicName}
                   </h3>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(offering.status)}`}>
-                    {offering.status}
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(product.status)}`}>
+                    {product.status}
                   </span>
                 </div>
                 
                 <p className="text-sm text-gray-600 mb-3">
-                  {offering.shortCardCopy || offering.description.substring(0, 100)}
+                  {product.shortCardCopy || product.description?.substring(0, 100)}
                 </p>
 
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center text-gray-600">
                     <span className="font-medium mr-2">Format:</span>
-                    <span>{getFormatName(offering.formatId)}</span>
+                    <span>{getFormatName(product.formatId)}</span>
                   </div>
                   
                   <div className="flex items-center text-gray-600">
                     <span className="font-medium mr-2">Flavours:</span>
-                    <span>{offering.primaryFlavourIds.length}</span>
+                    <span>{product.primaryFlavourIds.length}</span>
                   </div>
 
-                  {offering.price > 0 && (
+                  {product.toppingIds && product.toppingIds.length > 0 && (
                     <div className="flex items-center text-gray-600">
-                      <span className="font-medium mr-2">Price:</span>
-                      <span>${(offering.price / 100).toFixed(2)}</span>
+                      <span className="font-medium mr-2">Modifiers:</span>
+                      <span>{product.toppingIds.length}</span>
                     </div>
                   )}
 
-                  {offering.tags.length > 0 && (
+                  {product.price > 0 && (
+                    <div className="flex items-center text-gray-600">
+                      <span className="font-medium mr-2">Price:</span>
+                      <span>${(product.price / 100).toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {product.tags && product.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {offering.tags.slice(0, 3).map((tag) => (
+                      {product.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
                           className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
@@ -217,9 +247,9 @@ export default function OfferingsPage() {
                           {tag}
                         </span>
                       ))}
-                      {offering.tags.length > 3 && (
+                      {product.tags.length > 3 && (
                         <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
-                          +{offering.tags.length - 3}
+                          +{product.tags.length - 3}
                         </span>
                       )}
                     </div>
