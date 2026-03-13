@@ -140,7 +140,7 @@ function MobileSidebar() {
                   </div>
 
                   <nav className="flex-1 overflow-y-auto">
-                    <NavList activeUrl={pathname} items={navItems} />
+                    <NavList activeUrl={pathname ?? undefined} items={navItems} />
                   </nav>
 
                   {/* Sign Out */}
