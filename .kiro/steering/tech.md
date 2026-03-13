@@ -98,12 +98,35 @@ npm run deploy
 - Tables: https://www.untitledui.com/react/components/tables
 - Full component library: https://www.untitledui.com/react/components
 
+**Adding Untitled UI Components**:
+```bash
+# Add a specific component (interactive CLI)
+npx untitledui@latest add [component-name]
+
+# Example: Add date range picker
+npx untitledui@latest add date-range-picker
+
+# When prompted, specify: app/admin/components/ui
+```
+
 **Implementation Approach**:
-1. Check Untitled UI React components library first
-2. Copy the component code into `app/admin/components/ui/` directory
-3. Adapt TypeScript to JSX by removing type annotations
-4. Use the component throughout the CMS for consistency
-5. Only build custom components if no suitable Untitled UI component exists
+1. Check Untitled UI React components library first at https://www.untitledui.com/react/components
+2. Use `npx untitledui@latest add [component-name]` to add the component
+3. Components will be added to `app/admin/components/ui/` directory
+4. Import and use the component throughout the CMS for consistency
+5. Components are already adapted for Next.js and React 18
+6. Only build custom components if no suitable Untitled UI component exists
+
+**Available via CLI**:
+- `date-picker` - Single date selection
+- `date-range-picker` - Date range selection with calendar
+- `input` - Text input with variants
+- `textarea` - Multi-line text input
+- `select` - Dropdown select
+- `button` - Button with variants
+- `modal` - Dialog/modal component
+- `table` - Data table component
+- And many more at https://www.untitledui.com/react/components
 
 Reference `.kiro/steering/untitled-ui-reference.md` for:
 - Component structure and styling patterns
