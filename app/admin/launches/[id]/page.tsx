@@ -492,7 +492,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               )}
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              {launch.featuredProductIds.length} product(s) selected
+              {launch.featuredProductIds?.length || 0} product(s) selected
             </p>
           </div>
 
