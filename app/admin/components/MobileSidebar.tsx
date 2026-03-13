@@ -11,8 +11,8 @@ import {
   Settings01,
   BarChart03,
   FileCode01,
-  Newspaper,
-  GameController01,
+  BookOpen01,
+  Target01,
   LogOut01,
   X as CloseIcon,
   Menu02
@@ -75,12 +75,12 @@ export default function MobileSidebar() {
     { 
       label: 'News', 
       href: '/admin/news', 
-      icon: Newspaper 
+      icon: BookOpen01 
     },
     { 
       label: 'Games', 
       href: '/admin/games', 
-      icon: GameController01 
+      icon: Target01 
     },
     { 
       divider: true 

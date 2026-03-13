@@ -11,8 +11,8 @@ import {
   Settings01,
   BarChart03,
   FileCode01,
-  Newspaper,
-  GameController01,
+  BookOpen01,
+  Target01,
   LogOut01
 } from '@untitledui/icons';
 import { NavList } from '@/src/app/admin/components/ui/application/app-navigation/base-components/nav-list';
@@ -65,12 +65,12 @@ export default function Sidebar() {
     { 
       label: 'News', 
       href: '/admin/news', 
-      icon: Newspaper 
+      icon: BookOpen01 
     },
     { 
       label: 'Games', 
       href: '/admin/games', 
-      icon: GameController01 
+      icon: Target01 
     },
     { 
       divider: true 
