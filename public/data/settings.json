@@ -14,13 +14,6 @@
         "value": "sorbet",
         "sortOrder": 2,
         "archived": false
-      },
-      {
-        "id": "soft-serve-base",
-        "label": "Soft Serve Base",
-        "value": "soft-serve-base",
-        "sortOrder": 3,
-        "archived": false
       }
     ],
     "allergens": [
@@ -71,6 +64,52 @@
         "label": "Soy",
         "value": "soy",
         "sortOrder": 7,
+        "archived": false
+      }
+    ],
+    "modifierTypes": [
+      {
+        "id": "topping",
+        "label": "Topping",
+        "value": "topping",
+        "sortOrder": 1,
+        "archived": false
+      },
+      {
+        "id": "sauce",
+        "label": "Sauce",
+        "value": "sauce",
+        "sortOrder": 2,
+        "archived": false
+      },
+      {
+        "id": "crunch",
+        "label": "Crunch",
+        "value": "crunch",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "drizzle",
+        "label": "Drizzle",
+        "value": "drizzle",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "premium-addon",
+        "label": "Premium Add-on",
+        "value": "premium-addon",
+        "sortOrder": 5,
+        "archived": false
+      }
+    ],
+    "formatCategories": [
+      {
+        "id": "ice-cream",
+        "label": "Ice cream",
+        "value": "ice-cream",
+        "sortOrder": 1,
         "archived": false
       }
     ]

@@ -421,6 +421,37 @@ export interface Component {
 }
 
 // ============================================================================
+// Modifier Types
+// ============================================================================
+
+export interface Modifier {
+  id: string;                    // UUID
+  name: string;                  // Modifier name
+  slug: string;                  // URL-friendly identifier
+  type: string;                  // Modifier type (from taxonomy)
+  description?: string;          // Description
+  
+  // Allergens & Dietary (same model as ingredients)
+  allergens: Allergen[];         // Allergen flags (source of truth)
+  animalDerived?: boolean;       // Contains animal products
+  vegetarian?: boolean;          // Suitable for vegetarians
+  
+  // Pricing
+  price: number;                 // Price in cents
+  
+  // Display
+  image?: string;                // Modifier image
+  
+  // Availability
+  availableForFormatIds: string[]; // Format IDs this modifier is available for
+  status: 'active' | 'archived'; // Current availability status
+  
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================================
 // Seasonal Collection Types (Three-Layer Architecture)
 // ============================================================================
 
