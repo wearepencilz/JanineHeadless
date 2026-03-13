@@ -15,7 +15,7 @@ export default function CreateIngredientPage() {
     name: '',
     latinName: '',
     origin: '',
-    category: 'Fruit' as typeof ingredientCategoryOptions[number],
+    taxonomyCategory: '', // Changed from 'category'
     roles: [] as string[],
     descriptors: [] as string[],
     description: '',
@@ -162,8 +162,8 @@ export default function CreateIngredientPage() {
 
             <TaxonomySelect
               category="ingredientCategories"
-              value={formData.category}
-              onChange={(value) => setFormData({ ...formData, category: value as any })}
+              value={formData.taxonomyCategory}
+              onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
               label="Primary Category"
               required
             />

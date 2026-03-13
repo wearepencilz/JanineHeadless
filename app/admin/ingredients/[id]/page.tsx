@@ -15,7 +15,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     name: '',
     latinName: '',
     origin: '',
-    category: 'flavor',
+    taxonomyCategory: '', // Changed from 'category'
     story: '',
     tastingNotes: '',
     supplier: '',
@@ -167,8 +167,8 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
 
             <TaxonomySelect
               category="ingredientCategories"
-              value={formData.category}
-              onChange={(value) => setFormData({ ...formData, category: value })}
+              value={formData.taxonomyCategory}
+              onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
               label="Category"
               required
             />
