@@ -18,6 +18,7 @@ interface Product {
 export default function NewLaunchPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState('');
   const [flavours, setFlavours] = useState<Flavour[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,8 +38,11 @@ export default function NewLaunchPage() {
   });
 
   useEffect(() => {
-    fetchFlavours();
-    fetchProducts();
+    const fetchData = async () => {
+      await Promise.all([fetchFlavours(), fetchProducts()]);
+      setDataLoading(false);
+    };
+    fetchData();
   }, []);
 
   const fetchFlavours = async () => {
@@ -46,10 +50,11 @@ export default function NewLaunchPage() {
       const response = await fetch('/api/flavours');
       if (response.ok) {
         const data = await response.json();
-        setFlavours(data);
+        setFlavours(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error('Failed to load flavours');
+      setFlavours([]);
     }
   };
 
@@ -58,10 +63,11 @@ export default function NewLaunchPage() {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error('Failed to load products');
+      setProducts([]);
     }
   };
 
@@ -273,25 +279,31 @@ export default function NewLaunchPage() {
             <p className="text-sm text-gray-600 mb-3">
               Select flavours to feature in this launch. After creating the launch, you can auto-generate products from selected flavours.
             </p>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
-              {flavours.length === 0 ? (
-                <p className="text-sm text-gray-500">No flavours available</p>
-              ) : (
-                <div className="space-y-2">
-                  {flavours.map((flavour) => (
-                    <label key={flavour.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.featuredFlavourIds.includes(flavour.id)}
-                        onChange={() => toggleFlavour(flavour.id)}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{flavour.name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
+            {dataLoading ? (
+              <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+                {flavours.length === 0 ? (
+                  <p className="text-sm text-gray-500">No flavours available</p>
+                ) : (
+                  <div className="space-y-2">
+                    {flavours.map((flavour) => (
+                      <label key={flavour.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.featuredFlavourIds.includes(flavour.id)}
+                          onChange={() => toggleFlavour(flavour.id)}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="ml-3 text-sm text-gray-700">{flavour.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <p className="text-xs text-gray-500 mt-2">
               {formData.featuredFlavourIds.length} flavour(s) selected
             </p>
@@ -303,30 +315,36 @@ export default function NewLaunchPage() {
             <p className="text-sm text-gray-600 mb-3">
               Select products to feature in this launch.
             </p>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
-              {products.length === 0 ? (
-                <p className="text-sm text-gray-500">No products available</p>
-              ) : (
-                <div className="space-y-2">
-                  {products.map((product) => (
-                    <label key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.featuredProductIds.includes(product.id)}
-                        onChange={() => toggleProduct(product.id)}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">
-                        {product.name}
-                        {product.shopifyProductId && (
-                          <span className="ml-2 text-xs text-gray-500">(Shopify)</span>
-                        )}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
+            {dataLoading ? (
+              <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+                {products.length === 0 ? (
+                  <p className="text-sm text-gray-500">No products available</p>
+                ) : (
+                  <div className="space-y-2">
+                    {products.map((product) => (
+                      <label key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.featuredProductIds.includes(product.id)}
+                          onChange={() => toggleProduct(product.id)}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="ml-3 text-sm text-gray-700">
+                          {product.name}
+                          {product.shopifyProductId && (
+                            <span className="ml-2 text-xs text-gray-500">(Shopify)</span>
+                          )}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <p className="text-xs text-gray-500 mt-2">
               {formData.featuredProductIds.length} product(s) selected
             </p>
