@@ -123,9 +123,10 @@ export default function FormatsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFormats.map((format) => (
-            <div
+            <Link
               key={format.id}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+              href={`/admin/formats/${format.id}`}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
@@ -156,21 +157,24 @@ export default function FormatsPage() {
                 </div>
 
                 <div className="flex gap-2 pt-3 border-t border-gray-200">
-                  <Link
-                    href={`/admin/formats/${format.id}`}
+                  <span
                     className="flex-1 text-center px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                   >
                     Edit
-                  </Link>
+                  </span>
                   <button
-                    onClick={() => handleDelete(format.id, format.name)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete(format.id, format.name);
+                    }}
                     className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
                   >
                     Delete
                   </button>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

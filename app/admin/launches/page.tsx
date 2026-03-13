@@ -142,7 +142,11 @@ export default function LaunchesPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {launches.map((launch) => (
-                  <tr key={launch.id} className="hover:bg-gray-50">
+                  <tr 
+                    key={launch.id} 
+                    onClick={() => window.location.href = `/admin/launches/${launch.id}`}
+                    className="hover:bg-gray-50 cursor-pointer"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {launch.heroImage && (
@@ -177,6 +181,7 @@ export default function LaunchesPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         href={`/admin/launches/${launch.id}`}
+                        onClick={(e) => e.stopPropagation()}
                         className="text-blue-600 hover:text-blue-900 mr-4"
                       >
                         Edit
