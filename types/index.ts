@@ -196,10 +196,8 @@ export interface Flavour {
   // Availability
   status: Status;                // Current availability status
   
-  // Format eligibility flags
-  canBeUsedInTwist: boolean;     // Eligible for twist combinations
-  canBeSoldAsPint: boolean;      // Available as packaged pint
-  canBeUsedInSandwich: boolean;  // Suitable for sandwich filling
+  // Availability
+  status: Status;                // Current availability status
   
   // Shopify Integration
   shopifyProductId?: string;     // Shopify product ID

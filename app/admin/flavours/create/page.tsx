@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import BaseStyleSelector from '@/app/admin/components/BaseStyleSelector';
-import FormatEligibilitySelector from '@/app/admin/components/FormatEligibilitySelector';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 import type { FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
@@ -27,11 +26,6 @@ export default function CreateFlavourPage() {
     keyNotes: [] as string[],
     colour: '#FFFFFF',
     status: 'active' as Status,
-    
-    // Format eligibility
-    canBeUsedInTwist: true,
-    canBeSoldAsPint: true,
-    canBeUsedInSandwich: true,
     
     // Admin fields
     sortOrder: 0,
@@ -71,10 +65,6 @@ export default function CreateFlavourPage() {
 
   const handleKeyNoteRemove = (note: string) => {
     setFormData({ ...formData, keyNotes: formData.keyNotes.filter(n => n !== note) });
-  };
-
-  const handleFormatEligibilityChange = (field: 'canBeUsedInTwist' | 'canBeSoldAsPint' | 'canBeUsedInSandwich', value: boolean) => {
-    setFormData({ ...formData, [field]: value });
   };
 
   return (
@@ -285,16 +275,6 @@ export default function CreateFlavourPage() {
           <BaseStyleSelector
             value={formData.baseStyle}
             onChange={(value) => setFormData({ ...formData, baseStyle: value })}
-          />
-        </div>
-
-        {/* Format Eligibility Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <FormatEligibilitySelector
-            canBeUsedInTwist={formData.canBeUsedInTwist}
-            canBeSoldAsPint={formData.canBeSoldAsPint}
-            canBeUsedInSandwich={formData.canBeUsedInSandwich}
-            onChange={handleFormatEligibilityChange}
           />
         </div>
 

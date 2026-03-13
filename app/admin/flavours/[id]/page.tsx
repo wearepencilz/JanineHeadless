@@ -7,7 +7,6 @@ import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientS
 import ShopifyProductPicker from '@/app/admin/components/ShopifyProductPicker';
 import SyncStatusIndicator from '@/app/admin/components/SyncStatusIndicator';
 import BaseStyleSelector from '@/app/admin/components/BaseStyleSelector';
-import FormatEligibilitySelector from '@/app/admin/components/FormatEligibilitySelector';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
@@ -110,11 +109,6 @@ export default function EditFlavourPage() {
   const handleKeyNoteRemove = (note: string) => {
     if (!formData) return;
     setFormData({ ...formData, keyNotes: formData.keyNotes?.filter(n => n !== note) || [] });
-  };
-
-  const handleFormatEligibilityChange = (field: 'canBeUsedInTwist' | 'canBeSoldAsPint' | 'canBeUsedInSandwich', value: boolean) => {
-    if (!formData) return;
-    setFormData({ ...formData, [field]: value });
   };
 
   if (loading || !formData) {
@@ -331,16 +325,6 @@ export default function EditFlavourPage() {
           <BaseStyleSelector
             value={formData.baseStyle || 'dairy'}
             onChange={(value) => setFormData({ ...formData, baseStyle: value })}
-          />
-        </div>
-
-        {/* Format Eligibility Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <FormatEligibilitySelector
-            canBeUsedInTwist={formData.canBeUsedInTwist ?? true}
-            canBeSoldAsPint={formData.canBeSoldAsPint ?? true}
-            canBeUsedInSandwich={formData.canBeUsedInSandwich ?? true}
-            onChange={handleFormatEligibilityChange}
           />
         </div>
 
