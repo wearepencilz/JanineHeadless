@@ -19,10 +19,13 @@ interface TaxonomyCategory {
 }
 
 const TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
+  { key: 'flavourTypes', label: 'Flavour Types', description: 'Types of flavours (determines format eligibility)' },
+  { key: 'keyNotes', label: 'Flavour Tags', description: 'Tags for describing flavour profiles' },
   { key: 'ingredientCategories', label: 'Ingredient Categories', description: 'Categories for ingredient classification' },
   { key: 'ingredientRoles', label: 'Ingredient Roles', description: 'How ingredients are used in flavours' },
-  { key: 'flavourTypes', label: 'Flavour Types', description: 'Types of flavours (determines format eligibility)' },
+  { key: 'tastingNotes', label: 'Tasting Notes', description: 'Common tasting note descriptors for ingredients' },
   { key: 'formatCategories', label: 'Format Categories', description: 'Categories for product formats' },
+  { key: 'servingStyles', label: 'Serving Styles', description: 'How formats are served (scoop, soft-serve, etc.)' },
   { key: 'modifierTypes', label: 'Modifier Types', description: 'Types of modifiers (toppings, sauces, etc.)' },
   { key: 'allergens', label: 'Allergens', description: 'Common allergen tags' },
   { key: 'contentBlockTypes', label: 'Content Block Types', description: 'Types of content blocks for launches' },

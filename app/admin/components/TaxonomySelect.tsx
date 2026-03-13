@@ -3,10 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 
 export type TaxonomyCategory = 
+  | 'flavourTypes'
+  | 'keyNotes'
   | 'ingredientCategories'
   | 'ingredientRoles'
-  | 'flavourTypes'
+  | 'tastingNotes'
   | 'formatCategories'
+  | 'servingStyles'
   | 'modifierTypes'
   | 'allergens'
   | 'contentBlockTypes';

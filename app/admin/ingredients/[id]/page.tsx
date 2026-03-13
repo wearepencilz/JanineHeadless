@@ -191,19 +191,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Tasting Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tasting Notes
-            </label>
-            <input
-              type="text"
-              value={formData.tastingNotes}
-              onChange={(e) => setFormData({ ...formData, tastingNotes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="citrus, floral, bittersweet (comma separated)"
-            />
-            <p className="text-sm text-gray-500 mt-1">Separate multiple notes with commas</p>
-          </div>
+          <TaxonomyMultiSelect
+            category="tastingNotes"
+            values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
+            onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
+            label="Tasting Notes"
+            description="Select common tasting note descriptors"
+            allowCreate={true}
+          />
 
           {/* Sourcing */}
           <div className="grid grid-cols-2 gap-4">

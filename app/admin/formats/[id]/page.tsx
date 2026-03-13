@@ -184,23 +184,13 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                 required
               />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Serving Style *
-                </label>
-                <select
-                  required
-                  value={format.servingStyle}
-                  onChange={(e) => setFormat({ ...format, servingStyle: e.target.value as ServingStyle })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {servingStyles.map((style) => (
-                    <option key={style} value={style}>
-                      {style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <TaxonomySelect
+                category="servingStyles"
+                value={format.servingStyle}
+                onChange={(value) => setFormat({ ...format, servingStyle: value as ServingStyle })}
+                label="Serving Style"
+                required
+              />
             </div>
           </div>
         </div>
