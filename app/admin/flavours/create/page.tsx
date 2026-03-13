@@ -262,9 +262,6 @@ export default function CreateFlavourPage() {
             selectedIngredients={formData.ingredients}
             onChange={(ingredients) => setFormData({ ...formData, ingredients })}
           />
-          <p className="text-sm text-gray-500 mt-3">
-            You can link this flavour to a Shopify product after creation
-          </p>
         </div>
 
         {/* Actions */}
