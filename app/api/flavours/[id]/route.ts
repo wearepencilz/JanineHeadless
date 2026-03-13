@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import { getFlavours, saveFlavours, getIngredients } from '@/lib/db';
 import { withDeleteProtection, withUpdateProtection } from '@/lib/api-middleware';
 import { createBackup } from '@/lib/data-protection';
-import type { Flavour, Ingredient, Allergen, DietaryFlag, ErrorResponse } from '@/types';
+import type { Flavour, Ingredient, Allergen, DietaryClaim, ErrorResponse } from '@/types';
 
 // Helper function to calculate allergens from ingredients
 function calculateAllergens(ingredientIds: string[], allIngredients: Ingredient[]): Allergen[] {
@@ -20,14 +20,14 @@ function calculateAllergens(ingredientIds: string[], allIngredients: Ingredient[
 }
 
 // Helper function to determine dietary flags
-function calculateDietaryFlags(ingredientIds: string[], allIngredients: Ingredient[]): DietaryFlag[] {
+function calculateDietaryClaims(ingredientIds: string[], allIngredients: Ingredient[]): DietaryClaim[] {
   const ingredients = ingredientIds
     .map(id => allIngredients.find(ing => ing.id === id))
     .filter(Boolean) as Ingredient[];
   
   if (ingredients.length === 0) return [];
   
-  const flags: DietaryFlag[] = [];
+  const flags: DietaryClaim[] = [];
   
   // Check if vegan (no dairy, eggs, or animal products)
   const hasAnimalProducts = ingredients.some(ing => 

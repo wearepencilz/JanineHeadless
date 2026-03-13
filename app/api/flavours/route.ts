@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getFlavours, saveFlavours, getIngredients, getFormats } from '@/lib/db';
 import { getFormatEligibility } from '@/lib/validation';
-import type { Flavour, Ingredient, Allergen, DietaryFlag, PaginatedResponse, ErrorResponse } from '@/types';
+import type { Flavour, Ingredient, Allergen, DietaryClaim, PaginatedResponse, ErrorResponse } from '@/types';
 
 export async function GET(request: NextRequest) {
   try {
