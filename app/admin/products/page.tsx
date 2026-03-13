@@ -20,6 +20,9 @@ interface Product {
   price: number;
   tags?: string[];
   onlineOrderable: boolean;
+  shopifyProductId?: string;
+  shopifyProductHandle?: string;
+  syncStatus?: string;
 }
 
 interface Format {
@@ -242,9 +245,23 @@ export default function ProductsPage() {
                   <h3 className="text-lg font-semibold text-gray-900">
                     {product.publicName}
                   </h3>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(product.status)}`}>
-                    {product.status}
-                  </span>
+                  <div className="flex gap-2">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(product.status)}`}>
+                      {product.status}
+                    </span>
+                    {product.shopifyProductId ? (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Shopify
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
+                        Not linked
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 <p className="text-sm text-gray-600 mb-3">
@@ -273,6 +290,21 @@ export default function ProductsPage() {
                     <div className="flex items-center text-gray-600">
                       <span className="font-medium mr-2">Price:</span>
                       <span>${(product.price / 100).toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {product.shopifyProductId && product.shopifyProductHandle && (
+                    <div className="flex items-center text-gray-600">
+                      <span className="font-medium mr-2">Shopify:</span>
+                      <a
+                        href={`https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}/products/${product.shopifyProductHandle}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-blue-600 hover:text-blue-800 text-xs underline"
+                      >
+                        View in Shopify →
+                      </a>
                     </div>
                   )}
 
