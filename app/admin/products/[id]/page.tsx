@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
 import { computeProductAllergens, formatAllergen, formatDietaryClaim, getAllergenBadgeColor, getDietaryClaimBadgeColor } from '@/lib/product-allergens';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -16,7 +16,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [creatingShopifyProduct, setCreatingShopifyProduct] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -39,18 +38,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     fetchData();
   }, [params.id]);
-
-  // Handle ESC key to close delete confirmation modal
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showDeleteConfirm) {
-        setShowDeleteConfirm(false);
-      }
-    };
-    
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [showDeleteConfirm]);
 
   async function fetchData() {
     try {
@@ -162,12 +149,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       } else {
         const error = await response.json();
         setErrors([error.error || 'Failed to delete product']);
-        setShowDeleteConfirm(false);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
       setErrors(['Failed to delete product']);
-      setShowDeleteConfirm(false);
     }
   }
 
@@ -255,9 +240,17 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   if (!offering) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Product not found</p>
-      </div>
+      <EditPageLayout
+        title="Edit Product"
+        backHref="/admin/products"
+        backLabel="Back to Products"
+        onSave={() => {}}
+        onCancel={() => router.push('/admin/products')}
+        error="Product not found"
+        maxWidth="7xl"
+      >
+        <div />
+      </EditPageLayout>
     );
   }
 
@@ -274,41 +267,17 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const allergenData = computeProductAllergens(primaryFlavours, flavourIngredients, []);
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header with Back Link */}
-      <div className="mb-6">
-        <Link
-          href="/admin/products"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Products
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-      </div>
-
-      {/* Error Messages */}
-      {errors.length > 0 && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <ul className="mt-2 text-sm text-red-700 list-disc list-inside">
-                {errors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
+    <EditPageLayout
+      title="Edit Product"
+      backHref="/admin/products"
+      backLabel="Back to Products"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onDelete={handleDelete}
+      onCancel={() => router.push('/admin/products')}
+      saving={saving}
+      error={errors.length > 0 ? errors.join(', ') : undefined}
+      maxWidth="7xl"
+    >
 
       {/* Shopify Integration Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -722,60 +691,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               </div>
             )}
           </div>
-
-          <div className="mt-6 flex justify-between">
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-            >
-              Delete
-            </button>
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={() => router.push('/admin/products')}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
-          </div>
         </form>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Product</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete this product? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </EditPageLayout>
   );
 }
