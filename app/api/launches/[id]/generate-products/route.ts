@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getFlavours, getFormats, getProducts, saveProducts, getLaunches, saveLaunches } from '@/lib/db';
 import { generateProductName } from '@/lib/validation';
-import { isFormatEligibleForFlavour, isFormatEligibleForFlavours } from '@/lib/product-generation';
+import { isFormatEligibleForFlavour, isFormatEligibleForFlavours, buildGenerationReport } from '@/lib/product-generation';
 
 export async function POST(
   request: NextRequest,
@@ -60,6 +60,11 @@ export async function POST(
     let created = 0;
     let skipped = 0;
     const newProductIds: string[] = [];
+    const createdProducts: Array<{
+      formatName: string;
+      flavourType: string;
+      flavourName: string;
+    }> = [];
     const skippedCombinations: Array<{
       formatName: string;
       flavourName: string;
@@ -108,7 +113,7 @@ export async function POST(
 
         if (!existingProduct) {
           const newProduct = {
-            id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `product-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
             internalName: names.internalName,
             publicName: names.publicName,
             slug: `${format.slug}-${flavour.slug || flavour.name.toLowerCase().replace(/\s+/g, '-')}`,
@@ -129,6 +134,13 @@ export async function POST(
           products.push(newProduct);
           created++;
           newProductIds.push(newProduct.id);
+          
+          // Track created product for report
+          createdProducts.push({
+            formatName: format.name,
+            flavourType: flavour.type,
+            flavourName: flavour.name
+          });
         } else {
           newProductIds.push(existingProduct.id);
         }
@@ -199,6 +211,15 @@ export async function POST(
               products.push(newProduct);
               created++;
               newProductIds.push(newProduct.id);
+              
+              // Track created product for report
+              // For multi-flavour products, we'll use the first flavour's type
+              // or create a combined entry for each flavour
+              createdProducts.push({
+                formatName: format.name,
+                flavourType: flavourPair[0].type,
+                flavourName: `${flavourPair[0].name} + ${flavourPair[1].name}`
+              });
             } else {
               newProductIds.push(existingProduct.id);
             }
@@ -223,28 +244,14 @@ export async function POST(
 
     await saveLaunches(updatedLaunches);
 
-    // Build response message
-    const formatBreakdown: Record<string, number> = {};
-    for (const product of products.filter((p: any) => newProductIds.includes(p.id))) {
-      const format = availableFormats.find((f: any) => f.id === product.formatId);
-      if (format) {
-        formatBreakdown[format.name] = (formatBreakdown[format.name] || 0) + 1;
-      }
-    }
-
-    const breakdownMessage = Object.entries(formatBreakdown)
-      .map(([name, count]) => `${count} ${name.toLowerCase()}`)
-      .join(', ');
-
-    return NextResponse.json({
-      success: true,
-      created,
-      skipped,
-      total: newProductIds.length,
-      breakdown: formatBreakdown,
-      message: `Generated ${created} new product(s)${breakdownMessage ? `: ${breakdownMessage}` : ''}${skipped > 0 ? `. Skipped ${skipped} combination(s) due to eligibility rules` : ''}`,
-      details: skipped > 0 ? { skippedCombinations } : undefined
+    // Build and return detailed generation report
+    const report = buildGenerationReport({
+      createdProducts,
+      skippedCombinations,
+      totalProducts: updatedProductIds.length
     });
+
+    return NextResponse.json(report);
   } catch (error) {
     console.error('Error generating products:', error);
     return NextResponse.json(
