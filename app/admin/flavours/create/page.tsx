@@ -6,6 +6,8 @@ import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import BaseStyleSelector from '@/app/admin/components/BaseStyleSelector';
 import FormatEligibilitySelector from '@/app/admin/components/FormatEligibilitySelector';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 import type { FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 
 export default function CreateFlavourPage() {
@@ -109,21 +111,14 @@ export default function CreateFlavourPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
-              </label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as FlavourType })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="gelato">Gelato</option>
-                <option value="sorbet">Sorbet</option>
-                <option value="special">Special</option>
-                <option value="tasting-component">Tasting Component</option>
-              </select>
-            </div>
+            <TaxonomySelect
+              category="flavourTypes"
+              value={formData.type}
+              onChange={(value) => setFormData({ ...formData, type: value as FlavourType })}
+              label="Type"
+              required
+              description="Determines which formats this flavour can be used in"
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -191,18 +186,13 @@ export default function CreateFlavourPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Season
-              </label>
-              <input
-                type="text"
-                value={formData.season}
-                onChange={(e) => setFormData({ ...formData, season: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Spring, Summer"
-              />
-            </div>
+            <TaxonomySelect
+              category="seasons"
+              value={formData.season}
+              onChange={(value) => setFormData({ ...formData, season: value })}
+              label="Season"
+              placeholder="Select season"
+            />
           </div>
 
           <div>

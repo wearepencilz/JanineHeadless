@@ -9,6 +9,8 @@ import SyncStatusIndicator from '@/app/admin/components/SyncStatusIndicator';
 import BaseStyleSelector from '@/app/admin/components/BaseStyleSelector';
 import FormatEligibilitySelector from '@/app/admin/components/FormatEligibilitySelector';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 import type { Flavour, FlavourIngredient, SyncStatus, FlavourType, BaseStyle, Status } from '@/types';
 
 export default function EditFlavourPage() {
@@ -155,21 +157,14 @@ export default function EditFlavourPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
-              </label>
-              <select
-                value={formData.type || 'gelato'}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as FlavourType })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="gelato">Gelato</option>
-                <option value="sorbet">Sorbet</option>
-                <option value="special">Special</option>
-                <option value="tasting-component">Tasting Component</option>
-              </select>
-            </div>
+            <TaxonomySelect
+              category="flavourTypes"
+              value={formData.type || 'gelato'}
+              onChange={(value) => setFormData({ ...formData, type: value as FlavourType })}
+              label="Type"
+              required
+              description="Determines which formats this flavour can be used in"
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
