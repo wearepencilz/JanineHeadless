@@ -585,6 +585,54 @@ export interface CollectionFull extends SeasonalCollection {
 /**
  * Detailed report of product generation results.
  * Provides breakdown by format and flavour type, plus human-readable summary.
+ * 
+ * @example
+ * ```typescript
+ * const report: GenerationReport = {
+ *   success: true,
+ *   created: 8,
+ *   skipped: 2,
+ *   total: 15,
+ *   breakdown: {
+ *     byFormat: {
+ *       "Scoop": {
+ *         created: 4,
+ *         skipped: 0,
+ *         flavourTypes: ["gelato", "sorbet"]
+ *       },
+ *       "Sandwich": {
+ *         created: 2,
+ *         skipped: 1,
+ *         flavourTypes: ["gelato"]
+ *       },
+ *       "Twist": {
+ *         created: 2,
+ *         skipped: 1,
+ *         flavourTypes: ["gelato", "sorbet"]
+ *       }
+ *     },
+ *     byFlavourType: {
+ *       "gelato": 6,
+ *       "sorbet": 2
+ *     }
+ *   },
+ *   message: "Generated 8 new products across 3 formats. Skipped 2 combinations due to eligibility rules.",
+ *   details: {
+ *     skippedCombinations: [
+ *       {
+ *         formatName: "Sandwich",
+ *         flavourName: "Lemon Sorbet",
+ *         reason: "Flavour type 'sorbet' not eligible for format 'Sandwich'"
+ *       },
+ *       {
+ *         formatName: "Twist",
+ *         flavourName: "Chocolate Cookie",
+ *         reason: "Flavour type 'cookie' not eligible for format 'Twist'"
+ *       }
+ *     ]
+ *   }
+ * };
+ * ```
  */
 export interface GenerationReport {
   success: boolean;           // Overall success status
