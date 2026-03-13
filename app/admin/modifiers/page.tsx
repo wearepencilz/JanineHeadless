@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
+import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
+import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface Modifier {
   id: string;
@@ -17,6 +20,7 @@ interface Modifier {
 }
 
 export default function ModifiersPage() {
+  const router = useRouter();
   const [modifiers, setModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -30,18 +34,6 @@ export default function ModifiersPage() {
   useEffect(() => {
     fetchModifiers();
   }, [typeFilter, statusFilter]);
-
-  // Handle ESC key to close delete confirmation
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && deleteConfirm.show) {
-        setDeleteConfirm({ show: false, id: '', name: '' });
-      }
-    };
-    
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [deleteConfirm.show]);
 
   const fetchModifiers = async () => {
     try {
@@ -74,11 +66,11 @@ export default function ModifiersPage() {
   };
 
   const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
+    return `${(cents / 100).toFixed(2)}`;
   };
-  const handleDeleteClick = (e: React.MouseEvent, id: string, name: string) => {
-    e.stopPropagation();
-    setDeleteConfirm({ show: true, id, name });
+
+  const handleDeleteClick = (modifier: Modifier) => {
+    setDeleteConfirm({ show: true, id: modifier.id, name: modifier.name });
   };
 
   const handleDelete = async () => {
@@ -100,190 +92,136 @@ export default function ModifiersPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const filters: FilterConfig[] = [
+    {
+      type: 'select',
+      label: 'Type',
+      value: typeFilter,
+      onChange: setTypeFilter,
+      options: [
+        { value: 'all', label: 'All' },
+        { value: 'topping', label: 'Topping' },
+        { value: 'sauce', label: 'Sauce' },
+        { value: 'crunch', label: 'Crunch' },
+        { value: 'drizzle', label: 'Drizzle' },
+        { value: 'premium-addon', label: 'Premium Add-on' },
+        { value: 'pack-in', label: 'Pack-in' },
+      ],
+    },
+    {
+      type: 'select',
+      label: 'Status',
+      value: statusFilter,
+      onChange: setStatusFilter,
+      options: [
+        { value: 'all', label: 'All' },
+        { value: 'active', label: 'Active' },
+        { value: 'archived', label: 'Archived' },
+      ],
+    },
+  ];
+
+  const columns: Column<Modifier>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      render: (modifier) => (
+        <div className="flex items-center">
+          {modifier.image && (
+            <img
+              src={modifier.image}
+              alt={modifier.name}
+              className="h-10 w-10 rounded object-cover mr-3"
+            />
+          )}
+          <div>
+            <div className="text-sm font-medium text-gray-900">{modifier.name}</div>
+            <div className="text-sm text-gray-500">{modifier.slug}</div>
+          </div>
+        </div>
+      ),
+      className: 'whitespace-nowrap',
+    },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (modifier) => (
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTypeBadge(modifier.type)}`}>
+          {modifier.type}
+        </span>
+      ),
+      className: 'whitespace-nowrap',
+    },
+    {
+      key: 'price',
+      label: 'Price',
+      render: (modifier) => (
+        <div className="text-sm text-gray-900">{formatPrice(modifier.price)}</div>
+      ),
+      className: 'whitespace-nowrap',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (modifier) => (
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+          modifier.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {modifier.status}
+        </span>
+      ),
+      className: 'whitespace-nowrap',
+    },
+    {
+      key: 'formats',
+      label: 'Formats',
+      render: (modifier) => (
+        <div className="text-sm text-gray-500">
+          {modifier.availableForFormatIds.length} format(s)
+        </div>
+      ),
+      className: 'whitespace-nowrap',
+    },
+  ];
+
+  const actions: Action<Modifier>[] = [
+    {
+      label: 'Edit',
+      href: (modifier) => `/admin/modifiers/${modifier.id}`,
+      stopPropagation: true,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDeleteClick,
+      className: 'text-red-600 hover:text-red-900',
+      stopPropagation: true,
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Modifiers</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage toppings, sauces, and add-ons for products
-          </p>
-        </div>
-        <Link
-          href="/admin/modifiers/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-        >
-          Create Modifier
-        </Link>
-      </div>
+    <>
+      <DataTable
+        title="Modifiers"
+        description="Manage toppings, sauces, and add-ons for products"
+        createButton={{ label: 'Create Modifier', href: '/admin/modifiers/new' }}
+        filters={<TableFilters filters={filters} />}
+        data={modifiers}
+        columns={columns}
+        actions={actions}
+        keyExtractor={(modifier) => modifier.id}
+        onRowClick={(modifier) => router.push(`/admin/modifiers/${modifier.id}`)}
+        emptyMessage="No modifiers found"
+        emptyAction={{ label: 'Create your first modifier', href: '/admin/modifiers/new' }}
+        loading={loading}
+      />
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Type:</label>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              >
-                <option value="all">All</option>
-                <option value="topping">Topping</option>
-                <option value="sauce">Sauce</option>
-                <option value="crunch">Crunch</option>
-                <option value="drizzle">Drizzle</option>
-                <option value="premium-addon">Premium Add-on</option>
-                <option value="pack-in">Pack-in</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Status:</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              >
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {modifiers.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No modifiers found</p>
-            <Link
-              href="/admin/modifiers/new"
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Create your first modifier
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Formats
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {modifiers.map((modifier) => (
-                  <tr 
-                    key={modifier.id} 
-                    onClick={() => window.location.href = `/admin/modifiers/${modifier.id}`}
-                    className="hover:bg-gray-50 cursor-pointer"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {modifier.image && (
-                          <img
-                            src={modifier.image}
-                            alt={modifier.name}
-                            className="h-10 w-10 rounded object-cover mr-3"
-                          />
-                        )}
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{modifier.name}</div>
-                          <div className="text-sm text-gray-500">{modifier.slug}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTypeBadge(modifier.type)}`}>
-                        {modifier.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatPrice(modifier.price)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        modifier.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {modifier.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {modifier.availableForFormatIds.length} format(s)
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-3">
-                        <Link
-                          href={`/admin/modifiers/${modifier.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={(e) => handleDeleteClick(e, modifier.id, modifier.name)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm.show && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Modifier</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setDeleteConfirm({ show: false, id: '', name: '' })}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <DeleteModal
+        isOpen={deleteConfirm.show}
+        title="Delete Modifier"
+        message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+      />
+    </>
   );
 }
