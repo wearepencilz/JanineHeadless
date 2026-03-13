@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Ingredient, FlavourIngredient, Allergen, DietaryFlag, IngredientCategory } from '@/types';
+import type { Ingredient, FlavourIngredient, Allergen, DietaryClaim, IngredientCategory } from '@/types';
 
 interface Props {
   selectedIngredients: FlavourIngredient[];
@@ -16,13 +16,13 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [calculatedAllergens, setCalculatedAllergens] = useState<Allergen[]>([]);
-  const [calculatedDietaryFlags, setCalculatedDietaryFlags] = useState<DietaryFlag[]>([]);
+  const [calculatedDietaryFlags, setCalculatedDietaryFlags] = useState<DietaryClaim[]>([]);
   const [newIngredient, setNewIngredient] = useState({
     name: '',
     category: 'flavor' as IngredientCategory,
     origin: '',
     allergens: [] as Allergen[],
-    dietaryFlags: [] as DietaryFlag[],
+    dietaryFlags: [] as DietaryClaim[],
     seasonal: false,
     description: ''
   });
@@ -74,22 +74,22 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
     });
     setCalculatedAllergens(Array.from(allergenSet));
     
-    // Calculate dietary flags
-    const flags: DietaryFlag[] = [];
+    // Calculate dietary claims
+    const claims: DietaryClaim[] = [];
     const hasAnimalProducts = ingredients.some(ing => 
-      ing.allergens.includes('dairy') || ing.allergens.includes('eggs')
+      ing.allergens.includes('dairy') || ing.allergens.includes('egg')
     );
     if (!hasAnimalProducts && ingredients.length > 0) {
-      flags.push('vegan', 'vegetarian');
+      claims.push('vegan', 'vegetarian');
     } else if (ingredients.length > 0) {
-      flags.push('vegetarian');
+      claims.push('vegetarian');
     }
     
-    if (!ingredients.some(ing => ing.allergens.includes('gluten'))) flags.push('gluten-free');
-    if (!ingredients.some(ing => ing.allergens.includes('dairy'))) flags.push('dairy-free');
-    if (!ingredients.some(ing => ing.allergens.includes('nuts'))) flags.push('nut-free');
+    if (!ingredients.some(ing => ing.allergens.includes('gluten'))) claims.push('gluten-free');
+    if (!ingredients.some(ing => ing.allergens.includes('dairy'))) claims.push('dairy-free');
+    if (!ingredients.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'))) claims.push('nut-free');
     
-    setCalculatedDietaryFlags(flags);
+    setCalculatedDietaryFlags(claims);
   };
 
   const addIngredient = (ingredient: Ingredient) => {
