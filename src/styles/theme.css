@@ -161,22 +161,34 @@
 
 /* Map semantic tokens to Tailwind utilities */
 @theme {
-    /* Background utilities (bg-*) */
+    /* Background utilities (bg-*) - these are for backgrounds */
     --color-primary: var(--color-bg-primary);
     --color-primary_alt: var(--color-bg-primary_alt);
     --color-primary_hover: var(--color-bg-primary_hover);
     --color-primary_solid: var(--color-bg-primary_solid);
-    --color-secondary: var(--color-bg-secondary);
+    --color-active: var(--color-bg-active);
+    --color-overlay: var(--color-overlay);
+    
+    /* Text/foreground colors - these override bg colors for text-* utilities */
+    /* When used with text-*, these should be foreground colors, not background colors */
+    --color-secondary: #344054;  /* text-secondary should be dark text, not light bg */
     --color-secondary_alt: var(--color-bg-secondary_alt);
-    --color-secondary_hover: var(--color-bg-secondary_hover);
+    --color-secondary_hover: #1d2939;  /* text-secondary_hover should be darker text */
     --color-secondary_subtle: var(--color-bg-secondary_subtle);
     --color-secondary_solid: var(--color-bg-secondary_solid);
-    --color-tertiary: var(--color-bg-tertiary);
-    --color-quaternary: var(--color-bg-quaternary);
-    --color-active: var(--color-bg-active);
-    --color-disabled: var(--color-bg-disabled);
+    --color-tertiary: #475467;  /* text-tertiary should be medium gray text */
+    --color-tertiary_hover: #344054;  /* text-tertiary_hover should be darker */
+    --color-quaternary: #667085;  /* text-quaternary should be lighter gray text */
+    --color-quaternary_hover: #475467;  /* text-quaternary_hover should be darker */
+    --color-disabled: #d0d5dd;  /* text-disabled should be very light gray */
     --color-disabled_subtle: var(--color-bg-disabled_subtle);
-    --color-overlay: var(--color-overlay);
+    
+    /* Background-specific colors (use bg-secondary-bg, etc. when you need the actual bg color) */
+    --color-secondary-bg: var(--color-bg-secondary);
+    --color-tertiary-bg: var(--color-bg-tertiary);
+    --color-quaternary-bg: var(--color-bg-quaternary);
+    --color-active-bg: var(--color-bg-active);
+    --color-disabled-bg: var(--color-bg-disabled);
     
     /* Brand colors (bg-brand-*) */
     --color-brand-primary: var(--color-bg-brand-primary);
