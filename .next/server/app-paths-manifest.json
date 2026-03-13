@@ -1,18 +1,8 @@
 {
-  "/api/ingredients/route": "app/api/ingredients/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/ingredients/[id]/route": "app/api/ingredients/[id]/route.js",
-  "/api/formats/route": "app/api/formats/route.js",
-  "/api/settings/taxonomies/[category]/route": "app/api/settings/taxonomies/[category]/route.js",
-  "/api/flavours/route": "app/api/flavours/route.js",
   "/api/flavours/[id]/route": "app/api/flavours/[id]/route.js",
-  "/api/flavours/[id]/usage/route": "app/api/flavours/[id]/usage/route.js",
   "/admin/formats/[id]/page": "app/admin/formats/[id]/page.js",
-  "/admin/formats/page": "app/admin/formats/page.js",
-  "/admin/ingredients/page": "app/admin/ingredients/page.js",
-  "/admin/settings/taxonomies/page": "app/admin/settings/taxonomies/page.js",
-  "/admin/modifiers/page": "app/admin/modifiers/page.js",
   "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js",
-  "/admin/ingredients/[id]/page": "app/admin/ingredients/[id]/page.js",
-  "/admin/flavours/page": "app/admin/flavours/page.js"
+  "/admin/flavours/page": "app/admin/flavours/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
+  "/admin/products/[id]/page": "app/admin/products/[id]/page.js"
 }

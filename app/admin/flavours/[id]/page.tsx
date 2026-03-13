@@ -342,13 +342,86 @@ export default function EditFlavourPage() {
 
         {/* Shopify Integration Card */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900">Shopify Integration</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Shopify Integration</h2>
+            {formData.shopifyProductId ? (
+              <span className="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Linked to Shopify
+              </span>
+            ) : (
+              <span className="px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-600">
+                Not linked
+              </span>
+            )}
+          </div>
           
-          <ShopifyProductPicker
-            selectedProductId={formData.shopifyProductId}
-            selectedProductHandle={formData.shopifyProductHandle}
-            onSelect={handleProductSelect}
-          />
+          {formData.shopifyProductId ? (
+            // Linked State
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-green-900 mb-2">
+                      Connected to Shopify Product
+                    </p>
+                    <div className="space-y-1 text-sm text-green-700">
+                      <p>
+                        <span className="font-medium">Handle:</span>{' '}
+                        <span className="font-mono text-xs">{formData.shopifyProductHandle}</span>
+                      </p>
+                      <p className="text-xs text-green-600">
+                        Product ID: {formData.shopifyProductId}
+                      </p>
+                    </div>
+                    {formData.shopifyProductHandle && (
+                      <a
+                        href={`https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}/products/${formData.shopifyProductHandle}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 text-sm text-green-700 hover:text-green-900 font-medium"
+                      >
+                        View in Shopify Admin
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleProductSelect(null)}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium ml-4"
+                  >
+                    Unlink
+                  </button>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  💡 This flavour is linked to a Shopify product. Changes to flavour details may need to be synced manually.
+                </p>
+              </div>
+            </div>
+          ) : (
+            // Not Linked State
+            <div className="space-y-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <p className="text-sm text-gray-700 mb-3">
+                  This flavour is not connected to Shopify. Link it to an existing product:
+                </p>
+                
+                <ShopifyProductPicker
+                  selectedProductId={formData.shopifyProductId}
+                  selectedProductHandle={formData.shopifyProductHandle}
+                  onSelect={handleProductSelect}
+                />
+              </div>
+            </div>
+          )}
 
           <SyncStatusIndicator
             status={formData.syncStatus || 'not_linked'}

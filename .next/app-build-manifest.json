@@ -140,6 +140,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/ingredients/create/page.js"
+    ],
+    "/admin/modifiers/new/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/modifiers/new/page.js"
     ]
   }
 }

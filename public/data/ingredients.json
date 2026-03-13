@@ -10,12 +10,19 @@
       "Creamy"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Primary dairy base ingredient for gelato.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:22:54.835Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": false
   },
   {
     "id": "cream",
@@ -28,12 +35,19 @@
       "Creamy"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Used to enrich dairy base.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:01.842Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true
   },
   {
     "id": "browned-butter",
@@ -46,12 +60,19 @@
       "Browned"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Butter cooked until nutty and aromatic.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:07.081Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true
   },
   {
     "id": "garden-tomato-mix",
@@ -72,7 +93,12 @@
     "seasonal": true,
     "description": "Mixed tomato varieties used for sorbet or savoury-leaning flavour builds.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:12.512Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true
   },
   {
     "id": "white-peaches",
@@ -91,13 +117,15 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:45:16.984Z",
+    "updatedAt": "2026-03-13T17:23:15.963Z",
     "tastingNotes": [],
     "availableMonths": [
       7,
       8
     ],
-    "imageAlt": ""
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true
   },
   {
     "id": "ile-dorleans-strawberries",
@@ -117,7 +145,12 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:20.467Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true
   },
   {
     "id": "wild-strawberry-quebec",
@@ -369,7 +402,13 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:44.452Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true,
+    "isOrganic": true
   },
   {
     "id": "sun-dried-mole",
@@ -391,7 +430,12 @@
     "seasonal": false,
     "description": "Optional topping component, not a base ingredient.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z"
+    "updatedAt": "2026-03-13T17:23:49.470Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true
   },
   {
     "id": "himalayan-sea-salt",
