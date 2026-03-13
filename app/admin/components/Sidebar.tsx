@@ -17,9 +17,9 @@ import {
   LogOut01
 } from '@untitledui/icons';
 import { NavList } from '@/src/app/admin/components/ui/application/app-navigation/base-components/nav-list';
-import type { NavItemType } from '@/src/app/admin/components/ui/application/app-navigation/config';
+import type { NavItemType, NavItemDividerType } from '@/src/app/admin/components/ui/application/app-navigation/config';
 
-const navItems: NavItemType[] = [
+const navItems: (NavItemType | NavItemDividerType)[] = [
   { 
     label: 'Dashboard', 
     href: '/admin', 
