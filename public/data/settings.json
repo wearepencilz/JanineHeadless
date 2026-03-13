@@ -69,38 +69,87 @@
     ],
     "dietaryFlags": [
       {
+        "id": "contains-dairy",
+        "label": "Contains Dairy",
+        "value": "contains-dairy",
+        "sortOrder": 1,
+        "archived": false
+      },
+      {
+        "id": "contains-egg",
+        "label": "Contains Egg",
+        "value": "contains-egg",
+        "sortOrder": 2,
+        "archived": false
+      },
+      {
+        "id": "contains-gluten",
+        "label": "Contains Gluten",
+        "value": "contains-gluten",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "contains-nuts",
+        "label": "Contains Nuts",
+        "value": "contains-nuts",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "contains-peanuts",
+        "label": "Contains Peanuts",
+        "value": "contains-peanuts",
+        "sortOrder": 5,
+        "archived": false
+      },
+      {
+        "id": "contains-sesame",
+        "label": "Contains Sesame",
+        "value": "contains-sesame",
+        "sortOrder": 6,
+        "archived": false
+      },
+      {
+        "id": "contains-soy",
+        "label": "Contains Soy",
+        "value": "contains-soy",
+        "sortOrder": 7,
+        "archived": false
+      },
+      {
         "id": "vegan",
         "label": "Vegan",
         "value": "vegan",
-        "sortOrder": 1,
+        "sortOrder": 8,
         "archived": false
       },
       {
         "id": "vegetarian",
         "label": "Vegetarian",
         "value": "vegetarian",
-        "sortOrder": 2,
-        "archived": false
-      },
-      {
-        "id": "gluten-free",
-        "label": "Gluten-Free",
-        "value": "gluten-free",
-        "sortOrder": 3,
+        "sortOrder": 9,
         "archived": false
       },
       {
         "id": "dairy-free",
-        "label": "Dairy-Free",
+        "label": "Dairy Free",
         "value": "dairy-free",
-        "sortOrder": 4,
+        "sortOrder": 10,
+        "archived": false
+      },
+      {
+        "id": "gluten-free",
+        "label": "Gluten Free",
+        "value": "gluten-free",
+        "sortOrder": 11,
         "archived": false
       },
       {
         "id": "nut-free",
-        "label": "Nut-Free",
+        "label": "Nut Free",
         "value": "nut-free",
-        "sortOrder": 5,
+        "sortOrder": 12,
         "archived": false
       }
     ]
