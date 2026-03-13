@@ -127,23 +127,23 @@ This feature transforms product generation from hardcoded type checking to a fle
     - Test backward compatibility (missing formatEligibilityRules)
     - _Requirements: 7.1, 7.2, 7.5_
 
-- [-] 7. Checkpoint - Ensure all tests pass
+- [x] 7. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 8. Update TypeScript types
-  - [~] 8.1 Add eligibleFlavourTypes to Format type definition
+- [x] 8. Update TypeScript types
+  - [x] 8.1 Add eligibleFlavourTypes to Format type definition
     - Update Format interface in types file
     - Add JSDoc comments explaining the field
     - Ensure optional field with proper typing
     - _Requirements: 1.1, 1.5, 6.1, 6.2_
   
-  - [~] 8.2 Create GenerationReport type definition
+  - [x] 8.2 Create GenerationReport type definition
     - Define GenerationReport interface
     - Define nested breakdown interfaces
     - Add JSDoc comments with examples
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [~] 9. Final checkpoint - Ensure all tests pass
+- [x] 9. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
