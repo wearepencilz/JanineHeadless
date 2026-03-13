@@ -293,7 +293,8 @@ export default function TaxonomyTagSelect({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+        <div className="relative">
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
           <div className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 && !showCreateOption ? (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
