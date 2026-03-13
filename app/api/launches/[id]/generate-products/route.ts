@@ -93,23 +93,46 @@ export async function POST(
     }> = [];
 
     // Separate single-flavour and multi-flavour formats
+    // Single-flavour: minFlavours is 1 (can accept a single flavour)
+    // Multi-flavour: minFlavours > 1 (requires multiple flavours, e.g. twist)
     const singleFlavourFormats = availableFormats.filter(
-      (f: any) => f.requiresFlavours && f.minFlavours === 1 && f.maxFlavours === 1
+      (f: any) => f.requiresFlavours && f.minFlavours <= 1
     );
     const multiFlavourFormats = availableFormats.filter(
       (f: any) => f.requiresFlavours && f.minFlavours > 1
     );
 
+    console.log('=== Product Generation Debug ===');
+    console.log('Available formats:', availableFormats.map((f: any) => `${f.name} (min:${f.minFlavours}, max:${f.maxFlavours})`));
+    console.log('Single-flavour formats:', singleFlavourFormats.map((f: any) => f.name));
+    console.log('Multi-flavour formats:', multiFlavourFormats.map((f: any) => f.name));
+    console.log('Selected flavours:', selectedFlavours.map((f: any) => `${f.name} (${f.type})`));
+    console.log('================================');
+
     // Generate single-flavour products
     for (const format of singleFlavourFormats) {
+      console.log(`\nChecking format: ${format.name}`);
+      console.log(`  eligibleFlavourTypes:`, format.eligibleFlavourTypes);
+      console.log(`  requiresFlavours:`, format.requiresFlavours);
+      console.log(`  minFlavours:`, format.minFlavours);
+      console.log(`  maxFlavours:`, format.maxFlavours);
+      
       for (const flavour of selectedFlavours) {
+        console.log(`  Checking flavour: ${flavour.name} (${flavour.type})`);
+        
         // Check eligibility using the new function
-        if (!isFormatEligibleForFlavour(format, flavour)) {
+        const isEligible = isFormatEligibleForFlavour(format, flavour);
+        console.log(`    Eligible: ${isEligible}`);
+        
+        if (!isEligible) {
           skipped++;
+          const eligibleTypes = format.eligibleFlavourTypes && format.eligibleFlavourTypes.length > 0
+            ? format.eligibleFlavourTypes.join(', ')
+            : 'all types';
           skippedCombinations.push({
             formatName: format.name,
             flavourName: flavour.name,
-            reason: `Flavour type '${flavour.type}' not eligible for this format`
+            reason: `Flavour type '${flavour.type}' not eligible. Format accepts: ${eligibleTypes}`
           });
           continue;
         }
