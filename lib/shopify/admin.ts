@@ -257,7 +257,7 @@ export async function getProduct(productId: string) {
 
 
 export async function createProduct(input: CreateProductInput) {
-  // Create product with variant price and SKU in one mutation
+  // Create product without variants first
   const createMutation = `
     mutation productCreate($input: ProductInput!) {
       productCreate(input: $input) {
@@ -288,12 +288,6 @@ export async function createProduct(input: CreateProductInput) {
     }
   `;
 
-  // Build variant input with price and SKU
-  const variantInput = input.variants && input.variants.length > 0 ? {
-    price: input.variants[0].price,
-    ...(input.variants[0].sku ? { sku: input.variants[0].sku } : {})
-  } : undefined;
-
   const createVariables = {
     input: {
       title: input.title,
@@ -303,8 +297,7 @@ export async function createProduct(input: CreateProductInput) {
       tags: input.tags,
       status: input.status || 'DRAFT',
       ...(input.images && input.images.length > 0 ? { images: input.images } : {}),
-      ...(input.metafields && input.metafields.length > 0 ? { metafields: input.metafields } : {}),
-      ...(variantInput ? { variants: [variantInput] } : {})
+      ...(input.metafields && input.metafields.length > 0 ? { metafields: input.metafields } : {})
     }
   };
 
@@ -317,6 +310,47 @@ export async function createProduct(input: CreateProductInput) {
   }
 
   const product = createData.productCreate.product;
+
+  // Update the default variant with price and SKU if provided
+  if (input.variants && input.variants.length > 0 && product.variants.edges.length > 0) {
+    const variantId = product.variants.edges[0].node.id;
+    const variantInput = input.variants[0];
+
+    const updateVariantMutation = `
+      mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+        productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+          product {
+            id
+          }
+          productVariants {
+            id
+            price
+            sku
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const updateVariables = {
+      productId: product.id,
+      variants: [{
+        id: variantId,
+        price: variantInput.price,
+        ...(variantInput.sku ? { sku: variantInput.sku } : {})
+      }]
+    };
+
+    const updateData = await shopifyAdminFetch(updateVariantMutation, updateVariables);
+
+    if (updateData.productVariantsBulkUpdate.userErrors.length > 0) {
+      console.warn('Failed to update variant:', updateData.productVariantsBulkUpdate.userErrors);
+      // Don't throw - product was created successfully
+    }
+  }
 
   // Fetch the complete product to return
   const finalProduct = await getProduct(product.id);

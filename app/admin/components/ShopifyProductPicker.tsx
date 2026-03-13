@@ -38,7 +38,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
     try {
       // If no query, fetch all products (or use a wildcard)
       const searchQuery = query.trim() || '*';
-      const response = await fetch(`/api/shopify/products?q=${encodeURIComponent(searchQuery)}&limit=50`);
+      const response = await fetch(`/api/shopify/products?q=${encodeURIComponent(searchQuery)}&limit=250`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -164,7 +164,13 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                   type="text"
                   placeholder="Search by product name..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    // If user clears the search, reload all products
+                    if (e.target.value === '') {
+                      loadProducts('*');
+                    }
+                  }}
                   onKeyPress={handleKeyPress}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   autoFocus
