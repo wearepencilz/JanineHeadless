@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFormats, getFlavours } from '@/lib/db.js'
-import { filterEligibleFlavours } from '@/lib/validation.js'
+import { filterEligibleFlavours } from '@/lib/validation'
 
 // GET /api/formats/[id]/eligible-flavours - Get format and its eligible flavours
 export async function GET(

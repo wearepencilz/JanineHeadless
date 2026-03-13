@@ -1,15 +1,1 @@
-[
-  {
-    "id": "format-soft-serve",
-    "name": "Soft Serve",
-    "slug": "soft-serve",
-    "category": "soft-serve",
-    "requiresFlavours": true,
-    "minFlavours": 1,
-    "maxFlavours": 1,
-    "allowMixedTypes": false,
-    "canIncludeAddOns": true,
-    "createdAt": "2024-01-01T00:00:00Z",
-    "updatedAt": "2024-01-01T00:00:00Z"
-  }
-]
+[]

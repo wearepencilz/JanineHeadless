@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getProducts, saveProducts, getFormats, getFlavours, getModifiers, getLaunches } from '@/lib/db.js'
-import { validateProductComposition } from '@/lib/validation.js'
+import { validateProductComposition } from '@/lib/validation'
 
 // GET /api/products/[id] - Get a single product with expanded relationships
 export async function GET(

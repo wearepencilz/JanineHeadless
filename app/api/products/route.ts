@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getProducts, saveProducts, getFormats, getFlavours, getModifiers } from '@/lib/db.js'
-import { validateProductComposition, generateProductName } from '@/lib/validation.js'
+import { validateProductComposition, generateProductName } from '@/lib/validation'
 
 // GET /api/products - Get all products with optional filtering
 export async function GET(request: NextRequest) {
