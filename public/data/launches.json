@@ -13,13 +13,48 @@
       "grilled-corn",
       "wild-tomatoes"
     ],
-    "featuredProductIds": [],
+    "featuredProductIds": [
+      "product-1773429623429-95tqbzit8",
+      "product-1773429623429-qs91a8jgn",
+      "product-1773429623429-cx54fut4w"
+    ],
     "contentBlocks": [],
     "relatedEventIds": [],
     "relatedMembershipDropIds": [],
     "sortOrder": 1,
     "featured": false,
     "createdAt": "2026-03-13T18:28:53.642Z",
-    "updatedAt": "2026-03-13T18:28:53.642Z"
+    "updatedAt": "2026-03-13T19:20:28.872Z"
+  },
+  {
+    "id": "launch-1773429775680",
+    "title": "Basil Raspberry",
+    "slug": "basil-raspberry",
+    "status": "archived",
+    "heroImage": null,
+    "story": null,
+    "description": null,
+    "activeStart": null,
+    "activeEnd": null,
+    "featuredFlavourIds": [
+      "basil-lemon",
+      "raspberry"
+    ],
+    "featuredProductIds": [
+      "product-1773429790836-2gzqk4tcm",
+      "product-1773429790836-tec79xroj",
+      "product-1773429790837-xpis2qeia",
+      "product-1773429790837-3uw2g7eoz",
+      "product-1773429790837-dxj4tkk7j",
+      "product-1773429790837-q5q13fhm8",
+      "product-1773429790837-oh5rpk7mz"
+    ],
+    "contentBlocks": [],
+    "relatedEventIds": [],
+    "relatedMembershipDropIds": [],
+    "sortOrder": 2,
+    "featured": false,
+    "createdAt": "2026-03-13T19:22:55.680Z",
+    "updatedAt": "2026-03-13T19:23:30.100Z"
   }
 ]

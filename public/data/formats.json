@@ -3,7 +3,7 @@
     "id": "06b83c01-cb01-4a08-9a39-251591602015",
     "name": "Gelato",
     "slug": "gelato",
-    "category": "ice-cream",
+    "category": "frozen",
     "description": "Gelato",
     "requiresFlavours": true,
     "minFlavours": 1,
@@ -11,12 +11,12 @@
     "allowMixedTypes": false,
     "canIncludeAddOns": true,
     "defaultSizes": [],
-    "servingStyle": "scoop",
+    "servingStyle": "soft-serve",
     "menuSection": "",
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:46:47.682Z",
-    "updatedAt": "2026-03-13T17:21:06.957Z",
+    "updatedAt": "2026-03-13T19:39:16.365Z",
     "eligibleFlavourTypes": [
       "gelato"
     ]
@@ -25,7 +25,7 @@
     "id": "07dfa981-e16e-4c9c-92be-c9a9424d1a64",
     "name": "Sorbet",
     "slug": "sorbet",
-    "category": "ice-cream",
+    "category": "frozen",
     "description": "Sorbet",
     "requiresFlavours": true,
     "minFlavours": 1,
@@ -38,7 +38,7 @@
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:51:02.020Z",
-    "updatedAt": "2026-03-13T17:42:00.166Z",
+    "updatedAt": "2026-03-13T19:18:15.142Z",
     "eligibleFlavourTypes": [
       "sorbet"
     ]
@@ -47,7 +47,7 @@
     "id": "8e32f354-3d70-482d-be98-d0ed3296b98e",
     "name": "Twist",
     "slug": "twist",
-    "category": "ice-cream",
+    "category": "frozen",
     "description": "Twist",
     "requiresFlavours": true,
     "minFlavours": 2,
@@ -60,7 +60,7 @@
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:51:26.446Z",
-    "updatedAt": "2026-03-13T16:51:33.498Z",
+    "updatedAt": "2026-03-13T19:18:22.083Z",
     "eligibleFlavourTypes": [
       "gelato",
       "sorbet"
@@ -70,7 +70,7 @@
     "id": "1a59f17c-c29d-45cc-b449-fe30a56eba4d",
     "name": "Pint",
     "slug": "pint",
-    "category": "ice-cream",
+    "category": "frozen",
     "description": "Pint",
     "requiresFlavours": true,
     "minFlavours": 1,
@@ -83,7 +83,7 @@
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:52:16.032Z",
-    "updatedAt": "2026-03-13T16:52:22.782Z",
+    "updatedAt": "2026-03-13T19:18:28.896Z",
     "eligibleFlavourTypes": [
       "gelato",
       "sorbet"
@@ -93,8 +93,8 @@
     "id": "4c4a2d4d-84cd-4d52-87de-a2107057b5f3",
     "name": "Gallon",
     "slug": "gallon",
-    "category": "ice-cream",
-    "description": "Gallon of ice cream",
+    "category": "frozen",
+    "description": "Gallon of ice cream ",
     "requiresFlavours": true,
     "minFlavours": 1,
     "maxFlavours": 3,
@@ -106,7 +106,7 @@
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:52:46.680Z",
-    "updatedAt": "2026-03-13T16:52:58.378Z",
+    "updatedAt": "2026-03-13T19:42:35.207Z",
     "eligibleFlavourTypes": [
       "gelato",
       "sorbet"

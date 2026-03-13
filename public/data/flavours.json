@@ -12,7 +12,9 @@
     "ingredients": [
       {
         "ingredientId": "milk",
-        "displayOrder": 0
+        "displayOrder": 0,
+        "quantity": "",
+        "notes": ""
       },
       {
         "ingredientId": "cream",
@@ -48,7 +50,7 @@
     "featured": false,
     "syncStatus": "not_linked",
     "createdAt": "2026-03-13T14:00:07.254Z",
-    "updatedAt": "2026-03-13T16:57:27.226Z"
+    "updatedAt": "2026-03-13T19:34:24.824Z"
   },
   {
     "id": "wild-tomatoes",

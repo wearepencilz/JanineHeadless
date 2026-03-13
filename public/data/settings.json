@@ -392,14 +392,6 @@
     ],
     "servingStyles": [
       {
-        "id": "scoop",
-        "label": "Scoop",
-        "value": "scoop",
-        "description": "Traditional scooped ice cream",
-        "sortOrder": 1,
-        "archived": false
-      },
-      {
         "id": "soft-serve",
         "label": "Soft Serve",
         "value": "soft-serve",

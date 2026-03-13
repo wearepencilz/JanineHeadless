@@ -7,7 +7,7 @@ import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import FormatSelectionModal from '@/app/admin/components/FormatSelectionModal';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
 import { useToast } from '@/app/admin/components/ToastContainer';
-import DateRangePicker from '@/app/admin/components/ui/DateRangePicker';
+import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
 interface Launch {
@@ -384,8 +384,10 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Active Period
+            </label>
             <DateRangePicker
-              label="Active Period"
               value={
                 launch.activeStart && launch.activeEnd
                   ? {
@@ -409,8 +411,10 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                   });
                 }
               }}
-              description="When this launch will be active and visible to customers"
             />
+            <p className="mt-2 text-sm text-gray-600">
+              When this launch will be active and visible to customers
+            </p>
           </div>
 
           <div>

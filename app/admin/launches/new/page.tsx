@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/slug';
-import DateRangePicker from '@/app/admin/components/ui/DateRangePicker';
+import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
 interface Flavour {
@@ -243,8 +243,10 @@ export default function NewLaunchPage() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Active Period
+            </label>
             <DateRangePicker
-              label="Active Period"
               value={
                 formData.activeStart && formData.activeEnd
                   ? {
@@ -268,8 +270,10 @@ export default function NewLaunchPage() {
                   });
                 }
               }}
-              description="When this launch will be active and visible to customers"
             />
+            <p className="mt-2 text-sm text-gray-600">
+              When this launch will be active and visible to customers
+            </p>
           </div>
 
           <div>

@@ -2,7 +2,7 @@
   {
     "id": "milk",
     "name": "Milk",
-    "category": "Dairy",
+    "category": "dairy-bases",
     "roles": [
       "Base"
     ],
@@ -17,7 +17,7 @@
     "seasonal": false,
     "description": "Primary dairy base ingredient for gelato.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T17:22:54.835Z",
+    "updatedAt": "2026-03-13T19:37:18.454Z",
     "tastingNotes": [],
     "availableMonths": [],
     "imageAlt": "",

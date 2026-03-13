@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"../components/game/GameContainer.tsx -> @/lib/game/scenes/GameScene\":{\"id\":\"../components/game/GameContainer.tsx -> @/lib/game/scenes/GameScene\",\"files\":[\"static/chunks/_app-pages-browser_lib_game_scenes_GameScene_ts.js\"]},\"../components/game/GameContainer.tsx -> phaser\":{\"id\":\"../components/game/GameContainer.tsx -> phaser\",\"files\":[]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"
