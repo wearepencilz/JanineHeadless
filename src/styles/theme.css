@@ -161,7 +161,7 @@
 
 /* Map semantic tokens to Tailwind utilities */
 @theme {
-    /* Background utilities */
+    /* Background utilities (bg-*) */
     --color-primary: var(--color-bg-primary);
     --color-primary_alt: var(--color-bg-primary_alt);
     --color-primary_hover: var(--color-bg-primary_hover);
@@ -178,7 +178,7 @@
     --color-disabled_subtle: var(--color-bg-disabled_subtle);
     --color-overlay: var(--color-overlay);
     
-    /* Brand colors */
+    /* Brand colors (bg-brand-*) */
     --color-brand-primary: var(--color-bg-brand-primary);
     --color-brand-primary_alt: var(--color-bg-brand-primary_alt);
     --color-brand-secondary: var(--color-bg-brand-secondary);
@@ -186,12 +186,15 @@
     --color-brand-solid_hover: var(--color-bg-brand-solid_hover);
     --color-brand-section: var(--color-bg-brand-section);
     --color-brand-section_subtle: var(--color-bg-brand-section_subtle);
+    --color-brand-secondary_hover: #60a5fa;
+    --color-brand: var(--color-border-brand);
     
-    /* Status colors */
+    /* Status colors (bg-error-*, bg-warning-*, bg-success-*) */
     --color-error-primary: var(--color-bg-error-primary);
     --color-error-secondary: var(--color-bg-error-secondary);
     --color-error-solid: var(--color-bg-error-solid);
     --color-error-solid_hover: #b91c1c;
+    --color-error-primary_hover: #b91c1c;
     --color-error_subtle: #fecaca;
     --color-warning-primary: var(--color-bg-warning-primary);
     --color-warning-secondary: var(--color-bg-warning-secondary);
@@ -200,66 +203,47 @@
     --color-success-secondary: var(--color-bg-success-secondary);
     --color-success-solid: var(--color-bg-success-solid);
     
-    /* Text/Foreground colors - CRITICAL for Untitled UI */
-    --color-fg-primary: var(--color-fg-primary);
-    --color-fg-secondary: var(--color-fg-secondary);
-    --color-fg-secondary_hover: var(--color-fg-secondary_hover);
-    --color-fg-tertiary: var(--color-fg-tertiary);
-    --color-fg-tertiary_hover: var(--color-fg-tertiary_hover);
-    --color-fg-quaternary: var(--color-fg-quaternary);
-    --color-fg-quaternary_hover: var(--color-fg-quaternary_hover);
-    --color-fg-quinary: var(--color-fg-quinary);
-    --color-fg-quinary_hover: var(--color-fg-quinary_hover);
-    --color-fg-senary: var(--color-fg-senary);
-    --color-fg-white: var(--color-fg-white);
-    --color-fg-disabled: var(--color-fg-disabled);
-    --color-fg-disabled_subtle: var(--color-fg-disabled_subtle);
-    --color-fg-brand-primary: var(--color-fg-brand-primary);
-    --color-fg-brand-primary_alt: var(--color-fg-brand-primary_alt);
-    --color-fg-brand-secondary: var(--color-fg-brand-secondary);
+    /* Text/Foreground colors for text-* utilities */
+    /* These are used by Untitled UI components with text-secondary, text-disabled, etc. */
+    --color-fg-primary: #0c111d;
+    --color-fg-secondary: #344054;
+    --color-fg-secondary_hover: #1d2939;
+    --color-fg-tertiary: #475467;
+    --color-fg-tertiary_hover: #344054;
+    --color-fg-quaternary: #667085;
+    --color-fg-quaternary_hover: #475467;
+    --color-fg-quinary: #858d9d;
+    --color-fg-quinary_hover: #667085;
+    --color-fg-senary: #98a2b3;
+    --color-fg-white: #ffffff;
+    --color-fg-disabled: #d0d5dd;
+    --color-fg-disabled_subtle: #e4e7ec;
+    --color-fg-brand-primary: #2563eb;
+    --color-fg-brand-primary_alt: #1d4ed8;
+    --color-fg-brand-secondary: #3b82f6;
     --color-fg-brand-secondary_alt: #60a5fa;
     --color-fg-brand-secondary_hover: #3b82f6;
-    --color-fg-error-primary: var(--color-fg-error-primary);
-    --color-fg-error-secondary: var(--color-fg-error-secondary);
-    --color-fg-warning-primary: var(--color-fg-warning-primary);
-    --color-fg-warning-secondary: var(--color-fg-warning-secondary);
-    --color-fg-success-primary: var(--color-fg-success-primary);
-    --color-fg-success-secondary: var(--color-fg-success-secondary);
-    
-    /* Text semantic aliases (used by Untitled UI) */
-    --color-text-primary: var(--color-text-primary);
-    --color-text-secondary: var(--color-text-secondary);
-    --color-text-secondary_hover: var(--color-text-secondary_hover);
-    --color-text-tertiary: var(--color-text-tertiary);
-    --color-text-tertiary_hover: var(--color-text-tertiary_hover);
-    --color-text-quaternary: var(--color-text-quaternary);
-    --color-text-quaternary_hover: var(--color-text-quaternary_hover);
-    --color-text-white: var(--color-text-white);
-    --color-text-disabled: var(--color-text-disabled);
-    --color-text-placeholder: var(--color-text-placeholder);
-    --color-text-placeholder_subtle: var(--color-text-placeholder_subtle);
-    --color-text-brand-primary: var(--color-text-brand-primary);
-    --color-text-brand-secondary: var(--color-text-brand-secondary);
-    --color-text-brand-tertiary: var(--color-text-brand-tertiary);
-    --color-text-brand-tertiary_alt: var(--color-text-brand-tertiary_alt);
-    --color-text-error-primary: var(--color-text-error-primary);
-    --color-text-warning-primary: var(--color-text-warning-primary);
-    --color-text-success-primary: var(--color-text-success-primary);
+    --color-fg-error-primary: #dc2626;
+    --color-fg-error-secondary: #ef4444;
+    --color-fg-warning-primary: #f59e0b;
+    --color-fg-warning-secondary: #fbbf24;
+    --color-fg-success-primary: #10b981;
+    --color-fg-success-secondary: #34d399;
     
     /* Placeholder alias (used by DateRangePicker) */
     --color-placeholder: var(--color-text-placeholder);
     
-    /* Border colors */
-    --color-border-primary: var(--color-border-primary);
-    --color-border-secondary: var(--color-border-secondary);
-    --color-border-tertiary: var(--color-border-tertiary);
-    --color-border-disabled: var(--color-border-disabled);
-    --color-border-disabled_subtle: var(--color-border-disabled_subtle);
-    --color-border-brand: var(--color-border-brand);
-    --color-border-brand-solid: var(--color-border-brand-solid);
-    --color-border-brand-solid_alt: var(--color-border-brand-solid_alt);
-    --color-border-error: var(--color-border-error);
-    --color-border-error-solid: var(--color-border-error-solid);
+    /* Border colors (border-*) */
+    --color-border-primary: #d0d5dd;
+    --color-border-secondary: #e4e7ec;
+    --color-border-tertiary: #f2f4f7;
+    --color-border-disabled: #e4e7ec;
+    --color-border-disabled_subtle: #f2f4f7;
+    --color-border-brand: #2563eb;
+    --color-border-brand-solid: #2563eb;
+    --color-border-brand-solid_alt: #1d4ed8;
+    --color-border-error: #fca5a5;
+    --color-border-error-solid: #dc2626;
     
     /* Button-specific colors (used by Button component) */
     --color-button-primary-icon: #ffffff;
@@ -267,12 +251,12 @@
     --color-button-destructive-primary-icon: #ffffff;
     --color-button-destructive-primary-icon_hover: #ffffff;
     
-    /* Outline colors */
+    /* Outline colors (outline-*) */
     --color-outline-brand: var(--color-border-brand);
     --color-outline-error: var(--color-border-error-solid);
     
-    /* Focus ring */
-    --color-focus-ring: var(--color-focus-ring);
+    /* Focus ring (ring-*) */
+    --color-focus-ring: #3b82f6;
 }
 
 
@@ -286,18 +270,4 @@
     --shadow-xl: 0px 8px 8px -4px rgba(16, 24, 40, 0.03), 0px 20px 24px -4px rgba(16, 24, 40, 0.08);
     --shadow-2xl: 0px 24px 48px -12px rgba(16, 24, 40, 0.18);
     --shadow-3xl: 0px 32px 64px -12px rgba(16, 24, 40, 0.14);
-}
-
-
-/* Additional color variants needed by Untitled UI Button component */
-@theme {
-    /* Brand hover states */
-    --color-brand-secondary_hover: #60a5fa;
-    
-    /* Error hover states */
-    --color-error-primary_hover: #b91c1c;
-    
-    /* Text hover states for tertiary buttons */
-    --color-tertiary: var(--color-fg-tertiary);
-    --color-tertiary_hover: var(--color-fg-tertiary_hover);
 }
