@@ -111,7 +111,7 @@ export default function ProductsPage() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Menu Items</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Products</h1>
             <p className="mt-2 text-sm text-gray-600">
               Manage sellable products by combining formats with flavours and modifiers
             </p>

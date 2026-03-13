@@ -142,11 +142,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       if (response.ok) {
         router.push('/admin/products');
       } else {
-        setErrors(['Failed to delete product']);
+        const error = await response.json();
+        setErrors([error.error || 'Failed to delete product']);
+        setShowDeleteConfirm(false);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
       setErrors(['Failed to delete product']);
+      setShowDeleteConfirm(false);
     }
   }
 
@@ -529,7 +532,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Product</h3>
             <p className="text-sm text-gray-600 mb-4">
