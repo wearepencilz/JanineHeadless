@@ -468,5 +468,17 @@
     "description": "Seasoning blend used as topping or add-on.",
     "createdAt": "2026-03-10T04:16:09.882Z",
     "updatedAt": "2026-03-10T04:16:09.882Z"
+  },
+  {
+    "id": "test-ing-use",
+    "name": "Test Use Ingredient",
+    "category": "herb",
+    "roles": [],
+    "descriptors": [],
+    "allergens": [],
+    "dietaryFlags": [],
+    "seasonal": false,
+    "createdAt": "2026-03-13T01:02:12.954Z",
+    "updatedAt": "2026-03-13T01:02:12.954Z"
   }
 ]

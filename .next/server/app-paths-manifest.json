@@ -1,7 +1,6 @@
 {
-  "/admin/formats/[id]/page": "app/admin/formats/[id]/page.js",
-  "/admin/ingredients/page": "app/admin/ingredients/page.js",
-  "/admin/offerings/page": "app/admin/offerings/page.js",
-  "/admin/offerings/create/page": "app/admin/offerings/create/page.js",
-  "/admin/flavours/page": "app/admin/flavours/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/admin/flavours/page": "app/admin/flavours/page.js",
+  "/admin/launches/page": "app/admin/launches/page.js",
+  "/admin/formats/[id]/page": "app/admin/formats/[id]/page.js"
 }

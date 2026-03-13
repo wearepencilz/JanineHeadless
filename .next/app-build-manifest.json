@@ -1,10 +1,5 @@
 {
   "pages": {
-    "/admin/offerings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/offerings/page.js"
-    ],
     "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -71,10 +66,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/news/page.js"
     ],
-    "/admin/offerings/create/page": [
+    "/admin/launches/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/offerings/create/page.js"
+      "static/chunks/app/admin/launches/page.js"
+    ],
+    "/admin/settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/settings/page.js"
     ]
   }
 }
