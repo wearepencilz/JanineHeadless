@@ -14,7 +14,7 @@ export async function GET(
     
     // Get all formats for name lookup
     const formats = await getFormats();
-    const formatMap = new Map(formats.map(f => [f.id, f]));
+    const formatMap = new Map(formats.map((f: any) => [f.id, f]));
     
     // Find offerings that use this flavour
     const usageOfferings = offerings
