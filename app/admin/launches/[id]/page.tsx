@@ -119,7 +119,9 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
         await fetchLaunch();
       } else {
         const data = await response.json();
+        console.error('Generate products error:', data);
         setError(data.error || 'Failed to generate products');
+        alert(`Error: ${data.error || 'Failed to generate products'}`);
       }
     } catch (err) {
       setError('An error occurred while generating products');

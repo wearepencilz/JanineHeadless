@@ -30,7 +30,8 @@ export async function POST(
     }
 
     // Get all flavours and filter selected ones
-    const allFlavours = await getFlavours();
+    const flavoursResponse = await getFlavours();
+    const allFlavours = Array.isArray(flavoursResponse) ? flavoursResponse : (flavoursResponse.data || []);
     const selectedFlavours = allFlavours.filter((f: any) => flavourIds.includes(f.id));
 
     if (selectedFlavours.length === 0) {
@@ -46,18 +47,27 @@ export async function POST(
 
     // Get all formats
     const formats = await getFormats();
+    console.log('Formats fetched:', formats);
     const activeFormats = formats.filter((f: any) => f.status === 'active');
+    console.log('Active formats:', activeFormats);
 
-    if (activeFormats.length === 0) {
+    // If no active formats, use all formats
+    const availableFormats = activeFormats.length > 0 ? activeFormats : formats;
+    console.log('Available formats:', availableFormats);
+
+    if (availableFormats.length === 0) {
       return NextResponse.json(
-        { error: 'No active formats available. Please create formats first.' },
+        { error: 'No formats available. Please create formats first.' },
         { status: 400 }
       );
     }
 
     // Find specific format categories
-    const scoopFormat = activeFormats.find((f: any) => f.category === 'scoop');
-    const twistFormat = activeFormats.find((f: any) => f.category === 'twist');
+    const scoopFormat = availableFormats.find((f: any) => f.category === 'scoop');
+    const twistFormat = availableFormats.find((f: any) => f.category === 'twist');
+    
+    console.log('Scoop format:', scoopFormat);
+    console.log('Twist format:', twistFormat);
 
     if (!scoopFormat) {
       return NextResponse.json(
