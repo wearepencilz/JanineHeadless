@@ -33,10 +33,19 @@ interface Format {
   name: string;
 }
 
+interface Launch {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  featuredProductIds: string[];
+}
+
 export default function ProductsPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [formats, setFormats] = useState<Format[]>([]);
+  const [launches, setLaunches] = useState<Launch[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [formatFilter, setFormatFilter] = useState<string>('all');
@@ -64,16 +73,19 @@ export default function ProductsPage() {
         params.append('formatId', formatFilter);
       }
 
-      const [productsRes, formatsRes] = await Promise.all([
+      const [productsRes, formatsRes, launchesRes] = await Promise.all([
         fetch(`/api/products?${params.toString()}`),
         fetch('/api/formats'),
+        fetch('/api/launches'),
       ]);
 
-      if (productsRes.ok && formatsRes.ok) {
+      if (productsRes.ok && formatsRes.ok && launchesRes.ok) {
         const productsData = await productsRes.json();
         const formatsData = await formatsRes.json();
+        const launchesData = await launchesRes.json();
         setProducts(productsData);
         setFormats(formatsData.data || formatsData);
+        setLaunches(launchesData);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -91,6 +103,12 @@ export default function ProductsPage() {
   const getFormatName = (formatId: string) => {
     const format = formats.find(f => f.id === formatId);
     return format?.name || 'Unknown';
+  };
+
+  const getProductLaunches = (productId: string) => {
+    return launches.filter(launch => 
+      launch.featuredProductIds?.includes(productId)
+    );
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -225,6 +243,34 @@ export default function ProductsPage() {
           {product.status}
         </span>
       ),
+      className: 'whitespace-nowrap',
+    },
+    {
+      key: 'launch',
+      label: 'Launch',
+      render: (product) => {
+        const productLaunches = getProductLaunches(product.id);
+        if (productLaunches.length === 0) {
+          return <span className="text-sm text-gray-400">—</span>;
+        }
+        return (
+          <div className="flex flex-col gap-1">
+            {productLaunches.map((launch) => (
+              <a
+                key={launch.id}
+                href={`/admin/launches/${launch.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/admin/launches/${launch.id}`);
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer"
+              >
+                {launch.title}
+              </a>
+            ))}
+          </div>
+        );
+      },
       className: 'whitespace-nowrap',
     },
     {
