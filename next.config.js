@@ -49,12 +49,25 @@ const nextConfig = {
     ],
   },
   
+  // Tree-shake icon imports
+  modularizeImports: {
+    '@untitledui/icons': {
+      transform: '@untitledui/icons/{{member}}',
+    },
+  },
+  
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    // Optimize compilation
-    optimizePackageImports: ['react-icons', 'framer-motion'],
+    // Optimize compilation - add date picker dependencies
+    optimizePackageImports: [
+      'react-icons', 
+      'framer-motion',
+      '@internationalized/date',
+      'react-aria-components',
+      '@untitledui/icons'
+    ],
   },
   
   // Faster builds in development
