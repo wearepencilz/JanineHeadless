@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getFlavours, saveFlavours, getIngredients } from '@/lib/db';
+import { withDeleteProtection, withUpdateProtection } from '@/lib/api-middleware';
+import { createBackup } from '@/lib/data-protection';
 import type { Flavour, Ingredient, Allergen, DietaryFlag, ErrorResponse } from '@/types';
 
 // Helper function to calculate allergens from ingredients
@@ -186,28 +188,23 @@ export async function DELETE(
     return NextResponse.json(errorResponse, { status: 401 });
   }
 
-  try {
+  return withDeleteProtection('flavour', params.id, async () => {
     const flavours = await getFlavours() as Flavour[];
     const filtered = flavours.filter(f => f.id !== params.id);
     
     if (filtered.length === flavours.length) {
-      const errorResponse: ErrorResponse = {
-        error: 'Flavour not found',
-        code: 'NOT_FOUND',
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(errorResponse, { status: 404 });
+      return NextResponse.json(
+        {
+          error: 'Flavour not found',
+          code: 'NOT_FOUND',
+          timestamp: new Date().toISOString()
+        },
+        { status: 404 }
+      );
     }
     
     await saveFlavours(filtered);
     
-    return NextResponse.json({ message: 'Flavour deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting flavour:', error);
-    const errorResponse: ErrorResponse = {
-      error: 'Failed to delete flavour',
-      timestamp: new Date().toISOString()
-    };
-    return NextResponse.json(errorResponse, { status: 500 });
-  }
+    return { message: 'Flavour deleted successfully' };
+  });
 }
