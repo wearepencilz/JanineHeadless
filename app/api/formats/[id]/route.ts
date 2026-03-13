@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFormats, saveFormats } from '@/lib/db';
+import { withDeleteProtection, withUpdateProtection } from '@/lib/api-middleware';
+import { createBackup } from '@/lib/data-protection';
 
 export async function GET(
   request: NextRequest,
@@ -30,7 +32,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
+  return withUpdateProtection('format', async () => {
     const body = await request.json();
     const formats = await getFormats();
     const index = formats.findIndex((f: any) => f.id === params.id);
@@ -52,20 +54,14 @@ export async function PUT(
     await saveFormats(formats);
     
     return NextResponse.json(formats[index]);
-  } catch (error) {
-    console.error('Error updating format:', error);
-    return NextResponse.json(
-      { error: 'Failed to update format' },
-      { status: 500 }
-    );
-  }
+  });
 }
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
+  return withDeleteProtection('format', params.id, async () => {
     const formats = await getFormats();
     const index = formats.findIndex((f: any) => f.id === params.id);
     
@@ -79,12 +75,6 @@ export async function DELETE(
     formats.splice(index, 1);
     await saveFormats(formats);
     
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting format:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete format' },
-      { status: 500 }
-    );
-  }
+    return { success: true };
+  });
 }
