@@ -3,4 +3,187 @@
     /* FONT FAMILY - Using Inter as per Untitled UI defaults */
     --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     --font-display: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    /* COLORS - Untitled UI Semantic Tokens */
+    
+    /* Background Colors */
+    --color-bg-primary: #ffffff;
+    --color-bg-primary_alt: #ffffff;
+    --color-bg-primary_hover: #f9fafb;
+    --color-bg-primary_solid: #0c111d;
+    --color-bg-secondary: #f9fafb;
+    --color-bg-secondary_alt: #f2f4f7;
+    --color-bg-secondary_hover: #f2f4f7;
+    --color-bg-secondary_subtle: #f9fafb;
+    --color-bg-secondary_solid: #344054;
+    --color-bg-tertiary: #f2f4f7;
+    --color-bg-quaternary: #e4e7ec;
+    --color-bg-active: #f9fafb;
+    --color-bg-disabled: #f9fafb;
+    --color-bg-disabled_subtle: #f9fafb;
+    --color-bg-overlay: #0c111d;
+    --color-bg-brand-primary: #2563eb;
+    --color-bg-brand-primary_alt: #eff6ff;
+    --color-bg-brand-secondary: #eff6ff;
+    --color-bg-brand-solid: #2563eb;
+    --color-bg-brand-solid_hover: #1d4ed8;
+    --color-bg-brand-section: #eff6ff;
+    --color-bg-brand-section_subtle: #f5f8ff;
+    --color-bg-error-primary: #fee2e2;
+    --color-bg-error-secondary: #fef2f2;
+    --color-bg-error-solid: #dc2626;
+    --color-bg-warning-primary: #fef3c7;
+    --color-bg-warning-secondary: #fffbeb;
+    --color-bg-warning-solid: #f59e0b;
+    --color-bg-success-primary: #d1fae5;
+    --color-bg-success-secondary: #ecfdf5;
+    --color-bg-success-solid: #10b981;
+
+    /* Foreground/Text Colors */
+    --color-fg-primary: #0c111d;
+    --color-fg-secondary: #344054;
+    --color-fg-secondary_hover: #1d2939;
+    --color-fg-tertiary: #475467;
+    --color-fg-tertiary_hover: #344054;
+    --color-fg-quaternary: #667085;
+    --color-fg-quaternary_hover: #475467;
+    --color-fg-quinary: #858d9d;
+    --color-fg-quinary_hover: #667085;
+    --color-fg-senary: #98a2b3;
+    --color-fg-white: #ffffff;
+    --color-fg-disabled: #d0d5dd;
+    --color-fg-disabled_subtle: #e4e7ec;
+    --color-fg-brand-primary: #2563eb;
+    --color-fg-brand-primary_alt: #1d4ed8;
+    --color-fg-brand-secondary: #3b82f6;
+    --color-fg-error-primary: #dc2626;
+    --color-fg-error-secondary: #ef4444;
+    --color-fg-warning-primary: #f59e0b;
+    --color-fg-warning-secondary: #fbbf24;
+    --color-fg-success-primary: #10b981;
+    --color-fg-success-secondary: #34d399;
+
+    /* Border Colors */
+    --color-border-primary: #d0d5dd;
+    --color-border-secondary: #e4e7ec;
+    --color-border-tertiary: #f2f4f7;
+    --color-border-disabled: #e4e7ec;
+    --color-border-disabled_subtle: #f2f4f7;
+    --color-border-brand: #2563eb;
+    --color-border-brand-solid: #2563eb;
+    --color-border-brand-solid_alt: #1d4ed8;
+    --color-border-error: #fca5a5;
+    --color-border-error-solid: #dc2626;
+
+    /* Text Semantic Colors */
+    --color-text-primary: #0c111d;
+    --color-text-secondary: #344054;
+    --color-text-secondary_hover: #1d2939;
+    --color-text-tertiary: #475467;
+    --color-text-tertiary_hover: #344054;
+    --color-text-quaternary: #667085;
+    --color-text-quaternary_hover: #475467;
+    --color-text-white: #ffffff;
+    --color-text-disabled: #d0d5dd;
+    --color-text-placeholder: #667085;
+    --color-text-placeholder_subtle: #858d9d;
+    --color-text-brand-primary: #2563eb;
+    --color-text-brand-secondary: #3b82f6;
+    --color-text-brand-tertiary: #1d4ed8;
+    --color-text-brand-tertiary_alt: #1e40af;
+    --color-text-error-primary: #dc2626;
+    --color-text-warning-primary: #f59e0b;
+    --color-text-success-primary: #10b981;
+
+    /* Utility Colors */
+    --color-utility-gray-50: #f9fafb;
+    --color-utility-gray-100: #f2f4f7;
+    --color-utility-gray-200: #e4e7ec;
+    --color-utility-gray-300: #d0d5dd;
+    --color-utility-gray-400: #98a2b3;
+    --color-utility-gray-500: #667085;
+    --color-utility-gray-600: #475467;
+    --color-utility-gray-700: #344054;
+    --color-utility-gray-800: #1d2939;
+    --color-utility-gray-900: #0c111d;
+
+    --color-utility-brand-50: #eff6ff;
+    --color-utility-brand-100: #dbeafe;
+    --color-utility-brand-200: #bfdbfe;
+    --color-utility-brand-300: #93c5fd;
+    --color-utility-brand-400: #60a5fa;
+    --color-utility-brand-500: #3b82f6;
+    --color-utility-brand-600: #2563eb;
+    --color-utility-brand-700: #1d4ed8;
+    --color-utility-brand-800: #1e40af;
+    --color-utility-brand-900: #1e3a8a;
+
+    --color-utility-error-50: #fef2f2;
+    --color-utility-error-100: #fee2e2;
+    --color-utility-error-200: #fecaca;
+    --color-utility-error-300: #fca5a5;
+    --color-utility-error-400: #f87171;
+    --color-utility-error-500: #ef4444;
+    --color-utility-error-600: #dc2626;
+    --color-utility-error-700: #b91c1c;
+    --color-utility-error-800: #991b1b;
+    --color-utility-error-900: #7f1d1d;
+
+    --color-utility-warning-50: #fffbeb;
+    --color-utility-warning-100: #fef3c7;
+    --color-utility-warning-200: #fde68a;
+    --color-utility-warning-300: #fcd34d;
+    --color-utility-warning-400: #fbbf24;
+    --color-utility-warning-500: #f59e0b;
+    --color-utility-warning-600: #d97706;
+    --color-utility-warning-700: #b45309;
+    --color-utility-warning-800: #92400e;
+    --color-utility-warning-900: #78350f;
+
+    --color-utility-success-50: #ecfdf5;
+    --color-utility-success-100: #d1fae5;
+    --color-utility-success-200: #a7f3d0;
+    --color-utility-success-300: #6ee7b7;
+    --color-utility-success-400: #34d399;
+    --color-utility-success-500: #10b981;
+    --color-utility-success-600: #059669;
+    --color-utility-success-700: #047857;
+    --color-utility-success-800: #065f46;
+    --color-utility-success-900: #064e3b;
+
+    /* Focus Ring */
+    --color-focus-ring: #3b82f6;
+
+    /* Overlay */
+    --color-overlay: rgba(12, 17, 29, 0.7);
+}
+
+
+/* Map semantic tokens to Tailwind utilities */
+@theme {
+    /* Background utilities */
+    --color-primary: var(--color-bg-primary);
+    --color-primary_alt: var(--color-bg-primary_alt);
+    --color-primary_hover: var(--color-bg-primary_hover);
+    --color-secondary: var(--color-bg-secondary);
+    --color-secondary_alt: var(--color-bg-secondary_alt);
+    --color-secondary_hover: var(--color-bg-secondary_hover);
+    --color-tertiary: var(--color-bg-tertiary);
+    --color-quaternary: var(--color-bg-quaternary);
+    --color-active: var(--color-bg-active);
+    --color-disabled: var(--color-bg-disabled);
+    --color-overlay: var(--color-overlay);
+    
+    /* Brand colors */
+    --color-brand-primary: var(--color-bg-brand-primary);
+    --color-brand-secondary: var(--color-bg-brand-secondary);
+    --color-brand-solid: var(--color-bg-brand-solid);
+    
+    /* Status colors */
+    --color-error: var(--color-bg-error-solid);
+    --color-warning: var(--color-bg-warning-solid);
+    --color-success: var(--color-bg-success-solid);
+    
+    /* Focus ring */
+    --color-focus-ring: var(--color-focus-ring);
 }
