@@ -71,6 +71,7 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
 
   // Try direct access token first (for custom apps)
   let accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+  let authMethod = 'none';
   
   // If no direct token, try OAuth flow (for OAuth apps)
   if (!accessToken) {
@@ -78,6 +79,7 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
     const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
     
     if (clientId && clientSecret) {
+      authMethod = 'oauth';
       accessToken = await getOAuthAccessToken();
     } else {
       throw new Error(
@@ -86,7 +88,12 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
         '2. SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET (for OAuth apps)'
       );
     }
+  } else {
+    authMethod = 'direct_token';
   }
+  
+  // Log authentication method (first 10 chars of token for debugging)
+  console.log(`[Shopify Auth] Using ${authMethod}, token prefix: ${accessToken.substring(0, 10)}...`);
   
   return { shop, accessToken };
 }
