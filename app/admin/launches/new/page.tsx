@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/slug';
+import { Button } from '@/app/admin/components/ui/button';
 import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
@@ -382,19 +383,21 @@ export default function NewLaunchPage() {
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+              variant="primary"
+              isDisabled={loading}
+              isLoading={loading}
+              className="flex-1"
             >
               {loading ? 'Creating...' : 'Create Launch'}
-            </button>
-            <Link
-              href="/admin/launches"
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/admin/launches')}
             >
               Cancel
-            </Link>
+            </Button>
           </div>
         </form>
       </div>

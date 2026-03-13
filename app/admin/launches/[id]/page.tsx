@@ -7,6 +7,7 @@ import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import FormatSelectionModal from '@/app/admin/components/FormatSelectionModal';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
 import { useToast } from '@/app/admin/components/ToastContainer';
+import { Button } from '@/app/admin/components/ui/button';
 import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
@@ -452,14 +453,15 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           <div className="border-t border-gray-200 pt-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">Featured Flavours</h3>
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={handleOpenFormatModal}
-                disabled={generating || launch.featuredFlavourIds.length === 0}
-                className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+                isDisabled={generating || launch.featuredFlavourIds.length === 0}
+                isLoading={generating}
               >
                 {generating ? 'Generating...' : 'Generate Products from Flavours'}
-              </button>
+              </Button>
             </div>
             <p className="text-sm text-gray-600 mb-3">
               Select flavours to feature in this launch. You can auto-generate products from selected flavours.
