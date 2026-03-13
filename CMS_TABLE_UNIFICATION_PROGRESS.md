@@ -59,14 +59,16 @@ Create unified table components for all CMS list pages to ensure consistent UI/U
    - Secondary button (Seed Data)
    - Complex allergen and property badges
 
+5. **Products** (`app/admin/products/page.tsx`)
+   - Uses DataTable with clickable rows
+   - TableFilters (search + status + format filters)
+   - Delete modal with confirmation
+   - Shopify integration badges maintained
+   - Format name lookup
+
 ## Pages Remaining
 
 ### 🔄 To Update
-
-5. **Products** (`app/admin/products/page.tsx`)
-   - Currently has: Table with filters, delete modal
-   - Needs: Refactor to use DataTable + TableFilters
-   - Special features: Shopify integration badges, format names
 
 6. **Formats** (`app/admin/formats/page.tsx`)
    - Currently has: Card grid layout (NOT table!)
@@ -221,3 +223,5 @@ const handleDelete = async () => {
 - `c554705`: Create DataTable, DeleteModal, TableFilters components + update batches/news
 - `f4c3ff2`: Add filters prop to DataTable + update flavours page
 - `2fba080`: Update ingredients page to use unified components
+- `2521b91`: Add CMS table unification progress documentation
+- `5b7052f`: Update products page to use unified components
