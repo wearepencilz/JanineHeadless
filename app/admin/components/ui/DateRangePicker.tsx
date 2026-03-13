@@ -1,6 +1,21 @@
 'use client';
 
-import { DateRangePicker as AriaDateRangePicker, DateInput, DateSegment, Dialog, Group, Label, Popover, Button, RangeCalendar, CalendarGrid, CalendarCell, Heading } from 'react-aria-components';
+import { 
+  DateRangePicker as AriaDateRangePicker, 
+  DateInput, 
+  DateSegment, 
+  Dialog, 
+  Group, 
+  Label, 
+  Popover, 
+  Button, 
+  RangeCalendar, 
+  CalendarGrid, 
+  CalendarCell, 
+  Heading,
+  CalendarGridHeader,
+  CalendarHeaderCell
+} from 'react-aria-components';
 import { CalendarIcon, ChevronLeft, ChevronRight } from '@untitledui/icons';
 import type { DateValue } from '@internationalized/date';
 
@@ -108,6 +123,13 @@ export default function DateRangePicker({
               </Button>
             </header>
             <CalendarGrid className="border-spacing-1">
+              <CalendarGridHeader>
+                {(day) => (
+                  <CalendarHeaderCell className="text-xs font-medium text-gray-600">
+                    {day}
+                  </CalendarHeaderCell>
+                )}
+              </CalendarGridHeader>
               {(date) => (
                 <CalendarCell
                   date={date}
