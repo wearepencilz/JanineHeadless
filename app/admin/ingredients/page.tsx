@@ -11,16 +11,24 @@ interface Ingredient {
   name: string;
   latinName?: string;
   origin: string;
-  category: string;
+  category: string; // Legacy field
+  taxonomyCategory?: string; // New taxonomy field
   image?: string;
   allergens: string[];
   seasonal: boolean;
   status?: string;
 }
 
+interface TaxonomyCategory {
+  id: string;
+  label: string;
+  value: string;
+}
+
 export default function IngredientsPage() {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [taxonomyCategories, setTaxonomyCategories] = useState<TaxonomyCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -32,18 +40,27 @@ export default function IngredientsPage() {
   });
 
   useEffect(() => {
-    fetchIngredients();
+    fetchData();
   }, []);
 
-  const fetchIngredients = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch('/api/ingredients');
-      if (response.ok) {
-        const data = await response.json();
+      const [ingredientsRes, settingsRes] = await Promise.all([
+        fetch('/api/ingredients'),
+        fetch('/api/settings'),
+      ]);
+
+      if (ingredientsRes.ok) {
+        const data = await ingredientsRes.json();
         setIngredients(data.data || data);
       }
+
+      if (settingsRes.ok) {
+        const settings = await settingsRes.json();
+        setTaxonomyCategories(settings.ingredientCategories || []);
+      }
     } catch (error) {
-      console.error('Error fetching ingredients:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -76,18 +93,22 @@ export default function IngredientsPage() {
     }
   };
 
+  const getCategoryLabel = (ingredient: Ingredient) => {
+    const categoryId = ingredient.taxonomyCategory || ingredient.category;
+    const taxonomy = taxonomyCategories.find(t => t.id === categoryId || t.value === categoryId);
+    return taxonomy?.label || categoryId || 'Uncategorized';
+  };
+
   const filteredIngredients = ingredients.filter((ingredient) => {
     const matchesSearch = 
       ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ingredient.latinName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ingredient.origin?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || ingredient.category === categoryFilter;
+    const categoryId = ingredient.taxonomyCategory || ingredient.category;
+    const matchesCategory = categoryFilter === 'all' || categoryId === categoryFilter;
     const matchesStatus = statusFilter === 'all' || ingredient.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
-
-  // Get unique categories from ingredients
-  const categories = Array.from(new Set(ingredients.map(i => i.category))).sort();
 
   const filters: FilterConfig[] = [
     {
@@ -102,10 +123,12 @@ export default function IngredientsPage() {
       onChange: setCategoryFilter,
       options: [
         { value: 'all', label: 'All Categories' },
-        ...categories.map((cat) => ({
-          value: cat,
-          label: cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' '),
-        })),
+        ...taxonomyCategories
+          .filter(cat => !cat.archived)
+          .map((cat) => ({
+            value: cat.id,
+            label: cat.label,
+          })),
       ],
     },
     {
@@ -147,7 +170,7 @@ export default function IngredientsPage() {
       label: 'Category',
       render: (ingredient) => (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          {ingredient.category}
+          {getCategoryLabel(ingredient)}
         </span>
       ),
     },
