@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import ShopifyProductPicker from '@/app/admin/components/ShopifyProductPicker';
-import SyncStatusIndicator from '@/app/admin/components/SyncStatusIndicator';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
@@ -398,15 +397,6 @@ export default function EditFlavourPage() {
               </div>
             </div>
           )}
-
-          <SyncStatusIndicator
-            status={formData.syncStatus || 'not_linked'}
-            lastSyncedAt={formData.lastSyncedAt}
-            syncError={formData.syncError}
-            flavourId={formData.id}
-            productId={formData.shopifyProductId}
-            onResync={fetchFlavour}
-          />
         </div>
 
         {/* Actions */}
