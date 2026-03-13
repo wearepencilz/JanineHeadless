@@ -124,7 +124,7 @@ export default function IngredientsPage() {
       options: [
         { value: 'all', label: 'All Categories' },
         ...taxonomyCategories
-          .filter(cat => !cat.archived)
+          .filter(cat => cat.status !== 'archived')
           .map((cat) => ({
             value: cat.id,
             label: cat.label,
