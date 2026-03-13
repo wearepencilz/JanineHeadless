@@ -138,22 +138,23 @@ export async function DELETE(
       )
     }
     
-    // Check referential integrity - is this product referenced in any launches?
+    // Remove this product from any launches that reference it
     const launches = await getLaunches()
-    const usedInLaunches = launches.filter((l: any) => 
-      l.featuredProductIds && l.featuredProductIds.includes(params.id)
-    )
+    const updatedLaunches = launches.map((launch: any) => {
+      if (launch.featuredProductIds && launch.featuredProductIds.includes(params.id)) {
+        return {
+          ...launch,
+          featuredProductIds: launch.featuredProductIds.filter((id: string) => id !== params.id)
+        }
+      }
+      return launch
+    })
     
-    if (usedInLaunches.length > 0) {
-      return NextResponse.json(
-        { 
-          error: 'Cannot delete product that is featured in launches',
-          usedIn: usedInLaunches.map((l: any) => ({ id: l.id, title: l.title }))
-        },
-        { status: 400 }
-      )
-    }
+    // Save updated launches if any were modified
+    const { saveLaunches } = await import('@/lib/db.js')
+    await saveLaunches(updatedLaunches)
     
+    // Delete the product
     products.splice(index, 1)
     await saveProducts(products)
     
