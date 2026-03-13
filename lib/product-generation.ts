@@ -5,7 +5,7 @@
  * based on format-flavour compatibility rules.
  */
 
-import { Format } from '@/types';
+import { Format, GenerationReport } from '@/types';
 
 /**
  * Determines if a format is eligible for a specific flavour
@@ -111,4 +111,141 @@ export function isFormatEligibleForFlavours(
   return flavours.every(flavour => 
     isFormatEligibleForFlavour(format, flavour)
   );
+}
+
+/**
+ * Builds a detailed generation report from product generation results.
+ * 
+ * This function takes the raw results of product generation (created products,
+ * skipped combinations) and constructs a comprehensive report with:
+ * - Overall statistics (created, skipped, total)
+ * - Breakdown by format (which formats were used, how many products per format)
+ * - Breakdown by flavour type (distribution of products across flavour types)
+ * - Human-readable summary message
+ * - Optional detailed list of skipped combinations with reasons
+ * 
+ * @param results - The raw generation results
+ * @param results.createdProducts - Array of products that were created
+ * @param results.skippedCombinations - Array of combinations that were skipped
+ * @param results.totalProducts - Total number of products now associated with launch
+ * @returns A detailed GenerationReport object
+ * 
+ * @example
+ * const report = buildGenerationReport({
+ *   createdProducts: [
+ *     { formatName: 'Scoop', flavourType: 'gelato', flavourName: 'Vanilla' },
+ *     { formatName: 'Scoop', flavourType: 'sorbet', flavourName: 'Lemon' }
+ *   ],
+ *   skippedCombinations: [
+ *     { formatName: 'Sandwich', flavourName: 'Lemon', reason: 'Flavour type sorbet not eligible' }
+ *   ],
+ *   totalProducts: 2
+ * });
+ * // Returns detailed report with breakdowns and summary message
+ */
+export function buildGenerationReport(results: {
+  createdProducts: Array<{
+    formatName: string;
+    flavourType: string;
+    flavourName: string;
+  }>;
+  skippedCombinations: Array<{
+    formatName: string;
+    flavourName: string;
+    reason: string;
+  }>;
+  totalProducts: number;
+}): GenerationReport {
+  const { createdProducts, skippedCombinations, totalProducts } = results;
+  
+  // Initialize breakdown structures
+  const byFormat: Record<string, {
+    created: number;
+    skipped: number;
+    flavourTypes: string[];
+  }> = {};
+  
+  const byFlavourType: Record<string, number> = {};
+  
+  // Process created products
+  for (const product of createdProducts) {
+    const { formatName, flavourType } = product;
+    
+    // Update format breakdown
+    if (!byFormat[formatName]) {
+      byFormat[formatName] = {
+        created: 0,
+        skipped: 0,
+        flavourTypes: []
+      };
+    }
+    byFormat[formatName].created++;
+    
+    // Track unique flavour types for this format
+    if (!byFormat[formatName].flavourTypes.includes(flavourType)) {
+      byFormat[formatName].flavourTypes.push(flavourType);
+    }
+    
+    // Update flavour type breakdown
+    byFlavourType[flavourType] = (byFlavourType[flavourType] || 0) + 1;
+  }
+  
+  // Process skipped combinations
+  for (const skipped of skippedCombinations) {
+    const { formatName } = skipped;
+    
+    // Update format breakdown
+    if (!byFormat[formatName]) {
+      byFormat[formatName] = {
+        created: 0,
+        skipped: 0,
+        flavourTypes: []
+      };
+    }
+    byFormat[formatName].skipped++;
+  }
+  
+  // Generate human-readable summary message
+  const created = createdProducts.length;
+  const skipped = skippedCombinations.length;
+  
+  let message = '';
+  
+  if (created === 0 && skipped === 0) {
+    message = 'No products to generate.';
+  } else if (created === 0) {
+    message = `No products created. ${skipped} combination${skipped !== 1 ? 's' : ''} skipped due to eligibility rules.`;
+  } else if (skipped === 0) {
+    message = `Generated ${created} product${created !== 1 ? 's' : ''}.`;
+  } else {
+    message = `Generated ${created} product${created !== 1 ? 's' : ''}. Skipped ${skipped} combination${skipped !== 1 ? 's' : ''} due to eligibility rules.`;
+  }
+  
+  // Add format breakdown to message if products were created
+  if (created > 0) {
+    const formatCounts = Object.entries(byFormat)
+      .filter(([_, data]) => data.created > 0)
+      .map(([name, data]) => `${data.created} ${name.toLowerCase()}`)
+      .join(', ');
+    
+    if (formatCounts) {
+      message = message.replace('Generated', `Generated ${formatCounts} -`);
+      message = message.replace(` product${created !== 1 ? 's' : ''}.`, '.');
+    }
+  }
+  
+  return {
+    success: true,
+    created,
+    skipped,
+    total: totalProducts,
+    breakdown: {
+      byFormat,
+      byFlavourType
+    },
+    message,
+    details: skippedCombinations.length > 0 ? {
+      skippedCombinations
+    } : undefined
+  };
 }

@@ -565,6 +565,41 @@ export interface CollectionFull extends SeasonalCollection {
 }
 
 // ============================================================================
+// Product Generation Types
+// ============================================================================
+
+/**
+ * Detailed report of product generation results.
+ * Provides breakdown by format and flavour type, plus human-readable summary.
+ */
+export interface GenerationReport {
+  success: boolean;           // Overall success status
+  created: number;            // Number of new products created
+  skipped: number;            // Number of combinations skipped due to eligibility
+  total: number;              // Total products now associated with launch
+  breakdown: {
+    byFormat: {
+      [formatName: string]: {
+        created: number;        // Products created for this format
+        skipped: number;        // Combinations skipped for this format
+        flavourTypes: string[]; // Flavour types used in this format
+      };
+    };
+    byFlavourType: {
+      [flavourType: string]: number; // Count of products per flavour type
+    };
+  };
+  message: string;            // Human-readable summary message
+  details?: {
+    skippedCombinations: Array<{
+      formatName: string;
+      flavourName: string;
+      reason: string;
+    }>;
+  };
+}
+
+// ============================================================================
 // Validation Types
 // ============================================================================
 
