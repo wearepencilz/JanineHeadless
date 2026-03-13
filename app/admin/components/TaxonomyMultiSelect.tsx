@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { TaxonomyCategory } from './TaxonomySelect';
 
 interface TaxonomyValue {
@@ -20,6 +20,7 @@ interface TaxonomyMultiSelectProps {
   description?: string;
   showArchived?: boolean;
   className?: string;
+  allowCreate?: boolean;
 }
 
 export default function TaxonomyMultiSelect({
@@ -29,10 +30,17 @@ export default function TaxonomyMultiSelect({
   label,
   description,
   showArchived = false,
-  className = ''
+  className = '',
+  allowCreate = true
 }: TaxonomyMultiSelectProps) {
   const [options, setOptions] = useState<TaxonomyValue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newLabel, setNewLabel] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Ensure values is always an array
   const selectedValues = Array.isArray(values) ? values : [];
@@ -75,6 +83,61 @@ export default function TaxonomyMultiSelect({
       mounted = false;
     };
   }, [category]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setShowCreateForm(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleCreateNew = async () => {
+    if (!newLabel.trim()) return;
+
+    setIsCreating(true);
+    try {
+      // Generate value from label (lowercase, hyphenated)
+      const generatedValue = newLabel.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      
+      const response = await fetch(`/api/settings/taxonomies/${category}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          label: newLabel.trim(),
+          value: generatedValue,
+          description: ''
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create taxonomy value');
+      }
+
+      const created = await response.json();
+      
+      // Add to options list
+      setOptions([...options, created]);
+      
+      // Add to selected values
+      onChange([...selectedValues, created.value]);
+      
+      // Reset form
+      setNewLabel('');
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error('Error creating taxonomy value:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create taxonomy value');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const toggleValue = (value: string) => {
     if (selectedValues.includes(value)) {
