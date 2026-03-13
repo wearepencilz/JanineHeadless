@@ -19,16 +19,32 @@ interface Launch {
   featuredProductIds: string[];
 }
 
+interface Flavour {
+  id: string;
+  name: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  shopifyProductId?: string;
+}
+
 export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const [launch, setLaunch] = useState<Launch | null>(null);
+  const [flavours, setFlavours] = useState<Flavour[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     fetchLaunch();
+    fetchFlavours();
+    fetchProducts();
   }, [params.id]);
 
   const fetchLaunch = async () => {
@@ -45,6 +61,83 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchFlavours = async () => {
+    try {
+      const response = await fetch('/api/flavours');
+      if (response.ok) {
+        const data = await response.json();
+        setFlavours(data);
+      }
+    } catch (err) {
+      console.error('Failed to load flavours');
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      }
+    } catch (err) {
+      console.error('Failed to load products');
+    }
+  };
+
+  const handleGenerateProducts = async () => {
+    if (!launch || launch.featuredFlavourIds.length === 0) {
+      alert('Please select at least one flavour first');
+      return;
+    }
+
+    if (!confirm(`This will create products for ${launch.featuredFlavourIds.length} selected flavour(s). Continue?`)) {
+      return;
+    }
+
+    setGenerating(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/launches/${params.id}/generate-products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flavourIds: launch.featuredFlavourIds }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Successfully generated ${data.created} product(s)`);
+        // Refresh products and launch data
+        await fetchProducts();
+        await fetchLaunch();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to generate products');
+      }
+    } catch (err) {
+      setError('An error occurred while generating products');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const toggleFlavour = (flavourId: string) => {
+    if (!launch) return;
+    const ids = launch.featuredFlavourIds.includes(flavourId)
+      ? launch.featuredFlavourIds.filter(id => id !== flavourId)
+      : [...launch.featuredFlavourIds, flavourId];
+    setLaunch({ ...launch, featuredFlavourIds: ids });
+  };
+
+  const toggleProduct = (productId: string) => {
+    if (!launch) return;
+    const ids = launch.featuredProductIds.includes(productId)
+      ? launch.featuredProductIds.filter(id => id !== productId)
+      : [...launch.featuredProductIds, productId];
+    setLaunch({ ...launch, featuredProductIds: ids });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -291,6 +384,81 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
             <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
               Featured on homepage
             </label>
+          </div>
+
+          {/* Flavours Section */}
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Featured Flavours</h3>
+              <button
+                type="button"
+                onClick={handleGenerateProducts}
+                disabled={generating || launch.featuredFlavourIds.length === 0}
+                className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+              >
+                {generating ? 'Generating...' : 'Generate Products from Flavours'}
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              Select flavours to feature in this launch. You can auto-generate products from selected flavours.
+            </p>
+            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+              {flavours.length === 0 ? (
+                <p className="text-sm text-gray-500">No flavours available</p>
+              ) : (
+                <div className="space-y-2">
+                  {flavours.map((flavour) => (
+                    <label key={flavour.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={launch.featuredFlavourIds.includes(flavour.id)}
+                        onChange={() => toggleFlavour(flavour.id)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="ml-3 text-sm text-gray-700">{flavour.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {launch.featuredFlavourIds.length} flavour(s) selected
+            </p>
+          </div>
+
+          {/* Products Section */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-3">Featured Products</h3>
+            <p className="text-sm text-gray-600 mb-3">
+              Select products to feature in this launch. Products can be auto-generated from flavours above.
+            </p>
+            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+              {products.length === 0 ? (
+                <p className="text-sm text-gray-500">No products available</p>
+              ) : (
+                <div className="space-y-2">
+                  {products.map((product) => (
+                    <label key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={launch.featuredProductIds.includes(product.id)}
+                        onChange={() => toggleProduct(product.id)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="ml-3 text-sm text-gray-700">
+                        {product.name}
+                        {product.shopifyProductId && (
+                          <span className="ml-2 text-xs text-gray-500">(Shopify)</span>
+                        )}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {launch.featuredProductIds.length} product(s) selected
+            </p>
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-gray-200">
