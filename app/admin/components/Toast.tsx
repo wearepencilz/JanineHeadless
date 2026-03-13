@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { CheckCircle02, AlertCircle, InfoCircle, AlertTriangle, X } from '@untitledui/icons';
+import { CheckCircle, AlertCircle, InfoCircle, AlertTriangle, X } from '@untitledui/icons';
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -16,7 +16,7 @@ interface ToastProps {
 
 const variantConfig = {
   success: {
-    icon: CheckCircle02,
+    icon: CheckCircle,
     iconColor: 'text-green-600',
     bg: 'bg-green-50',
     border: 'border-green-200',

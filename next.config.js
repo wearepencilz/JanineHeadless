@@ -5,6 +5,19 @@ const nextConfig = {
   // Development optimizations
   reactStrictMode: false, // Disable strict mode in dev for faster rendering
   
+  // Reduce logging noise
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  
+  // Suppress webpack warnings
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+  
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -48,6 +61,11 @@ const nextConfig = {
   swcMinify: true,
   
   webpack: (config, { isServer, dev }) => {
+    // Suppress noisy warnings
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+    
     // Fix for next-auth module resolution on mobile/different networks
     if (!isServer) {
       config.resolve.fallback = {
