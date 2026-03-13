@@ -144,7 +144,7 @@ function mapIngredient(legacy: LegacyIngredient): Ingredient {
     name: legacy.name,
     latinName: undefined,
     category: legacy.category,
-    roles: legacy.roles,
+    roles: legacy.roles as any,
     descriptors: (legacy.tags || []) as any[],
     origin: legacy.origin || 'Unknown',
     allergens: inferAllergens(legacy),

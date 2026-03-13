@@ -2,7 +2,7 @@
 
 import { type HTMLAttributes } from "react";
 import { type DateValue, RangeCalendarContext, useSlottedContext } from "react-aria-components";
-import { cx } from "@/utils/cx";
+import { cx } from "../../../utils/cx";
 
 interface RangePresetButtonProps extends HTMLAttributes<HTMLButtonElement> {
     value: { start: DateValue; end: DateValue };
