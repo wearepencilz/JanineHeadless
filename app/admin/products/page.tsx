@@ -228,115 +228,122 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Table */}
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <p className="text-gray-500">No products found. Create your first product to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="relative block bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all">
-              <Link
-                href={`/admin/products/${product.id}`}
-                className="block p-6"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {product.publicName}
-                  </h3>
-                  <div className="flex gap-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(product.status)}`}>
-                      {product.status}
-                    </span>
-                    {product.shopifyProductId ? (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Shopify
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
-                        Not linked
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <p className="text-sm text-gray-600 mb-3">
-                  {product.shortCardCopy || product.description?.substring(0, 100)}
-                </p>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center text-gray-600">
-                    <span className="font-medium mr-2">Format:</span>
-                    <span>{getFormatName(product.formatId)}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-gray-600">
-                    <span className="font-medium mr-2">Flavours:</span>
-                    <span>{product.primaryFlavourIds.length}</span>
-                  </div>
-
-                  {product.toppingIds && product.toppingIds.length > 0 && (
-                    <div className="flex items-center text-gray-600">
-                      <span className="font-medium mr-2">Modifiers:</span>
-                      <span>{product.toppingIds.length}</span>
-                    </div>
-                  )}
-
-                  {product.price > 0 && (
-                    <div className="flex items-center text-gray-600">
-                      <span className="font-medium mr-2">Price:</span>
-                      <span>${(product.price / 100).toFixed(2)}</span>
-                    </div>
-                  )}
-
-                  {product.shopifyProductId && product.shopifyProductHandle && (
-                    <div className="flex items-center text-gray-600">
-                      <span className="font-medium mr-2">Shopify:</span>
-                      <a
-                        href={`https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}/products/${product.shopifyProductHandle}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-blue-600 hover:text-blue-800 text-xs underline"
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Product
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Format
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Flavours
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Shopify
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredProducts.map((product) => (
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link
+                        href={`/admin/products/${product.id}`}
+                        className="block"
                       >
-                        View in Shopify →
-                      </a>
-                    </div>
-                  )}
-
-                  {product.tags && product.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {product.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                      {product.tags.length > 3 && (
-                        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
-                          +{product.tags.length - 3}
+                        <div className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                          {product.publicName}
+                        </div>
+                        {product.shortCardCopy && (
+                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                            {product.shortCardCopy}
+                          </div>
+                        )}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{getFormatName(product.formatId)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{product.primaryFlavourIds.length}</div>
+                      {product.toppingIds && product.toppingIds.length > 0 && (
+                        <div className="text-xs text-gray-500">+{product.toppingIds.length} modifiers</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {product.price > 0 ? `$${(product.price / 100).toFixed(2)}` : '—'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(product.status)}`}>
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {product.shopifyProductId ? (
+                        <div className="flex flex-col gap-1">
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 inline-flex items-center gap-1 w-fit">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            Linked
+                          </span>
+                          {product.shopifyProductHandle && (
+                            <a
+                              href={`https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}/products/${product.shopifyProductHandle}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-600 hover:text-blue-800 underline"
+                            >
+                              View →
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
+                          Not linked
                         </span>
                       )}
-                    </div>
-                  )}
-                </div>
-              </Link>
-              <div className="px-6 pb-4 flex justify-end">
-                <button
-                  onClick={(e) => handleDeleteClick(e, product.id, product.publicName)}
-                  className="text-sm text-red-600 hover:text-red-900"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Link
+                        href={`/admin/products/${product.id}`}
+                        className="text-blue-600 hover:text-blue-900 mr-4"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={(e) => handleDeleteClick(e, product.id, product.publicName)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
