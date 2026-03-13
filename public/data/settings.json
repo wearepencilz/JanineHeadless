@@ -193,13 +193,6 @@
     ],
     "formatCategories": [
       {
-        "id": "scoop",
-        "label": "Scoop",
-        "value": "scoop",
-        "sortOrder": 1,
-        "archived": false
-      },
-      {
         "id": "take-home",
         "label": "Take Home",
         "value": "take-home",
@@ -211,20 +204,6 @@
         "label": "Sandwich",
         "value": "sandwich",
         "sortOrder": 3,
-        "archived": false
-      },
-      {
-        "id": "twist",
-        "label": "Twist",
-        "value": "twist",
-        "sortOrder": 4,
-        "archived": false
-      },
-      {
-        "id": "soft-serve",
-        "label": "Soft Serve",
-        "value": "soft-serve",
-        "sortOrder": 5,
         "archived": false
       },
       {

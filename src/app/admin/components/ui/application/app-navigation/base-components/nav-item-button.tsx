@@ -2,8 +2,8 @@
 
 import type { FC, MouseEventHandler } from "react";
 import { Pressable } from "react-aria-components";
-import { Tooltip } from "@/app/admin/components/ui/base/tooltip/tooltip";
-import { cx } from "@/utils/cx";
+import { Tooltip } from "@/src/app/admin/components/ui/base/tooltip/tooltip";
+import { cx } from "@/src/utils/cx";
 
 const styles = {
     md: {

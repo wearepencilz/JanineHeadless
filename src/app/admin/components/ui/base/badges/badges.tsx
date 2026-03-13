@@ -2,8 +2,8 @@
 
 import type { MouseEventHandler, ReactNode } from "react";
 import { X as CloseX } from "@untitledui/icons";
-import { Dot } from "@/app/admin/components/ui/foundations/dot-icon";
-import { cx } from "@/utils/cx";
+import { Dot } from "@/src/app/admin/components/ui/foundations/dot-icon";
+import { cx } from "@/src/utils/cx";
 import type { BadgeColors, BadgeTypeToColorMap, BadgeTypes, FlagTypes, IconComponentType, Sizes } from "./badge-types";
 import { badgeTypes } from "./badge-types";
 
