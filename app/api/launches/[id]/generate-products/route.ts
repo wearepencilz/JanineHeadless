@@ -14,11 +14,19 @@ export async function POST(
   }
 
   try {
-    const { flavourIds } = await request.json();
+    const { flavourIds, formatIds } = await request.json();
 
     if (!Array.isArray(flavourIds) || flavourIds.length === 0) {
       return NextResponse.json(
         { error: 'flavourIds must be a non-empty array' },
+        { status: 400 }
+      );
+    }
+
+    // formatIds is optional - if not provided, use all formats
+    if (formatIds && !Array.isArray(formatIds)) {
+      return NextResponse.json(
+        { error: 'formatIds must be an array' },
         { status: 400 }
       );
     }
@@ -44,16 +52,29 @@ export async function POST(
 
     // Get all formats
     const formats = await getFormats();
-    const activeFormats = formats.filter((f: any) => f.status === 'active');
+    
+    // Filter by formatIds if provided, otherwise use all formats
+    let availableFormats = formats;
+    if (formatIds && formatIds.length > 0) {
+      availableFormats = formats.filter((f: any) => formatIds.includes(f.id));
+      
+      if (availableFormats.length === 0) {
+        return NextResponse.json(
+          { error: 'No valid formats found for the provided formatIds' },
+          { status: 400 }
+        );
+      }
+    } else {
+      // If no formatIds provided, use active formats (backward compatible)
+      const activeFormats = formats.filter((f: any) => f.status === 'active');
+      availableFormats = activeFormats.length > 0 ? activeFormats : formats;
 
-    // If no active formats, use all formats
-    const availableFormats = activeFormats.length > 0 ? activeFormats : formats;
-
-    if (availableFormats.length === 0) {
-      return NextResponse.json(
-        { error: 'No formats available. Please create formats first.' },
-        { status: 400 }
-      );
+      if (availableFormats.length === 0) {
+        return NextResponse.json(
+          { error: 'No formats available. Please create formats first.' },
+          { status: 400 }
+        );
+      }
     }
 
     const products = await getProducts();

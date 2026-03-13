@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateSlug } from '@/lib/slug';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
+import FormatSelectionModal from '@/app/admin/components/FormatSelectionModal';
 
 interface Launch {
   id: string;
@@ -23,6 +24,7 @@ interface Launch {
 interface Flavour {
   id: string;
   name: string;
+  type: string;
 }
 
 interface Product {
@@ -31,6 +33,16 @@ interface Product {
   publicName?: string;
   name?: string; // Legacy field for backwards compatibility
   shopifyProductId?: string;
+}
+
+interface Format {
+  id: string;
+  name: string;
+  description?: string;
+  eligibleFlavourTypes?: string[];
+  minFlavours: number;
+  maxFlavours: number;
+  allowMixedTypes?: boolean;
 }
 
 export default function EditLaunchPage({ params }: { params: { id: string } }) {
@@ -43,12 +55,15 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const [launch, setLaunch] = useState<Launch | null>(null);
   const [flavours, setFlavours] = useState<Flavour[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [formats, setFormats] = useState<Format[]>([]);
   const [slugTouched, setSlugTouched] = useState(false);
+  const [showFormatModal, setShowFormatModal] = useState(false);
 
   useEffect(() => {
     fetchLaunch();
     fetchFlavours();
     fetchProducts();
+    fetchFormats();
   }, [params.id]);
 
   const fetchLaunch = async () => {
@@ -93,29 +108,41 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleGenerateProducts = async () => {
-    if (!launch || launch.featuredFlavourIds.length === 0) {
-      alert('Please select at least one flavour first');
-      return;
+  const fetchFormats = async () => {
+    try {
+      const response = await fetch('/api/formats');
+      if (response.ok) {
+        const data = await response.json();
+        setFormats(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Failed to load formats', err);
     }
+  };
 
-    if (!confirm(`This will create products for ${launch.featuredFlavourIds.length} selected flavour(s). Continue?`)) {
+  const handleGenerateProducts = async (selectedFormatIds: string[]) => {
+    if (!launch || launch.featuredFlavourIds.length === 0) {
       return;
     }
 
     setGenerating(true);
     setError('');
+    setShowFormatModal(false);
 
     try {
       const response = await fetch(`/api/launches/${params.id}/generate-products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flavourIds: launch.featuredFlavourIds }),
+        body: JSON.stringify({ 
+          flavourIds: launch.featuredFlavourIds,
+          formatIds: selectedFormatIds
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Successfully generated ${data.created} product(s)`);
+        const message = data.message || `Successfully generated ${data.created} product(s)`;
+        alert(message);
         // Refresh products and launch data
         await fetchProducts();
         await fetchLaunch();
@@ -130,6 +157,14 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleOpenFormatModal = () => {
+    if (!launch || launch.featuredFlavourIds.length === 0) {
+      alert('Please select at least one flavour first');
+      return;
+    }
+    setShowFormatModal(true);
   };
 
   const toggleFlavour = (flavourId: string) => {
@@ -417,7 +452,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               <h3 className="text-lg font-medium text-gray-900">Featured Flavours</h3>
               <button
                 type="button"
-                onClick={handleGenerateProducts}
+                onClick={handleOpenFormatModal}
                 disabled={generating || launch.featuredFlavourIds.length === 0}
                 className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors"
               >
@@ -440,7 +475,10 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                         onChange={() => toggleFlavour(flavour.id)}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
-                      <span className="ml-3 text-sm text-gray-700">{flavour.name}</span>
+                      <span className="ml-3 text-sm text-gray-700">
+                        {flavour.name}
+                        <span className="ml-2 text-xs text-gray-500">({flavour.type})</span>
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -488,6 +526,16 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
 
         </div>
       </form>
+
+      {/* Format Selection Modal */}
+      <FormatSelectionModal
+        isOpen={showFormatModal}
+        onClose={() => setShowFormatModal(false)}
+        onConfirm={handleGenerateProducts}
+        formats={formats}
+        selectedFlavours={flavours.filter(f => launch.featuredFlavourIds.includes(f.id))}
+        isGenerating={generating}
+      />
     </EditPageLayout>
   );
 }
