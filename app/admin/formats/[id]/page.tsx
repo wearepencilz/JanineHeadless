@@ -100,9 +100,6 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const categories: FormatCategory[] = ['frozen', 'food', 'experience', 'bundle'];
-  const servingStyles: ServingStyle[] = ['scoop', 'soft-serve', 'packaged', 'plated'];
-
   if (loading || !format) {
     return (
       <div className="flex justify-center items-center h-64">

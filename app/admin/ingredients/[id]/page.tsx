@@ -11,7 +11,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     latinName: '',
@@ -31,7 +30,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     imageAlt: '',
   });
 
-  const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
