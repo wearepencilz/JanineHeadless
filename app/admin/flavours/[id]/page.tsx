@@ -6,7 +6,6 @@ import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import ShopifyProductPicker from '@/app/admin/components/ShopifyProductPicker';
 import SyncStatusIndicator from '@/app/admin/components/SyncStatusIndicator';
-import BaseStyleSelector from '@/app/admin/components/BaseStyleSelector';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
@@ -99,18 +98,6 @@ export default function EditFlavourPage() {
     setFormData({ ...formData, ingredients });
   };
 
-  const handleKeyNoteAdd = (note: string) => {
-    if (!formData) return;
-    if (note.trim() && !formData.keyNotes?.includes(note.trim())) {
-      setFormData({ ...formData, keyNotes: [...(formData.keyNotes || []), note.trim()] });
-    }
-  };
-
-  const handleKeyNoteRemove = (note: string) => {
-    if (!formData) return;
-    setFormData({ ...formData, keyNotes: formData.keyNotes?.filter(n => n !== note) || [] });
-  };
-
   if (loading || !formData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -178,7 +165,7 @@ export default function EditFlavourPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Short Description *
+              Short Notes *
             </label>
             <input
               type="text"
@@ -186,7 +173,7 @@ export default function EditFlavourPage() {
               value={formData.shortDescription || ''}
               onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Brief description for cards (1-2 sentences)"
+              placeholder="Brief, merchandisable descriptor (e.g., Browned butter, grilled corn, honey)"
             />
           </div>
 
@@ -200,72 +187,38 @@ export default function EditFlavourPage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Longer editorial description (e.g., A sweet, savoury gelato built around grilled corn, browned butter, and honey)"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Base - Only show for gelato or special types */}
+          {(formData.type === 'gelato' || formData.type === 'special') && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Colour
+                Base *
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={formData.colour || '#FFFFFF'}
-                  onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
-                  className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={formData.colour || '#FFFFFF'}
-                  onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="#FFFFFF"
-                />
-              </div>
+              <select
+                value={formData.baseStyle || 'dairy'}
+                onChange={(e) => setFormData({ ...formData, baseStyle: e.target.value as BaseStyle })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="dairy">Dairy</option>
+                <option value="non-dairy">Non-Dairy</option>
+                <option value="cheese">Cheese</option>
+                <option value="other">Other</option>
+              </select>
             </div>
-          </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Key Notes
-            </label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Add a flavour note (e.g., nutty, floral)"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleKeyNoteAdd(e.currentTarget.value);
-                      e.currentTarget.value = '';
-                    }
-                  }}
-                />
-              </div>
-              {formData.keyNotes && formData.keyNotes.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.keyNotes.map((note) => (
-                    <span
-                      key={note}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                    >
-                      {note}
-                      <button
-                        type="button"
-                        onClick={() => handleKeyNoteRemove(note)}
-                        className="hover:text-blue-900"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Flavour Tags - Connected to taxonomy */}
+          <TaxonomyMultiSelect
+            category="keyNotes"
+            values={formData.keyNotes || []}
+            onChange={(values) => setFormData({ ...formData, keyNotes: values })}
+            label="Flavour Tags"
+            description="Select tags that describe this flavour (e.g., smoky, sweet, summer)"
+            allowCreate={true}
+          />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -279,54 +232,77 @@ export default function EditFlavourPage() {
               placeholder="Sweet, creamy, hints of vanilla..."
             />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story
-            </label>
-            <textarea
-              rows={4}
-              value={formData.story || ''}
-              onChange={(e) => setFormData({ ...formData, story: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="The inspiration behind this flavour..."
-            />
-          </div>
+        {/* Advanced Options - Collapsible */}
+        <details className="bg-white rounded-lg border border-gray-200">
+          <summary className="cursor-pointer p-6 font-medium text-gray-900 hover:bg-gray-50">
+            Advanced Options
+          </summary>
+          <div className="px-6 pb-6 space-y-6 border-t border-gray-200 pt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Colour
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={formData.colour || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
+                    className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={formData.colour || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="#FFFFFF"
+                  />
+                </div>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sort Order
+                Archive Note
               </label>
-              <input
-                type="number"
-                value={formData.sortOrder ?? 0}
-                onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
+              <textarea
+                rows={4}
+                value={formData.story || ''}
+                onChange={(e) => setFormData({ ...formData, story: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Context about this flavour (e.g., Served alongside Wild Tomatoes)"
               />
             </div>
 
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sort Order
+                </label>
                 <input
-                  type="checkbox"
-                  checked={formData.featured ?? false}
-                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  type="number"
+                  value={formData.sortOrder ?? 0}
+                  onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">Featured</span>
-              </label>
+              </div>
+
+              <div className="flex items-end">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured ?? false}
+                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Featured</span>
+                </label>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Base Style Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <BaseStyleSelector
-            value={formData.baseStyle || 'dairy'}
-            onChange={(value) => setFormData({ ...formData, baseStyle: value })}
-          />
-        </div>
+        </details>
 
         {/* Ingredients Card */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">

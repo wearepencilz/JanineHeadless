@@ -112,6 +112,78 @@
         "sortOrder": 1,
         "archived": false
       }
+    ],
+    "keyNotes": [
+      {
+        "id": "sweet",
+        "label": "Sweet",
+        "value": "sweet",
+        "sortOrder": 1,
+        "archived": false
+      },
+      {
+        "id": "smoky",
+        "label": "Smoky",
+        "value": "smoky",
+        "sortOrder": 2,
+        "archived": false
+      },
+      {
+        "id": "summer",
+        "label": "Summer",
+        "value": "summer",
+        "sortOrder": 3,
+        "archived": false
+      },
+      {
+        "id": "nutty",
+        "label": "Nutty",
+        "value": "nutty",
+        "sortOrder": 4,
+        "archived": false
+      },
+      {
+        "id": "floral",
+        "label": "Floral",
+        "value": "floral",
+        "sortOrder": 5,
+        "archived": false
+      },
+      {
+        "id": "fruity",
+        "label": "Fruity",
+        "value": "fruity",
+        "sortOrder": 6,
+        "archived": false
+      },
+      {
+        "id": "creamy",
+        "label": "Creamy",
+        "value": "creamy",
+        "sortOrder": 7,
+        "archived": false
+      },
+      {
+        "id": "tangy",
+        "label": "Tangy",
+        "value": "tangy",
+        "sortOrder": 8,
+        "archived": false
+      },
+      {
+        "id": "rich",
+        "label": "Rich",
+        "value": "rich",
+        "sortOrder": 9,
+        "archived": false
+      },
+      {
+        "id": "refreshing",
+        "label": "Refreshing",
+        "value": "refreshing",
+        "sortOrder": 10,
+        "archived": false
+      }
     ]
   }
 }
