@@ -6,6 +6,9 @@ import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
 import { computeProductAllergens, formatAllergen, formatDietaryClaim, getAllergenBadgeColor, getDietaryClaimBadgeColor } from '@/lib/product-allergens';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -329,8 +332,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     </a>
                   )}
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="danger"
+                  size="sm"
                   onClick={() => {
                     if (confirm('Are you sure you want to unlink this Shopify product? This will not delete the product from Shopify.')) {
                       setFormData({
@@ -340,10 +344,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                       });
                     }
                   }}
-                  className="text-sm text-red-600 hover:text-red-700 font-medium ml-4"
+                  className="ml-4"
                 >
                   Unlink
-                </button>
+                </Button>
               </div>
             </div>
             
@@ -381,14 +385,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                         </p>
                       </div>
                     )}
-                    <button
-                      type="button"
+                    <Button
+                      variant="primary"
+                      size="sm"
                       onClick={handleCreateShopifyProduct}
-                      disabled={creatingShopifyProduct || !formData.price || parseFloat(formData.price) <= 0}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                      isDisabled={creatingShopifyProduct || !formData.price || parseFloat(formData.price) <= 0}
+                      isLoading={creatingShopifyProduct}
                     >
                       {creatingShopifyProduct ? 'Creating...' : 'Create New Product'}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -537,81 +542,61 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Internal Name *
-                </label>
-                <input
+                <Input
+                  label="Internal Name"
                   type="text"
                   value={formData.internalName}
-                  onChange={(e) => setFormData({ ...formData, internalName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                  required
+                  onChange={(value) => setFormData({ ...formData, internalName: value })}
+                  isRequired
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Public Name *
-                </label>
-                <input
+                <Input
+                  label="Public Name"
                   type="text"
                   value={formData.publicName}
-                  onChange={(e) => setFormData({ ...formData, publicName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                  required
+                  onChange={(value) => setFormData({ ...formData, publicName: value })}
+                  isRequired
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description *
-              </label>
-              <textarea
+              <Textarea
+                label="Description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, description: value })}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                required
+                isRequired
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Short Card Copy
-              </label>
-              <input
+              <Input
+                label="Short Card Copy"
                 type="text"
                 value={formData.shortCardCopy}
-                onChange={(e) => setFormData({ ...formData, shortCardCopy: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                onChange={(value) => setFormData({ ...formData, shortCardCopy: value })}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price ($)
-                </label>
-                <input
+                <Input
+                  label="Price ($)"
                   type="number"
-                  step="0.01"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  onChange={(value) => setFormData({ ...formData, price: value })}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Compare At Price ($)
-                </label>
-                <input
+                <Input
+                  label="Compare At Price ($)"
                   type="number"
-                  step="0.01"
                   value={formData.compareAtPrice}
-                  onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  onChange={(value) => setFormData({ ...formData, compareAtPrice: value })}
                 />
               </div>
             </div>
@@ -634,14 +619,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tags (comma-separated)
-              </label>
-              <input
+              <Input
+                label="Tags (comma-separated)"
                 type="text"
                 value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                onChange={(value) => setFormData({ ...formData, tags: value })}
               />
             </div>
 
@@ -679,14 +661,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
             {formData.inventoryTracked && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Inventory Quantity
-                </label>
-                <input
+                <Input
+                  label="Inventory Quantity"
                   type="number"
                   value={formData.inventoryQuantity}
-                  onChange={(e) => setFormData({ ...formData, inventoryQuantity: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  onChange={(value) => setFormData({ ...formData, inventoryQuantity: value })}
                 />
               </div>
             )}
