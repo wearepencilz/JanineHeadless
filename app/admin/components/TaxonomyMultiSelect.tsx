@@ -24,7 +24,7 @@ interface TaxonomyMultiSelectProps {
 
 export default function TaxonomyMultiSelect({
   category,
-  values = [],
+  values,
   onChange,
   label,
   description,
@@ -36,9 +36,10 @@ export default function TaxonomyMultiSelect({
   const [showAddNew, setShowAddNew] = useState(false);
   const [newValue, setNewValue] = useState({ label: '', description: '' });
   const [creating, setCreating] = useState(false);
-  
-  // Ensure values is always an array
-  const safeValues = Array.isArray(values) ? values : [];
+
+  useEffect(() => {
+    fetchTaxonomyValues();
+  }, [category]);
 
   const fetchTaxonomyValues = async () => {
     setLoading(true);
@@ -53,10 +54,6 @@ export default function TaxonomyMultiSelect({
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchTaxonomyValues();
-  }, [category]);
 
   const createNewValue = async () => {
     if (!newValue.label.trim()) {
@@ -86,7 +83,7 @@ export default function TaxonomyMultiSelect({
       setTaxonomyValues([...taxonomyValues, created]);
       
       // Add to selected values
-      onChange([...safeValues, created.value]);
+      onChange([...values, created.value]);
       
       // Reset form
       setNewValue({ label: '', description: '' });
@@ -100,15 +97,15 @@ export default function TaxonomyMultiSelect({
   };
 
   const toggleValue = (value: string) => {
-    if (safeValues.includes(value)) {
-      onChange(safeValues.filter(v => v !== value));
+    if (values.includes(value)) {
+      onChange(values.filter(v => v !== value));
     } else {
-      onChange([...safeValues, value]);
+      onChange([...values, value]);
     }
   };
 
   const removeValue = (value: string) => {
-    onChange(safeValues.filter(v => v !== value));
+    onChange(values.filter(v => v !== value));
   };
 
   // Filter out archived values unless showArchived is true
@@ -118,7 +115,7 @@ export default function TaxonomyMultiSelect({
   const sortedValues = [...filteredValues].sort((a, b) => a.sortOrder - b.sortOrder);
 
   // Get selected taxonomy items for display
-  const selectedItems = taxonomyValues.filter(v => safeValues.includes(v.value));
+  const selectedItems = taxonomyValues.filter(v => values.includes(v.value));
 
   if (loading) {
     return (
@@ -178,7 +175,7 @@ export default function TaxonomyMultiSelect({
             >
               <input
                 type="checkbox"
-                checked={safeValues.includes(item.value)}
+                checked={values.includes(item.value)}
                 onChange={() => toggleValue(item.value)}
                 className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
