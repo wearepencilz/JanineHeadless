@@ -7,6 +7,9 @@ import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function CreateIngredientPage() {
   const router = useRouter();
@@ -118,47 +121,32 @@ export default function CreateIngredientPage() {
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="space-y-6">
           {/* Basic Info */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Blood Orange"
-            />
-          </div>
+          <Input
+            label="Name"
+            type="text"
+            isRequired
+            value={formData.name}
+            onChange={(value) => setFormData({ ...formData, name: value })}
+            placeholder="e.g., Blood Orange"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Latin Name
-            </label>
-            <input
-              type="text"
-              value={formData.latinName}
-              onChange={(e) => setFormData({ ...formData, latinName: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Citrus × sinensis"
-            />
-          </div>
+          <Input
+            label="Latin Name"
+            type="text"
+            value={formData.latinName}
+            onChange={(value) => setFormData({ ...formData, latinName: value })}
+            placeholder="e.g., Citrus × sinensis"
+          />
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Origin *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.origin}
-                onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Sicily"
-              />
-            </div>
+            <Input
+              label="Origin"
+              type="text"
+              isRequired
+              value={formData.origin}
+              onChange={(value) => setFormData({ ...formData, origin: value })}
+              placeholder="e.g., Sicily"
+            />
 
             <TaxonomySelect
               category="ingredientCategories"
@@ -202,74 +190,49 @@ export default function CreateIngredientPage() {
             <p className="text-sm text-gray-500 mt-1">Add descriptive characteristics</p>
           </div>
 
-          {/* Story */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Brief description of this ingredient..."
-            />
-          </div>
+          {/* Description */}
+          <Textarea
+            label="Description"
+            value={formData.description}
+            onChange={(value) => setFormData({ ...formData, description: value })}
+            rows={3}
+            placeholder="Brief description of this ingredient..."
+          />
 
           {/* Story */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story & Provenance
-            </label>
-            <textarea
-              value={formData.story}
-              onChange={(e) => setFormData({ ...formData, story: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Tell the story of this ingredient..."
-            />
-          </div>
+          <Textarea
+            label="Story & Provenance"
+            value={formData.story}
+            onChange={(value) => setFormData({ ...formData, story: value })}
+            rows={4}
+            placeholder="Tell the story of this ingredient..."
+          />
 
           {/* Tasting Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tasting Notes
-            </label>
-            <input
-              type="text"
-              value={formData.tastingNotes}
-              onChange={(e) => setFormData({ ...formData, tastingNotes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="citrus, floral, bittersweet (comma separated)"
-            />
-            <p className="text-sm text-gray-500 mt-1">Separate multiple notes with commas</p>
-          </div>
+          <Input
+            label="Tasting Notes"
+            type="text"
+            value={formData.tastingNotes}
+            onChange={(value) => setFormData({ ...formData, tastingNotes: value })}
+            placeholder="citrus, floral, bittersweet (comma separated)"
+            helperText="Separate multiple notes with commas"
+          />
 
           {/* Sourcing */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Supplier
-              </label>
-              <input
-                type="text"
-                value={formData.supplier}
-                onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <Input
+              label="Supplier"
+              type="text"
+              value={formData.supplier}
+              onChange={(value) => setFormData({ ...formData, supplier: value })}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Farm
-              </label>
-              <input
-                type="text"
-                value={formData.farm}
-                onChange={(e) => setFormData({ ...formData, farm: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <Input
+              label="Farm"
+              type="text"
+              value={formData.farm}
+              onChange={(value) => setFormData({ ...formData, farm: value })}
+            />
           </div>
 
           {/* Allergens */}
@@ -373,13 +336,15 @@ export default function CreateIngredientPage() {
         </div>
 
         <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+            variant="primary"
+            isLoading={loading}
+            isDisabled={loading}
+            className="flex-1"
           >
             {loading ? 'Creating...' : 'Create Ingredient'}
-          </button>
+          </Button>
           <Link
             href="/admin/ingredients"
             className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"

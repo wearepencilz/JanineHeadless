@@ -6,6 +6,8 @@ import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -123,47 +125,32 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="space-y-6">
           {/* Basic Info */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Blood Orange"
-            />
-          </div>
+          <Input
+            label="Name"
+            type="text"
+            isRequired
+            value={formData.name}
+            onChange={(value) => setFormData({ ...formData, name: value })}
+            placeholder="e.g., Blood Orange"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Latin Name
-            </label>
-            <input
-              type="text"
-              value={formData.latinName}
-              onChange={(e) => setFormData({ ...formData, latinName: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Citrus × sinensis"
-            />
-          </div>
+          <Input
+            label="Latin Name"
+            type="text"
+            value={formData.latinName}
+            onChange={(value) => setFormData({ ...formData, latinName: value })}
+            placeholder="e.g., Citrus × sinensis"
+          />
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Origin *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.origin}
-                onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Sicily"
-              />
-            </div>
+            <Input
+              label="Origin"
+              type="text"
+              isRequired
+              value={formData.origin}
+              onChange={(value) => setFormData({ ...formData, origin: value })}
+              placeholder="e.g., Sicily"
+            />
 
             <TaxonomySelect
               category="ingredientCategories"
@@ -175,18 +162,13 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Story */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story & Provenance
-            </label>
-            <textarea
-              value={formData.story}
-              onChange={(e) => setFormData({ ...formData, story: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Tell the story of this ingredient..."
-            />
-          </div>
+          <Textarea
+            label="Story & Provenance"
+            value={formData.story}
+            onChange={(value) => setFormData({ ...formData, story: value })}
+            rows={4}
+            placeholder="Tell the story of this ingredient..."
+          />
 
           {/* Tasting Notes */}
           <TaxonomyTagSelect
@@ -200,29 +182,19 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
 
           {/* Sourcing */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Supplier
-              </label>
-              <input
-                type="text"
-                value={formData.supplier}
-                onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <Input
+              label="Supplier"
+              type="text"
+              value={formData.supplier}
+              onChange={(value) => setFormData({ ...formData, supplier: value })}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Farm
-              </label>
-              <input
-                type="text"
-                value={formData.farm}
-                onChange={(e) => setFormData({ ...formData, farm: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <Input
+              label="Farm"
+              type="text"
+              value={formData.farm}
+              onChange={(value) => setFormData({ ...formData, farm: value })}
+            />
           </div>
 
           {/* Allergens */}
