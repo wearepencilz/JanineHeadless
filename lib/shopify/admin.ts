@@ -311,7 +311,7 @@ export async function createProduct(input: CreateProductInput) {
 
   const product = createData.productCreate.product;
 
-  // Update the default variant with price and SKU if provided
+  // Update the default variant with price only (SKU not supported in bulk update)
   if (input.variants && input.variants.length > 0 && product.variants.edges.length > 0) {
     const variantId = product.variants.edges[0].node.id;
     const variantInput = input.variants[0];
@@ -325,7 +325,6 @@ export async function createProduct(input: CreateProductInput) {
           productVariants {
             id
             price
-            sku
           }
           userErrors {
             field
@@ -339,15 +338,14 @@ export async function createProduct(input: CreateProductInput) {
       productId: product.id,
       variants: [{
         id: variantId,
-        price: variantInput.price,
-        ...(variantInput.sku ? { sku: variantInput.sku } : {})
+        price: variantInput.price
       }]
     };
 
     const updateData = await shopifyAdminFetch(updateVariantMutation, updateVariables);
 
     if (updateData.productVariantsBulkUpdate.userErrors.length > 0) {
-      console.warn('Failed to update variant:', updateData.productVariantsBulkUpdate.userErrors);
+      console.warn('Failed to update variant price:', updateData.productVariantsBulkUpdate.userErrors);
       // Don't throw - product was created successfully
     }
   }
