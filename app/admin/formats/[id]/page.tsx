@@ -96,11 +96,10 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         toast.error('Delete failed', error.details?.message || error.error || 'Failed to delete format');
       }
     } catch (error) {
-      toast.error('Delete failed', 'Unable to delete format');
-    }
-  };
       console.error('Error deleting format:', error);
-      alert('Failed to delete format');
+      toast.error('Delete failed', 'Unable to delete format');
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
