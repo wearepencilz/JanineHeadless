@@ -476,7 +476,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                     <label key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={launch.featuredProductIds.includes(product.id)}
+                        checked={launch?.featuredProductIds?.includes(product.id) || false}
                         onChange={() => toggleProduct(product.id)}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />

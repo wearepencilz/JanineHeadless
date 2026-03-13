@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface Product {
@@ -31,6 +32,7 @@ interface Format {
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [formats, setFormats] = useState<Format[]>([]);
   const [loading, setLoading] = useState(true);
@@ -264,21 +266,16 @@ export default function ProductsPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/products/${product.id}`)}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/admin/products/${product.id}`}
-                        className="block"
-                      >
-                        <div className="text-sm font-medium text-gray-900 hover:text-blue-600">
-                          {product.publicName}
+                      <div className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                        {product.publicName}
+                      </div>
+                      {product.shortCardCopy && (
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {product.shortCardCopy}
                         </div>
-                        {product.shortCardCopy && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {product.shortCardCopy}
-                          </div>
-                        )}
-                      </Link>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{getFormatName(product.formatId)}</div>
@@ -299,7 +296,7 @@ export default function ProductsPage() {
                         {product.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       {product.shopifyProductId ? (
                         <div className="flex flex-col gap-1">
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 inline-flex items-center gap-1 w-fit">
@@ -325,7 +322,7 @@ export default function ProductsPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                       <Link
                         href={`/admin/products/${product.id}`}
                         className="text-blue-600 hover:text-blue-900 mr-4"
