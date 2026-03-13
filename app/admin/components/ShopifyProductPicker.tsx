@@ -141,10 +141,21 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
 
       {/* Search Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] flex flex-col">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] flex flex-col m-4" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Shopify Products</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Search Shopify Products</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
               
               <div className="flex gap-2">
                 <input
@@ -160,14 +171,16 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                   type="button"
                   onClick={searchProducts}
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </button>
               </div>
               
               {error && (
-                <p className="mt-2 text-sm text-red-600">{error}</p>
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
               )}
             </div>
             
@@ -179,21 +192,28 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                 </div>
               ) : products.length === 0 && !error ? (
                 <div className="text-center text-gray-500 py-12">
-                  <p className="text-gray-900">Search for products or browse all available products</p>
-                </div>
-              ) : products.length === 0 && error ? (
-                <div className="text-center text-gray-500 py-12">
-                  <p className="text-gray-900">{error}</p>
+                  <p className="text-gray-900 mb-2">Search for products or browse all available products</p>
                   <button
                     type="button"
                     onClick={() => loadProducts('*')}
-                    className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                   >
                     Load all products
                   </button>
                 </div>
+              ) : products.length === 0 && error ? (
+                <div className="text-center text-gray-500 py-12">
+                  <p className="text-gray-900 mb-3">{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => loadProducts('*')}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    Try loading all products
+                  </button>
+                </div>
               ) : (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-3">
                   {products.map(product => (
                     <button
                       key={product.id}
@@ -203,7 +223,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                     >
                       <div className="flex gap-4">
                         {product.featuredImage && (
-                          <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                          <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
                             <img
                               src={product.featuredImage.url}
                               alt={product.featuredImage.altText || product.title}
@@ -213,18 +233,15 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                         )}
                         
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{product.title}</h4>
+                          <h4 className="font-medium text-gray-900">{product.title}</h4>
                           <p className="text-sm text-gray-600 mt-1">
                             Handle: <span className="font-mono text-xs">{product.handle}</span>
                           </p>
                           {product.priceRangeV2 && (
                             <p className="text-sm text-gray-600 mt-1">
-                              From {product.priceRangeV2.minVariantPrice.currencyCode} {product.priceRangeV2.minVariantPrice.amount}
+                              From {product.priceRangeV2.minVariantPrice.currencyCode} ${product.priceRangeV2.minVariantPrice.amount}
                             </p>
                           )}
-                          <p className="text-xs text-gray-500 mt-1 font-mono truncate">
-                            {product.id}
-                          </p>
                         </div>
                       </div>
                     </button>
@@ -233,7 +250,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
               )}
             </div>
             
-            <div className="p-6 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
               <button
                 type="button"
                 onClick={() => {
@@ -242,7 +259,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                   setProducts([]);
                   setError('');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
               >
                 Cancel
               </button>
