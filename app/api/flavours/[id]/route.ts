@@ -54,7 +54,7 @@ function calculateDietaryClaims(ingredientIds: string[], allIngredients: Ingredi
   }
   
   // Check if nut-free
-  const hasNuts = ingredients.some(ing => ing.allergens.includes('nuts'));
+  const hasNuts = ingredients.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'));
   if (!hasNuts) {
     flags.push('nut-free');
   }
