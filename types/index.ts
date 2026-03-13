@@ -120,8 +120,16 @@ export interface Ingredient {
   animalDerived?: boolean;          // Contains animal products
   vegetarian?: boolean;             // Suitable for vegetarians
   seasonal: boolean;                // Seasonal availability
+  availableMonths?: number[];       // Month indices (0-11) when available
   image?: string;                   // Image URL (Vercel Blob or local)
+  imageAlt?: string;                // Image alt text
   description?: string;             // Additional information
+  story?: string;                   // Provenance story
+  tastingNotes?: string[];          // Tasting notes array
+  supplier?: string;                // Supplier name
+  farm?: string;                    // Farm name
+  isOrganic?: boolean;              // Organic certification
+  status?: 'active' | 'archived';   // Status
   createdAt: string;                // ISO 8601 timestamp
   updatedAt: string;                // ISO 8601 timestamp
 }
@@ -179,7 +187,7 @@ export interface Flavour {
   
   // Allergens & Dietary (calculated from ingredients)
   allergens: Allergen[];         // Auto-calculated
-  dietaryTags: DietaryFlag[];    // Auto-calculated
+  dietaryClaims?: DietaryClaim[]; // Auto-calculated (computed, not stored)
   
   // Display
   colour: string;                // Hex color code
@@ -396,7 +404,7 @@ export interface Component {
   
   // Allergens & Dietary
   allergens: Allergen[];         // Allergen tags
-  dietaryTags: DietaryFlag[];    // Dietary flags
+  dietaryClaims?: DietaryClaim[]; // Computed dietary claims
   
   // Pricing
   price?: number;                // Price if sold separately
@@ -472,7 +480,7 @@ export interface ProductMetafields {
   'custom.flavour_id': string;              // CMS flavour ID
   'custom.ingredient_ids': string[];        // Array of ingredient IDs
   'custom.allergens': Allergen[];           // Calculated allergen list
-  'custom.dietary_tags': DietaryFlag[];     // vegan, gluten-free, etc.
+  'custom.dietary_tags': DietaryClaim[];     // Computed dietary claims
   'custom.seasonal_ingredients': boolean;   // Has seasonal items
 }
 
