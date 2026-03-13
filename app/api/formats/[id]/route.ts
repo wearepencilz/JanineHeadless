@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFormats, saveFormats } from '@/lib/db';
 import { withDeleteProtection, withUpdateProtection } from '@/lib/api-middleware';
 import { createBackup } from '@/lib/data-protection';
+import { validateEligibleFlavourTypes } from '@/lib/validation';
 
 export async function GET(
   request: NextRequest,
@@ -42,6 +43,20 @@ export async function PUT(
         { error: 'Format not found' },
         { status: 404 }
       );
+    }
+    
+    // Validate eligibleFlavourTypes if provided
+    if (body.eligibleFlavourTypes !== undefined) {
+      const validationResult = await validateEligibleFlavourTypes(body.eligibleFlavourTypes);
+      if (!validationResult.valid) {
+        return NextResponse.json(
+          { 
+            error: 'Invalid eligibleFlavourTypes',
+            details: validationResult.errors
+          },
+          { status: 400 }
+        );
+      }
     }
     
     formats[index] = {

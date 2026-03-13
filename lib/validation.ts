@@ -2,6 +2,49 @@ import { getSettings, getIngredients, getFlavours, getFormats, getOfferings } fr
 
 // Taxonomy Validation Functions
 
+/**
+ * Validates that eligibleFlavourTypes array contains only valid flavourType taxonomy IDs
+ * Empty array or undefined is valid (means "accept all types")
+ */
+export async function validateEligibleFlavourTypes(eligibleFlavourTypes: string[] | undefined): Promise<{ valid: boolean; errors: any[] }> {
+  const errors: any[] = []
+  
+  // Empty array or undefined is valid (accept all types)
+  if (!eligibleFlavourTypes || eligibleFlavourTypes.length === 0) {
+    return { valid: true, errors: [] }
+  }
+  
+  // Get flavourTypes taxonomy from settings
+  const settings = await getSettings()
+  if (!settings.taxonomies || !settings.taxonomies.flavourTypes) {
+    errors.push({
+      field: 'eligibleFlavourTypes',
+      constraint: 'taxonomy-missing',
+      message: 'flavourTypes taxonomy not found in settings'
+    })
+    return { valid: false, errors }
+  }
+  
+  const validFlavourTypes = settings.taxonomies.flavourTypes.map((item: any) => item.id)
+  
+  // Check each provided type exists in taxonomy
+  for (const typeId of eligibleFlavourTypes) {
+    if (!validFlavourTypes.includes(typeId)) {
+      errors.push({
+        field: 'eligibleFlavourTypes',
+        constraint: 'invalid-taxonomy-reference',
+        value: typeId,
+        message: `Flavour type '${typeId}' does not exist in flavourTypes taxonomy`
+      })
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  }
+}
+
 export async function validateTaxonomyUniqueness(category: string, value: string, excludeId?: string): Promise<boolean> {
   const settings = await getSettings()
   if (!settings.taxonomies || !settings.taxonomies[category]) {
