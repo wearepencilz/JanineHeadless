@@ -178,7 +178,7 @@ export default function TaxonomyMultiSelect({
             >
               <input
                 type="checkbox"
-                checked={values.includes(item.value)}
+                checked={safeValues.includes(item.value)}
                 onChange={() => toggleValue(item.value)}
                 className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
