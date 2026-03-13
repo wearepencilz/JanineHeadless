@@ -103,10 +103,7 @@ export default function CreateProductPage() {
       if (selectedFlavourIds.length !== 1) {
         newErrors.push('Sandwich format requires exactly 1 flavour');
       }
-      const ineligible = selectedFlavours.filter(f => !f.canBeUsedInSandwich);
-      if (ineligible.length > 0) {
-        newErrors.push(`These flavours cannot be used in sandwich: ${ineligible.map(f => f.name).join(', ')}`);
-      }
+      // Sandwich eligibility is now handled by format eligibleFlavourTypes rules
     }
 
     setErrors(newErrors);
