@@ -22,11 +22,8 @@ async function getOAuthAccessToken(): Promise<string> {
 
   // Return cached token if still valid
   if (cachedAccessToken && Date.now() < tokenExpiresAt) {
-    console.log('🔄 Using cached OAuth token');
     return cachedAccessToken;
   }
-
-  console.log('🔑 Fetching new OAuth access token...');
 
   // Exchange client credentials for access token
   const tokenUrl = `https://${shop}/admin/oauth/access_token`;
@@ -45,8 +42,7 @@ async function getOAuthAccessToken(): Promise<string> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ OAuth token exchange failed:', errorText);
-    throw new Error(`OAuth token exchange failed: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`OAuth token exchange failed: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
@@ -58,8 +54,6 @@ async function getOAuthAccessToken(): Promise<string> {
   cachedAccessToken = data.access_token;
   // Tokens typically expire in 24 hours, cache for 23 hours to be safe
   tokenExpiresAt = Date.now() + (23 * 60 * 60 * 1000);
-  
-  console.log('✅ OAuth access token obtained');
   
   if (!cachedAccessToken) {
     throw new Error('Failed to cache access token');
@@ -84,7 +78,6 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
     const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
     
     if (clientId && clientSecret) {
-      console.log('🔐 Using OAuth client credentials flow');
       accessToken = await getOAuthAccessToken();
     } else {
       throw new Error(
@@ -93,8 +86,6 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
         '2. SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET (for OAuth apps)'
       );
     }
-  } else {
-    console.log('🔑 Using direct Admin API access token');
   }
   
   return { shop, accessToken };
@@ -105,15 +96,6 @@ async function shopifyAdminFetch(query: string, variables?: any) {
   
   const url = `https://${shop}/admin/api/${SHOPIFY_ADMIN_API_VERSION}/graphql.json`;
   
-  console.log('🔍 Shopify Admin API Request:', {
-    url,
-    shop,
-    hasAccessToken: !!accessToken,
-    accessTokenPrefix: accessToken.substring(0, 10) + '...',
-    query: query.substring(0, 100) + '...',
-    variables
-  });
-  
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -123,28 +105,14 @@ async function shopifyAdminFetch(query: string, variables?: any) {
     body: JSON.stringify({ query, variables }),
   });
   
-  console.log('📡 Shopify Admin API Response:', {
-    status: response.status,
-    statusText: response.statusText,
-    ok: response.ok
-  });
-  
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Shopify Admin API Error Response:', errorText);
-    throw new Error(`Shopify Admin API error: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`Shopify Admin API error: ${response.status} ${response.statusText}`);
   }
   
   const data = await response.json();
   
-  console.log('✅ Shopify Admin API Data:', {
-    hasData: !!data.data,
-    hasErrors: !!data.errors,
-    errors: data.errors
-  });
-  
   if (data.errors) {
-    console.error('❌ GraphQL Errors:', JSON.stringify(data.errors, null, 2));
     throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
   }
   
@@ -347,8 +315,6 @@ export async function createProduct(input: CreateProductInput) {
     }
   };
   
-  console.log('🔍 Creating product with input:', JSON.stringify(createVariables, null, 2));
-  
   const createData = await shopifyAdminFetch(createMutation, createVariables);
   
   if (createData.productCreate.userErrors.length > 0) {
@@ -394,12 +360,9 @@ export async function createProduct(input: CreateProductInput) {
       }
     };
     
-    console.log('🔍 Updating variant with input:', JSON.stringify(updateVariables, null, 2));
-    
     const updateData = await shopifyAdminFetch(updateVariantMutation, updateVariables);
     
     if (updateData.productVariantUpdate.userErrors.length > 0) {
-      console.warn('⚠️ Variant update errors:', updateData.productVariantUpdate.userErrors);
       // Don't throw here, product was created successfully
     }
   }
