@@ -31,6 +31,9 @@ interface DataTableProps<T> {
     href: string;
   };
   
+  // Filters (optional)
+  filters?: ReactNode;
+  
   // Data
   data: T[];
   columns: Column<T>[];
@@ -56,6 +59,7 @@ export default function DataTable<T>({
   description,
   createButton,
   secondaryButton,
+  filters,
   data,
   columns,
   actions,
@@ -104,6 +108,9 @@ export default function DataTable<T>({
           </div>
         )}
       </div>
+
+      {/* Filters */}
+      {filters && filters}
 
       {/* Table */}
       {data.length === 0 ? (
