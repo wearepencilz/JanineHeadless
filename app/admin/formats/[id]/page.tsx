@@ -6,9 +6,12 @@ import type { Format, FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [format, setFormat] = useState<Format | null>(null);
@@ -26,11 +29,12 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         const data = await response.json();
         setFormat(data);
       } else {
-        alert('Format not found');
+        toast.error('Format not found', 'Redirecting to formats list');
         router.push('/admin/formats');
       }
     } catch (error) {
       console.error('Error fetching format:', error);
+      toast.error('Failed to load format', 'Please try again');
     } finally {
       setLoading(false);
     }
@@ -65,40 +69,42 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
       if (response.ok) {
         const updatedFormat = await response.json();
         setFormat(updatedFormat);
-        alert('Format updated successfully');
+        toast.success('Format updated', 'Your changes have been saved');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to update format');
+        toast.error('Update failed', error.error || 'Failed to update format');
       }
     } catch (error) {
       console.error('Error updating format:', error);
-      alert('Failed to update format');
+      toast.error('Update failed', 'Unable to save changes');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${format?.name}"?`)) {
-      return;
-    }
-
     try {
       const response = await fetch(`/api/formats/${params.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
+        toast.success('Format deleted', `${format?.name} has been removed`);
         router.push('/admin/formats');
       } else {
         const error = await response.json();
-        alert(error.details?.message || error.error || 'Failed to delete format');
+        toast.error('Delete failed', error.details?.message || error.error || 'Failed to delete format');
       }
     } catch (error) {
+      toast.error('Delete failed', 'Unable to delete format');
+    }
+  };
       console.error('Error deleting format:', error);
       alert('Failed to delete format');
     }
   };
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   if (loading || !format) {
     return (
@@ -109,17 +115,18 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <EditPageLayout
-      title="Edit Format"
-      backHref="/admin/formats"
-      backLabel="Back to Formats"
-      onSave={() => handleSubmit(new Event('submit') as any)}
-      onDelete={handleDelete}
-      onCancel={() => router.push('/admin/formats')}
-      saving={saving}
-      deleteDisabled={usageCount > 0}
-      deleteDisabledReason={`Cannot delete format that is used in ${usageCount} offering(s)`}
-    >
+    <>
+      <EditPageLayout
+        title="Edit Format"
+        backHref="/admin/formats"
+        backLabel="Back to Formats"
+        onSave={() => handleSubmit(new Event('submit') as any)}
+        onDelete={() => setShowDeleteModal(true)}
+        onCancel={() => router.push('/admin/formats')}
+        saving={saving}
+        deleteDisabled={usageCount > 0}
+        deleteDisabledReason={`Cannot delete format that is used in ${usageCount} offering(s)`}
+      >
       {usageCount > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
@@ -289,5 +296,17 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         </div>
       </form>
     </EditPageLayout>
+
+    <ConfirmModal
+      isOpen={showDeleteModal}
+      variant="danger"
+      title="Delete Format"
+      message={`Are you sure you want to delete "${format?.name}"? This action cannot be undone.`}
+      confirmLabel="Delete"
+      cancelLabel="Cancel"
+      onConfirm={handleDelete}
+      onCancel={() => setShowDeleteModal(false)}
+    />
+    </>
   );
 }
