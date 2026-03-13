@@ -1,4 +1,4 @@
-import { parseDate, CalendarDate } from '@internationalized/date';
+import { parseDate, CalendarDate, type DateValue } from '@internationalized/date';
 
 /**
  * Convert a date string (YYYY-MM-DD) to a CalendarDate object
@@ -13,9 +13,9 @@ export function stringToDateValue(dateString: string | null | undefined): Calend
 }
 
 /**
- * Convert a CalendarDate object to a date string (YYYY-MM-DD)
+ * Convert a CalendarDate or DateValue object to a date string (YYYY-MM-DD)
  */
-export function dateValueToString(date: CalendarDate | null | undefined): string {
+export function dateValueToString(date: DateValue | null | undefined): string {
   if (!date) return '';
   return date.toString();
 }
