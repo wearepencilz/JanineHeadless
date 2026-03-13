@@ -32,7 +32,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
   const [error, setError] = useState('');
   const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  const loadProducts = async (query: string = '') => {
+  const loadProducts = async (query: string = '*') => {
     setLoading(true);
     setError('');
     
@@ -71,7 +71,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
   const handleModalOpen = () => {
     setShowModal(true);
     if (!initialLoadDone) {
-      loadProducts(); // Auto-load products on first open
+      loadProducts('*'); // Auto-load all products on first open
       setInitialLoadDone(true);
     }
   };
@@ -147,7 +147,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   autoFocus
                 />
                 <button
@@ -169,18 +169,18 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
               {loading ? (
                 <div className="text-center text-gray-500 py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                  <p>Loading products...</p>
+                  <p className="text-gray-900">Loading products...</p>
                 </div>
               ) : products.length === 0 && !error ? (
                 <div className="text-center text-gray-500 py-12">
-                  <p>Search for products or browse all available products</p>
+                  <p className="text-gray-900">Search for products or browse all available products</p>
                 </div>
               ) : products.length === 0 && error ? (
                 <div className="text-center text-gray-500 py-12">
-                  <p>{error}</p>
+                  <p className="text-gray-900">{error}</p>
                   <button
                     type="button"
-                    onClick={() => loadProducts()}
+                    onClick={() => loadProducts('*')}
                     className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
                   >
                     Load all products

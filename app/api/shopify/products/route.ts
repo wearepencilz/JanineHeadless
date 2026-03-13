@@ -17,19 +17,10 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q') || '';
+    const query = searchParams.get('q') || '*';
     const limit = parseInt(searchParams.get('limit') || '10');
     
     console.log('🔍 Shopify Product Search Request:', { query, limit });
-    
-    if (!query) {
-      const errorResponse: ErrorResponse = {
-        error: 'Search query is required',
-        code: 'MISSING_QUERY',
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(errorResponse, { status: 400 });
-    }
     
     // Check environment variables (support both OAuth and direct token)
     const shopDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
