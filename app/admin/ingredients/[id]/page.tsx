@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
-import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
@@ -189,7 +189,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Tasting Notes */}
-          <TaxonomyMultiSelect
+          <TaxonomyTagSelect
             category="tastingNotes"
             values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
             onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
@@ -226,7 +226,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Allergens */}
-          <TaxonomyMultiSelect
+          <TaxonomyTagSelect
             category="allergens"
             values={formData.allergens}
             onChange={(values) => setFormData({ ...formData, allergens: values })}

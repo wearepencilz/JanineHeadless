@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Format, FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
-import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
@@ -244,7 +244,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <TaxonomyMultiSelect
+                  <TaxonomyTagSelect
                     category="flavourTypes"
                     values={format.eligibleFlavourTypes || []}
                     onChange={(values) => setFormat({ 

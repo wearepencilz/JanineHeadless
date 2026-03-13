@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
-import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
 
 export default function CreateIngredientPage() {
@@ -170,7 +170,7 @@ export default function CreateIngredientPage() {
           </div>
 
           {/* Usage Roles */}
-          <TaxonomyMultiSelect
+          <TaxonomyTagSelect
             category="ingredientRoles"
             values={formData.roles}
             onChange={(values) => setFormData({ ...formData, roles: values })}
@@ -273,7 +273,7 @@ export default function CreateIngredientPage() {
           </div>
 
           {/* Allergens */}
-          <TaxonomyMultiSelect
+          <TaxonomyTagSelect
             category="allergens"
             values={formData.allergens}
             onChange={(values) => setFormData({ ...formData, allergens: values })}

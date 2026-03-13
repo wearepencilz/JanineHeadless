@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
-import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import type { Flavour, FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 
@@ -184,7 +184,7 @@ export default function EditFlavourPage() {
           )}
 
           {/* Flavour Tags - Connected to taxonomy */}
-          <TaxonomyMultiSelect
+          <TaxonomyTagSelect
             category="keyNotes"
             values={formData.keyNotes || []}
             onChange={(values) => setFormData({ ...formData, keyNotes: values })}
