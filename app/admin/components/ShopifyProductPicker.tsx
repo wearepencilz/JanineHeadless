@@ -89,7 +89,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
     onSelect(null);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       searchProducts();
@@ -111,43 +111,15 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
   }, [showModal]);
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        Link to Shopify Product
-      </label>
-      
-      {selectedProductId ? (
-        <div className="border border-green-300 bg-green-50 rounded-lg p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-900">
-                Linked to Shopify Product
-              </p>
-              <p className="text-sm text-green-700 mt-1">
-                Handle: <span className="font-mono">{selectedProductHandle}</span>
-              </p>
-              <p className="text-xs text-green-600 mt-1">
-                ID: {selectedProductId}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleUnlink}
-              className="text-sm text-red-600 hover:text-red-700 font-medium"
-            >
-              Unlink
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={handleModalOpen}
-          className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition-colors"
-        >
-          <p className="text-sm text-gray-600">Click to search and link a Shopify product</p>
-        </button>
-      )}
+    <div>
+      <button
+        type="button"
+        onClick={handleModalOpen}
+        className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+      >
+        <p className="text-sm text-gray-700 font-medium">Search Shopify Products</p>
+        <p className="text-xs text-gray-500 mt-1">Browse and select an existing product from your store</p>
+      </button>
 
       {/* Search Modal */}
       {showModal && (
@@ -185,7 +157,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                       loadProducts('*');
                     }
                   }}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   autoFocus
                 />
