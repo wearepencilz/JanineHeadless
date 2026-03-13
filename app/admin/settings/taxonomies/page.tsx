@@ -67,10 +67,16 @@ export default function TaxonomiesPage() {
 
     setSaving(true);
     try {
+      // Generate value from label (lowercase, hyphenated)
+      const generatedValue = addForm.label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      
       const response = await fetch(`/api/settings/taxonomies/${activeTab}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(addForm),
+        body: JSON.stringify({
+          ...addForm,
+          value: generatedValue
+        }),
       });
 
       if (!response.ok) {

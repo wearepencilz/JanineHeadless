@@ -233,6 +233,13 @@
         "value": "special",
         "sortOrder": 6,
         "archived": false
+      },
+      {
+        "id": "ice-cream",
+        "label": "Ice Cream",
+        "value": "ice-cream",
+        "sortOrder": 7,
+        "archived": false
       }
     ],
     "modifierTypes": [
