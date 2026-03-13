@@ -31,7 +31,21 @@ export async function POST(
     // Check if already linked
     if (product.shopifyProductId) {
       return NextResponse.json(
-        { error: 'Product is already linked to a Shopify product' },
+        { 
+          error: 'Product is already linked to a Shopify product',
+          details: { shopifyProductId: product.shopifyProductId }
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate price
+    if (!product.price || product.price <= 0) {
+      return NextResponse.json(
+        { 
+          error: 'Product must have a valid price greater than 0',
+          details: { price: product.price }
+        },
         { status: 400 }
       );
     }
@@ -41,37 +55,107 @@ export async function POST(
     const flavours = await getFlavours();
     
     const format = formats.find((f: any) => f.id === product.formatId);
+    
+    if (!format) {
+      return NextResponse.json(
+        { 
+          error: 'Format not found for this product',
+          details: { formatId: product.formatId }
+        },
+        { status: 400 }
+      );
+    }
+    
     const primaryFlavours = flavours.filter((f: any) => 
       product.primaryFlavourIds?.includes(f.id)
     );
 
-    // Build product title and description
-    const title = product.publicName || product.internalName;
+    if (primaryFlavours.length === 0) {
+      return NextResponse.json(
+        { 
+          error: 'No flavours found for this product',
+          details: { primaryFlavourIds: product.primaryFlavourIds }
+        },
+        { status: 400 }
+      );
+    }
+
+    // Build product title
     const flavourNames = primaryFlavours.map((f: any) => f.name).join(' & ');
-    const formatName = format?.name || 'Product';
-    
-    const descriptionHtml = `
-      <p>${product.description || ''}</p>
-      ${format ? `<p><strong>Format:</strong> ${format.name}</p>` : ''}
-      ${flavourNames ? `<p><strong>Flavours:</strong> ${flavourNames}</p>` : ''}
-    `.trim();
+    const productTitle = `${flavourNames} - ${format.name}`;
+
+    // Build description HTML
+    const descriptionParts = [
+      `<h2>${product.publicName || product.internalName}</h2>`,
+      `<p>${product.description || ''}</p>`,
+    ];
+
+    if (primaryFlavours.length > 0) {
+      descriptionParts.push('<h3>Flavours</h3>');
+      descriptionParts.push('<ul>');
+      primaryFlavours.forEach((f: any) => {
+        descriptionParts.push(`<li><strong>${f.name}</strong>${f.shortDescription ? `: ${f.shortDescription}` : ''}</li>`);
+      });
+      descriptionParts.push('</ul>');
+    }
+
+    const descriptionHtml = descriptionParts.join('\n');
+
+    // Build tags
+    const tags = [
+      ...(product.tags || []),
+      format.name,
+      ...primaryFlavours.map((f: any) => f.type),
+    ].filter(Boolean);
 
     // Prepare Shopify product input
     const shopifyInput: CreateProductInput = {
-      title,
+      title: productTitle,
       descriptionHtml,
-      productType: formatName,
+      productType: format.category || format.name,
       vendor: 'Janine',
-      tags: product.tags || [],
+      tags,
       status: product.status === 'active' ? 'ACTIVE' : 'DRAFT',
-      variants: product.price ? [{
+      variants: [{
         price: (product.price / 100).toFixed(2),
         sku: product.slug || product.id,
-      }] : undefined,
+        ...(product.inventoryTracked && product.inventoryQuantity ? {
+          inventoryQuantities: [{
+            availableQuantity: product.inventoryQuantity,
+            locationId: process.env.SHOPIFY_LOCATION_ID || '',
+          }]
+        } : {})
+      }],
+      ...(product.image ? {
+        images: [{
+          src: product.image,
+          altText: productTitle
+        }]
+      } : {}),
+      metafields: [
+        {
+          namespace: 'janine',
+          key: 'product_id',
+          value: product.id,
+          type: 'single_line_text_field'
+        },
+        {
+          namespace: 'janine',
+          key: 'format_id',
+          value: product.formatId,
+          type: 'single_line_text_field'
+        },
+        {
+          namespace: 'janine',
+          key: 'flavour_ids',
+          value: JSON.stringify(product.primaryFlavourIds),
+          type: 'json'
+        }
+      ]
     };
 
     // Create product in Shopify
-    console.log('Creating Shopify product:', shopifyInput);
+    console.log('Creating Shopify product with input:', JSON.stringify(shopifyInput, null, 2));
     const shopifyProduct = await createProduct(shopifyInput);
     
     // Update local product with Shopify IDs
@@ -93,12 +177,19 @@ export async function POST(
         id: shopifyProduct.id,
         handle: shopifyProduct.handle,
         title: shopifyProduct.title,
+        status: shopifyProduct.status,
       },
       offering: products[productIndex],
+      timestamp: new Date().toISOString(),
     });
 
   } catch (error: any) {
     console.error('Error creating Shopify product:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      product: params.id
+    });
     return NextResponse.json(
       { 
         error: 'Failed to create Shopify product',
