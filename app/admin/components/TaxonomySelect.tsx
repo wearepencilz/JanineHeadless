@@ -36,7 +36,7 @@ interface TaxonomySelectProps {
 
 export default function TaxonomySelect({
   category,
-  value,
+  value = '',
   onChange,
   required = false,
   placeholder = 'Select an option',
@@ -50,6 +50,9 @@ export default function TaxonomySelect({
   const [showAddNew, setShowAddNew] = useState(false);
   const [newValue, setNewValue] = useState({ label: '', description: '' });
   const [creating, setCreating] = useState(false);
+  
+  // Ensure value is always a string
+  const safeValue = value ?? '';
 
   useEffect(() => {
     fetchTaxonomyValues();
@@ -146,7 +149,7 @@ export default function TaxonomySelect({
       {!showAddNew ? (
         <div className="space-y-2">
           <select
-            value={value}
+            value={safeValue}
             onChange={(e) => {
               if (e.target.value === '__ADD_NEW__') {
                 setShowAddNew(true);
