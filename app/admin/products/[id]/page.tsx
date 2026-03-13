@@ -59,18 +59,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
         // Populate form
         setFormData({
-          internalName: offeringData.internalName,
-          publicName: offeringData.publicName,
-          description: offeringData.description,
+          internalName: offeringData.internalName || '',
+          publicName: offeringData.publicName || '',
+          description: offeringData.description || '',
           shortCardCopy: offeringData.shortCardCopy || '',
           price: offeringData.price ? (offeringData.price / 100).toFixed(2) : '',
           compareAtPrice: offeringData.compareAtPrice ? (offeringData.compareAtPrice / 100).toFixed(2) : '',
-          status: offeringData.status,
-          tags: offeringData.tags.join(', '),
-          inventoryTracked: offeringData.inventoryTracked,
+          status: offeringData.status || 'draft',
+          tags: (offeringData.tags || []).join(', '),
+          inventoryTracked: offeringData.inventoryTracked || false,
           inventoryQuantity: offeringData.inventoryQuantity?.toString() || '',
-          onlineOrderable: offeringData.onlineOrderable,
-          pickupOnly: offeringData.pickupOnly,
+          onlineOrderable: offeringData.onlineOrderable !== undefined ? offeringData.onlineOrderable : true,
+          pickupOnly: offeringData.pickupOnly || false,
           shopifyProductId: offeringData.shopifyProductId || '',
           shopifyProductHandle: offeringData.shopifyProductHandle || '',
         });
