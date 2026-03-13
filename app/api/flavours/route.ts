@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getFlavours, saveFlavours, getIngredients } from '@/lib/db';
+import { getFlavours, saveFlavours, getIngredients, getFormats } from '@/lib/db';
+import { getFormatEligibility } from '@/lib/validation';
 import type { Flavour, Ingredient, Allergen, DietaryFlag, PaginatedResponse, ErrorResponse } from '@/types';
 
 export async function GET(request: NextRequest) {
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
     const syncStatus = searchParams.get('syncStatus');
     const type = searchParams.get('type');
     const baseStyle = searchParams.get('baseStyle');
+    const formatId = searchParams.get('formatId');
     const twistEligible = searchParams.get('twistEligible');
     const pintEligible = searchParams.get('pintEligible');
     const sandwichEligible = searchParams.get('sandwichEligible');
@@ -47,6 +49,23 @@ export async function GET(request: NextRequest) {
       flavours = flavours.filter(f => f.baseStyle === baseStyle);
     }
     
+    // Filter by format eligibility (using format category)
+    if (formatId) {
+      const formats = await getFormats();
+      const format = formats.find((f: any) => f.id === formatId);
+      if (format) {
+        // Filter flavours that are eligible for this format's category
+        const eligibleFlavours = [];
+        for (const flavour of flavours) {
+          const eligibleFormats = await getFormatEligibility(flavour.type);
+          if (eligibleFormats.includes(format.category)) {
+            eligibleFlavours.push(flavour);
+          }
+        }
+        flavours = eligibleFlavours;
+      }
+    }
+    
     if (twistEligible === 'true') {
       flavours = flavours.filter(f => f.canBeUsedInTwist === true);
     }
@@ -59,11 +78,22 @@ export async function GET(request: NextRequest) {
       flavours = flavours.filter(f => f.canBeUsedInSandwich === true);
     }
     
+    // Add eligibleFormats to each flavour
+    const flavoursWithEligibility = await Promise.all(
+      flavours.map(async (flavour) => {
+        const eligibleFormatCategories = await getFormatEligibility(flavour.type);
+        return {
+          ...flavour,
+          eligibleFormats: eligibleFormatCategories
+        };
+      })
+    );
+    
     // Calculate pagination
-    const total = flavours.length;
+    const total = flavoursWithEligibility.length;
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const paginatedData = flavours.slice(startIndex, endIndex);
+    const paginatedData = flavoursWithEligibility.slice(startIndex, endIndex);
     
     const response: PaginatedResponse<Flavour> = {
       data: paginatedData,
