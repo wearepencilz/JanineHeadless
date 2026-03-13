@@ -1,11 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Settings {
   logo: string;
   email: string;
   companyName: string;
+  formatEligibilityRules?: {
+    [flavourTypeId: string]: string[];
+  };
 }
 
 export default function SettingsPage() {
@@ -13,6 +17,7 @@ export default function SettingsPage() {
     logo: '',
     email: '',
     companyName: '',
+    formatEligibilityRules: {},
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,6 +36,7 @@ export default function SettingsPage() {
         logo: data.logo || '',
         email: data.email || '',
         companyName: data.companyName || '',
+        formatEligibilityRules: data.formatEligibilityRules || {},
       });
     } catch (error) {
       console.error('Failed to fetch settings:', error);
@@ -111,6 +117,56 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-semibold text-gray-900">Settings</h1>
         <p className="text-gray-600 mt-2">Configure your site settings</p>
       </div>
+
+      {/* Quick Links */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+          href="/admin/settings/taxonomies"
+          className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+        >
+          <h3 className="font-medium text-gray-900 mb-1">Taxonomy Management</h3>
+          <p className="text-sm text-gray-600">Manage categories, types, and tags used throughout the CMS</p>
+        </Link>
+      </div>
+
+      {/* Format Eligibility Rules */}
+      {formData.formatEligibilityRules && Object.keys(formData.formatEligibilityRules).length > 0 && (
+        <div className="mb-6 bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Format Eligibility Rules</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Default mappings that define which formats accept which flavour types. These rules guide product generation.
+          </p>
+          
+          <div className="space-y-3">
+            {Object.entries(formData.formatEligibilityRules).map(([flavourType, formats]) => (
+              <div key={flavourType} className="flex items-start gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div className="flex-shrink-0">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                    {flavourType}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-gray-600 mb-1">Eligible formats:</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {formats.map((format) => (
+                      <span
+                        key={format}
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white border border-gray-300 text-gray-700"
+                      >
+                        {format}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-4">
+            These rules are used as defaults when creating new formats. Individual formats can override these settings.
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="max-w-2xl">
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">

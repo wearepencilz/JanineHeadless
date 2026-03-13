@@ -1,6 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['tsx', 'ts'], // Only look for .tsx and .ts files, ignore .jsx
+  
+  // Development optimizations
+  reactStrictMode: false, // Disable strict mode in dev for faster rendering
+  
+  // Reduce logging noise
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  
+  // Suppress webpack warnings
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+  
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -31,12 +48,37 @@ const nextConfig = {
       },
     ],
   },
+  
+  // Tree-shake icon imports
+  modularizeImports: {
+    '@untitledui/icons': {
+      transform: '@untitledui/icons/{{member}}',
+    },
+  },
+  
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+    // Optimize compilation - add date picker dependencies
+    optimizePackageImports: [
+      'react-icons', 
+      'framer-motion',
+      '@internationalized/date',
+      'react-aria-components',
+      '@untitledui/icons'
+    ],
   },
-  webpack: (config, { isServer }) => {
+  
+  // Faster builds in development
+  swcMinify: true,
+  
+  webpack: (config, { isServer, dev }) => {
+    // Suppress noisy warnings
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+    
     // Fix for next-auth module resolution on mobile/different networks
     if (!isServer) {
       config.resolve.fallback = {
@@ -46,6 +88,15 @@ const nextConfig = {
         tls: false,
       };
     }
+    
+    // Speed up development builds
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+    }
+    
     return config;
   },
 };

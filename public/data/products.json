@@ -1,0 +1,204 @@
+[
+  {
+    "id": "product-1773429623429-95tqbzit8",
+    "internalName": "Gelato - Grilled Corn",
+    "publicName": "Grilled Corn Gelato",
+    "slug": "gelato-grilled-corn",
+    "status": "draft",
+    "formatId": "06b83c01-cb01-4a08-9a39-251591602015",
+    "primaryFlavourIds": [
+      "grilled-corn"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Grilled Corn gelato",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:20:23.429Z",
+    "updatedAt": "2026-03-13T19:20:23.429Z"
+  },
+  {
+    "id": "product-1773429623429-qs91a8jgn",
+    "internalName": "Sorbet - Wild Tomatoes",
+    "publicName": "Wild Tomatoes Sorbet",
+    "slug": "sorbet-wild-tomatoes",
+    "status": "draft",
+    "formatId": "07dfa981-e16e-4c9c-92be-c9a9424d1a64",
+    "primaryFlavourIds": [
+      "wild-tomatoes"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Wild Tomatoes sorbet",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:20:23.429Z",
+    "updatedAt": "2026-03-13T19:20:23.429Z"
+  },
+  {
+    "id": "product-1773429623429-cx54fut4w",
+    "internalName": "Twist - Grilled Corn",
+    "publicName": "Grilled Corn Twist",
+    "slug": "twist-grilled-corn-wild-tomatoes",
+    "status": "draft",
+    "formatId": "8e32f354-3d70-482d-be98-d0ed3296b98e",
+    "primaryFlavourIds": [
+      "grilled-corn",
+      "wild-tomatoes"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Grilled Corn and Wild Tomatoes twist",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:20:23.429Z",
+    "updatedAt": "2026-03-13T19:20:23.429Z"
+  },
+  {
+    "id": "product-1773429790836-2gzqk4tcm",
+    "internalName": "Gelato - Basil Lemon",
+    "publicName": "Basil Lemon Gelato",
+    "slug": "gelato-basil-lemon",
+    "status": "draft",
+    "formatId": "06b83c01-cb01-4a08-9a39-251591602015",
+    "primaryFlavourIds": [
+      "basil-lemon"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Basil Lemon gelato",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.836Z",
+    "updatedAt": "2026-03-13T19:23:10.836Z"
+  },
+  {
+    "id": "product-1773429790836-tec79xroj",
+    "internalName": "Sorbet - Raspberry",
+    "publicName": "Raspberry Sorbet",
+    "slug": "sorbet-raspberry",
+    "status": "draft",
+    "formatId": "07dfa981-e16e-4c9c-92be-c9a9424d1a64",
+    "primaryFlavourIds": [
+      "raspberry"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Raspberry sorbet",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.836Z",
+    "updatedAt": "2026-03-13T19:23:10.836Z"
+  },
+  {
+    "id": "product-1773429790837-xpis2qeia",
+    "internalName": "Pint - Basil Lemon",
+    "publicName": "Basil Lemon Pint",
+    "slug": "pint-basil-lemon",
+    "status": "draft",
+    "formatId": "1a59f17c-c29d-45cc-b449-fe30a56eba4d",
+    "primaryFlavourIds": [
+      "basil-lemon"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Basil Lemon gelato",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.837Z",
+    "updatedAt": "2026-03-13T19:23:10.837Z"
+  },
+  {
+    "id": "product-1773429790837-3uw2g7eoz",
+    "internalName": "Pint - Raspberry",
+    "publicName": "Raspberry Pint",
+    "slug": "pint-raspberry",
+    "status": "draft",
+    "formatId": "1a59f17c-c29d-45cc-b449-fe30a56eba4d",
+    "primaryFlavourIds": [
+      "raspberry"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Raspberry sorbet",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.837Z",
+    "updatedAt": "2026-03-13T19:23:10.837Z"
+  },
+  {
+    "id": "product-1773429790837-dxj4tkk7j",
+    "internalName": "Gallon - Basil Lemon",
+    "publicName": "Basil Lemon Gallon",
+    "slug": "gallon-basil-lemon",
+    "status": "draft",
+    "formatId": "4c4a2d4d-84cd-4d52-87de-a2107057b5f3",
+    "primaryFlavourIds": [
+      "basil-lemon"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Basil Lemon gelato",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.837Z",
+    "updatedAt": "2026-03-13T19:23:10.837Z"
+  },
+  {
+    "id": "product-1773429790837-q5q13fhm8",
+    "internalName": "Gallon - Raspberry",
+    "publicName": "Raspberry Gallon",
+    "slug": "gallon-raspberry",
+    "status": "draft",
+    "formatId": "4c4a2d4d-84cd-4d52-87de-a2107057b5f3",
+    "primaryFlavourIds": [
+      "raspberry"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Raspberry sorbet",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.837Z",
+    "updatedAt": "2026-03-13T19:23:10.837Z"
+  },
+  {
+    "id": "product-1773429790837-oh5rpk7mz",
+    "internalName": "Twist - Basil Lemon",
+    "publicName": "Basil Lemon Twist",
+    "slug": "twist-basil-lemon-raspberry",
+    "status": "draft",
+    "formatId": "8e32f354-3d70-482d-be98-d0ed3296b98e",
+    "primaryFlavourIds": [
+      "basil-lemon",
+      "raspberry"
+    ],
+    "secondaryFlavourIds": [],
+    "componentIds": [],
+    "toppingIds": [],
+    "description": "Basil Lemon and Raspberry twist",
+    "price": 0,
+    "onlineOrderable": false,
+    "pickupOnly": false,
+    "createdAt": "2026-03-13T19:23:10.837Z",
+    "updatedAt": "2026-03-13T19:23:10.837Z"
+  }
+]

@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')?.toLowerCase();
     const category = searchParams.get('category');
     const allergen = searchParams.get('allergen');
-    const dietaryFlag = searchParams.get('dietaryFlag');
     const seasonal = searchParams.get('seasonal');
     
     let ingredients = await getIngredients() as Ingredient[];
@@ -35,10 +34,6 @@ export async function GET(request: NextRequest) {
     
     if (allergen) {
       ingredients = ingredients.filter(ing => ing.allergens.includes(allergen as any));
-    }
-    
-    if (dietaryFlag) {
-      ingredients = ingredients.filter(ing => ing.dietaryFlags.includes(dietaryFlag as any));
     }
     
     if (seasonal !== null && seasonal !== undefined) {
@@ -108,12 +103,21 @@ export async function POST(request: NextRequest) {
       category: body.category,
       origin: body.origin,
       allergens: body.allergens || [],
-      dietaryFlags: body.dietaryFlags || [],
+      animalDerived: body.animalDerived || false,
+      vegetarian: body.vegetarian !== false, // Default to true
       seasonal: body.seasonal || false,
+      availableMonths: body.availableMonths || [],
       image: body.image,
+      imageAlt: body.imageAlt,
       description: body.description,
+      story: body.story,
+      tastingNotes: body.tastingNotes || [],
+      supplier: body.supplier,
+      farm: body.farm,
+      isOrganic: body.isOrganic || false,
       roles: body.roles || [],
       descriptors: body.descriptors || [],
+      status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -3,7 +3,8 @@
 import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import AdminNav from './components/AdminNav';
+import SimpleSidebar from './components/SimpleSidebar';
+import { ToastProvider } from './components/ToastContainer';
 
 export default function AdminLayout({
   children,
@@ -38,11 +39,15 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNav />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen bg-gray-50">
+        <SimpleSidebar />
+        <main className="lg:pl-64">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

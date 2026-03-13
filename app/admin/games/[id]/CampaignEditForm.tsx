@@ -57,11 +57,27 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
     icecream_sprite_url: (campaign as any).icecream_sprite_url || '',
     ingredient_sprite_url: (campaign as any).ingredient_sprite_url || '',
     platform_sprite_url: (campaign as any).platform_sprite_url || '',
+    platform_wood_sprite_url: (campaign as any).platform_wood_sprite_url || '',
+    platform_stone_sprite_url: (campaign as any).platform_stone_sprite_url || '',
+    platform_ice_sprite_url: (campaign as any).platform_ice_sprite_url || '',
+    bridge_sprite_url: (campaign as any).bridge_sprite_url || '',
     background_url: (campaign as any).background_url || '',
     hazard_sprite_url: (campaign as any).hazard_sprite_url || '',
   });
 
   const [activeTab, setActiveTab] = useState<'basic' | 'rewards' | 'assets'>('basic');
+
+  // Handle ESC key to close delete confirmation modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDeleteConfirm) {
+        setShowDeleteConfirm(false);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showDeleteConfirm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +115,10 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
           icecream_sprite_url: formData.icecream_sprite_url,
           ingredient_sprite_url: formData.ingredient_sprite_url,
           platform_sprite_url: formData.platform_sprite_url,
+          platform_wood_sprite_url: formData.platform_wood_sprite_url,
+          platform_stone_sprite_url: formData.platform_stone_sprite_url,
+          platform_ice_sprite_url: formData.platform_ice_sprite_url,
+          bridge_sprite_url: formData.bridge_sprite_url,
           background_url: formData.background_url,
           hazard_sprite_url: formData.hazard_sprite_url,
         }),
@@ -583,13 +603,53 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
               onUpload={(url) => setFormData({ ...formData, ingredient_sprite_url: url })}
             />
 
-            <AssetUploader
-              label="Platform Texture"
-              description="Platform surface - should be tileable/repeatable pattern"
-              recommendedSize="Any size, tileable recommended"
-              currentUrl={formData.platform_sprite_url}
-              onUpload={(url) => setFormData({ ...formData, platform_sprite_url: url })}
-            />
+          </div>
+
+          {/* Platform Sprites Section */}
+          <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-purple-900 mb-2">
+              🎨 Platform Sprites (New!)
+            </h4>
+            <p className="text-sm text-purple-700 mb-4">
+              Upload 4 platform sprites for visual variety. Each sprite is 60×20px with 3 sections: left (20px), center (20px), right (20px). The center section repeats for platform length. The bridge is used for the highest platform.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <AssetUploader
+                label="Wood Platform"
+                description="Brown wooden platform with grain texture"
+                recommendedSize="60×20px (left, center, right sections)"
+                currentUrl={formData.platform_wood_sprite_url}
+                onUpload={(url) => setFormData({ ...formData, platform_wood_sprite_url: url })}
+              />
+
+              <AssetUploader
+                label="Stone Platform"
+                description="Gray stone blocks with mortar lines"
+                recommendedSize="60×20px (left, center, right sections)"
+                currentUrl={formData.platform_stone_sprite_url}
+                onUpload={(url) => setFormData({ ...formData, platform_stone_sprite_url: url })}
+              />
+
+              <AssetUploader
+                label="Ice Platform"
+                description="Light blue ice with crystalline highlights"
+                recommendedSize="60×20px (left, center, right sections)"
+                currentUrl={formData.platform_ice_sprite_url}
+                onUpload={(url) => setFormData({ ...formData, platform_ice_sprite_url: url })}
+              />
+
+              <AssetUploader
+                label="Rope Bridge"
+                description="Wooden planks with rope - for highest platform"
+                recommendedSize="60×20px (left, center, right sections)"
+                currentUrl={formData.bridge_sprite_url}
+                onUpload={(url) => setFormData({ ...formData, bridge_sprite_url: url })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
             <AssetUploader
               label="Hazard Sprite"
@@ -656,7 +716,7 @@ export default function CampaignEditForm({ campaign }: CampaignEditFormProps) {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Delete Campaign?

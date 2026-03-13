@@ -1,53 +1,8 @@
 [
   {
-    "id": "1773100414419",
-    "name": "White Peach",
-    "latinName": "Prunus persica var. nucipersica",
-    "category": "flavor",
-    "origin": "Niagara, Ontario",
-    "allergens": [
-      "dairy"
-    ],
-    "dietaryFlags": [],
-    "seasonal": true,
-    "image": "/uploads/1773110533533-frame-45.jpg",
-    "description": "White peach is a seasonal favourite at Janine — soft, floral, and delicate, it captures the height of summer in every spoonful. It’s the kind of flavour that doesn’t shout — it lingers.",
-    "createdAt": "2026-03-09T23:53:34.419Z",
-    "updatedAt": "2026-03-10T13:56:21.454Z",
-    "tastingNotes": [
-      "citrus"
-    ],
-    "availableMonths": [
-      7,
-      8
-    ],
-    "story": "test of the story",
-    "supplier": "Ontario Farm",
-    "imageAlt": "White peaches"
-  },
-  {
-    "id": "1773100466995",
-    "name": "Jersey milk",
-    "latinName": "",
-    "category": "base",
-    "origin": "Ontario",
-    "allergens": [
-      "dairy"
-    ],
-    "dietaryFlags": [],
-    "seasonal": false,
-    "image": "",
-    "description": "",
-    "createdAt": "2026-03-09T23:54:26.995Z",
-    "updatedAt": "2026-03-10T02:43:03.679Z",
-    "tastingNotes": [],
-    "availableMonths": [],
-    "imageAlt": ""
-  },
-  {
     "id": "milk",
     "name": "Milk",
-    "category": "Dairy",
+    "category": "dairy-bases",
     "roles": [
       "Base"
     ],
@@ -55,12 +10,20 @@
       "Creamy"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Primary dairy base ingredient for gelato.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T19:37:18.454Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": false,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "cream",
@@ -73,12 +36,20 @@
       "Creamy"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Used to enrich dairy base.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:01.842Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "browned-butter",
@@ -91,12 +62,20 @@
       "Browned"
     ],
     "origin": "Unknown",
-    "allergens": [],
+    "allergens": [
+      "dairy"
+    ],
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Butter cooked until nutty and aromatic.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:07.081Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true,
+    "taxonomyCategory": "dairy-bases"
   },
   {
     "id": "garden-tomato-mix",
@@ -116,13 +95,19 @@
     "dietaryFlags": [],
     "seasonal": true,
     "description": "Mixed tomato varieties used for sorbet or savoury-leaning flavour builds.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:12.512Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "white-peaches",
     "name": "White Peaches",
-    "category": "Fruit",
+    "category": "fruit",
     "roles": [
       "Base",
       "Primary Flavour"
@@ -135,8 +120,17 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:15.963Z",
+    "tastingNotes": [],
+    "availableMonths": [
+      7,
+      8
+    ],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "ile-dorleans-strawberries",
@@ -155,8 +149,14 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:20.467Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true,
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "wild-strawberry-quebec",
@@ -174,8 +174,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "red-watermelon",
@@ -193,8 +194,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "yellow-watermelon",
@@ -212,8 +214,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "lime",
@@ -231,8 +234,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "lemon",
@@ -250,8 +254,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "raspberries",
@@ -270,8 +275,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": true,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "fruits-vegetables"
   },
   {
     "id": "grilled-corn",
@@ -292,8 +298,9 @@
     "dietaryFlags": [],
     "seasonal": true,
     "description": "Operationally classified as grain for consistency, even if used like a vegetable.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "nuts-seeds-grains"
   },
   {
     "id": "thyme",
@@ -311,8 +318,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "madagascar-bourbon-vanilla",
@@ -330,8 +338,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "spruce-tip",
@@ -349,8 +358,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "mint",
@@ -369,8 +379,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "basil",
@@ -389,8 +400,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "honey",
@@ -407,8 +419,15 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:44.452Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": true,
+    "vegetarian": true,
+    "isOrganic": true,
+    "taxonomyCategory": "sweeteners-syrups"
   },
   {
     "id": "sun-dried-mole",
@@ -429,8 +448,14 @@
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Optional topping component, not a base ingredient.",
-    "createdAt": "2026-03-10T04:16:09.881Z",
-    "updatedAt": "2026-03-10T04:16:09.881Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T17:23:49.470Z",
+    "tastingNotes": [],
+    "availableMonths": [],
+    "imageAlt": "",
+    "animalDerived": false,
+    "vegetarian": true,
+    "taxonomyCategory": "sweeteners-syrups"
   },
   {
     "id": "himalayan-sea-salt",
@@ -445,8 +470,9 @@
     "allergens": [],
     "dietaryFlags": [],
     "seasonal": false,
-    "createdAt": "2026-03-10T04:16:09.882Z",
-    "updatedAt": "2026-03-10T04:16:09.882Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "spices-herbs-botanicals"
   },
   {
     "id": "tajin",
@@ -466,7 +492,28 @@
     "dietaryFlags": [],
     "seasonal": false,
     "description": "Seasoning blend used as topping or add-on.",
-    "createdAt": "2026-03-10T04:16:09.882Z",
-    "updatedAt": "2026-03-10T04:16:09.882Z"
+    "createdAt": "2026-03-13T02:44:47.109Z",
+    "updatedAt": "2026-03-13T02:44:47.109Z",
+    "taxonomyCategory": "sweeteners-syrups"
+  },
+  {
+    "id": "1773420159139",
+    "name": "Test ingredient",
+    "latinName": "",
+    "category": "new",
+    "origin": "new",
+    "allergens": [],
+    "dietaryFlags": [],
+    "seasonal": false,
+    "image": "",
+    "description": "",
+    "roles": [],
+    "descriptors": [
+      "Local",
+      "Seasonal",
+      "Caramelized"
+    ],
+    "createdAt": "2026-03-13T16:42:39.139Z",
+    "updatedAt": "2026-03-13T16:42:39.139Z"
   }
 ]

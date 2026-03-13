@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface ResetCampaignButtonProps {
@@ -16,6 +16,19 @@ export default function ResetCampaignButton({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Handle ESC key to close confirmation modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showConfirm) {
+        setShowConfirm(false);
+        setError(null);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showConfirm]);
 
   const handleReset = async () => {
     setIsResetting(true);
@@ -63,7 +76,7 @@ export default function ResetCampaignButton({
 
       {/* Confirmation Dialog */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Reset Campaign?

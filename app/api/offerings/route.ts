@@ -1,34 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOfferings, saveOfferings } from '@/lib/db';
-import { getFormats } from '@/lib/db';
-import { Offering, OfferingStatus } from '@/types';
+import { getProducts, getOfferings } from '@/lib/db';
 
-// GET /api/offerings - List offerings with filters
+// LEGACY API - Backward compatibility layer
+// This endpoint maps to /api/products for backward compatibility
+// New code should use /api/products directly
+
+// GET /api/offerings - List offerings (maps to products)
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status') as OfferingStatus | null;
+    const status = searchParams.get('status');
     const formatId = searchParams.get('formatId');
     const tags = searchParams.get('tags')?.split(',').filter(Boolean);
 
-    let offerings = await getOfferings();
+    // Try to get products first (new model)
+    let items = await getProducts();
+    
+    // Fallback to offerings if products is empty (during transition)
+    if (items.length === 0) {
+      items = await getOfferings();
+    }
 
     // Apply filters
     if (status) {
-      offerings = offerings.filter((o: Offering) => o.status === status);
+      items = items.filter((item: any) => item.status === status);
     }
 
     if (formatId) {
-      offerings = offerings.filter((o: Offering) => o.formatId === formatId);
+      items = items.filter((item: any) => item.formatId === formatId);
     }
 
     if (tags && tags.length > 0) {
-      offerings = offerings.filter((o: Offering) =>
-        tags.some(tag => o.tags.includes(tag))
+      items = items.filter((item: any) =>
+        item.tags && tags.some(tag => item.tags.includes(tag))
       );
     }
 
-    return NextResponse.json(offerings);
+    // Add deprecation warning header
+    const response = NextResponse.json({ data: items });
+    response.headers.set('X-API-Deprecated', 'true');
+    response.headers.set('X-API-Deprecation-Message', 'This endpoint is deprecated. Please use /api/products instead.');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching offerings:', error);
     return NextResponse.json(
@@ -38,87 +51,30 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/offerings - Create offering with format validation
+// POST /api/offerings - Create offering (deprecated, redirects to products)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate required fields
-    if (!body.internalName || !body.publicName || !body.formatId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: internalName, publicName, formatId' },
-        { status: 400 }
-      );
-    }
+    // Forward to products API
+    const response = await fetch(`${request.nextUrl.origin}/api/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-    // Validate format exists
-    const formats = await getFormats();
-    const format = formats.find((f: any) => f.id === body.formatId);
-    if (!format) {
-      return NextResponse.json(
-        { error: 'Format not found' },
-        { status: 404 }
-      );
-    }
-
-    // Validate format constraints
-    const primaryFlavourIds = body.primaryFlavourIds || [];
+    const data = await response.json();
     
-    if (format.requiresFlavours) {
-      if (primaryFlavourIds.length < format.minFlavours) {
-        return NextResponse.json(
-          { error: `Format requires at least ${format.minFlavours} flavour(s)` },
-          { status: 400 }
-        );
-      }
-      if (primaryFlavourIds.length > format.maxFlavours) {
-        return NextResponse.json(
-          { error: `Format allows maximum ${format.maxFlavours} flavour(s)` },
-          { status: 400 }
-        );
-      }
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
     }
 
-    // Create offering
-    const offerings = await getOfferings();
+    // Add deprecation warning header
+    const result = NextResponse.json(data, { status: 201 });
+    result.headers.set('X-API-Deprecated', 'true');
+    result.headers.set('X-API-Deprecation-Message', 'This endpoint is deprecated. Please use /api/products instead.');
     
-    const newOffering: Offering = {
-      id: Date.now().toString(),
-      internalName: body.internalName,
-      publicName: body.publicName,
-      slug: body.slug || body.publicName.toLowerCase().replace(/\s+/g, '-'),
-      status: body.status || 'draft',
-      formatId: body.formatId,
-      primaryFlavourIds: primaryFlavourIds,
-      secondaryFlavourIds: body.secondaryFlavourIds || [],
-      componentIds: body.componentIds || [],
-      description: body.description || '',
-      shortCardCopy: body.shortCardCopy || '',
-      image: body.image,
-      price: body.price || 0,
-      compareAtPrice: body.compareAtPrice,
-      availabilityStart: body.availabilityStart,
-      availabilityEnd: body.availabilityEnd,
-      location: body.location,
-      tags: body.tags || [],
-      shopifyProductId: body.shopifyProductId,
-      shopifySKU: body.shopifySKU,
-      posMapping: body.posMapping,
-      inventoryTracked: body.inventoryTracked || false,
-      inventoryQuantity: body.inventoryQuantity,
-      batchCode: body.batchCode,
-      restockDate: body.restockDate,
-      shelfLifeNotes: body.shelfLifeNotes,
-      onlineOrderable: body.onlineOrderable !== false,
-      pickupOnly: body.pickupOnly || false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    offerings.push(newOffering);
-    await saveOfferings(offerings);
-
-    return NextResponse.json(newOffering, { status: 201 });
+    return result;
   } catch (error) {
     console.error('Error creating offering:', error);
     return NextResponse.json(

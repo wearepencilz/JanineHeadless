@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ShopifyProduct {
   id: string;
@@ -30,19 +30,24 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  const loadProducts = async (query: string = '') => {
+  const loadProducts = async (query: string = '*') => {
     setLoading(true);
     setError('');
     
     try {
       // If no query, fetch all products (or use a wildcard)
       const searchQuery = query.trim() || '*';
-      const response = await fetch(`/api/shopify/products?q=${encodeURIComponent(searchQuery)}&limit=50`);
+      const response = await fetch(`/api/shopify/products?q=${encodeURIComponent(searchQuery)}&limit=250`);
       
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Check for configuration errors
+        if (errorData.code === 'MISSING_STORE_DOMAIN' || errorData.code === 'MISSING_CREDENTIALS') {
+          throw new Error('Shopify is not configured. Please add Shopify credentials to your environment variables.');
+        }
+        
         throw new Error(errorData.error || 'Failed to load products');
       }
       
@@ -50,7 +55,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
       setProducts(data.products || []);
       
       if (data.products.length === 0) {
-        setError('No products found');
+        setError('No products found in your Shopify store');
       }
     } catch (err: any) {
       console.error('Error loading products:', err);
@@ -70,10 +75,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
 
   const handleModalOpen = () => {
     setShowModal(true);
-    if (!initialLoadDone) {
-      loadProducts(); // Auto-load products on first open
-      setInitialLoadDone(true);
-    }
+    loadProducts('*'); // Always load fresh products when modal opens
   };
 
   const handleSelect = (product: ShopifyProduct) => {
@@ -87,117 +89,135 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
     onSelect(null);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       searchProducts();
     }
   };
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowModal(false);
+      }
+    };
+    
+    if (showModal) {
+      document.addEventListener('keydown', handleEsc);
+      return () => document.removeEventListener('keydown', handleEsc);
+    }
+  }, [showModal]);
+
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        Link to Shopify Product
-      </label>
-      
-      {selectedProductId ? (
-        <div className="border border-green-300 bg-green-50 rounded-lg p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-900">
-                Linked to Shopify Product
-              </p>
-              <p className="text-sm text-green-700 mt-1">
-                Handle: <span className="font-mono">{selectedProductHandle}</span>
-              </p>
-              <p className="text-xs text-green-600 mt-1">
-                ID: {selectedProductId}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleUnlink}
-              className="text-sm text-red-600 hover:text-red-700 font-medium"
-            >
-              Unlink
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={handleModalOpen}
-          className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition-colors"
-        >
-          <p className="text-sm text-gray-600">Click to search and link a Shopify product</p>
-        </button>
-      )}
+    <div>
+      <button
+        type="button"
+        onClick={handleModalOpen}
+        className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+      >
+        <p className="text-sm text-gray-700 font-medium">Search Shopify Products</p>
+        <p className="text-xs text-gray-500 mt-1">Browse and select an existing product from your store</p>
+      </button>
 
       {/* Search Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] flex flex-col">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Shopify Products</h3>
+        <div 
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4" 
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[85vh] flex flex-col" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-200 flex-shrink-0">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Search Shopify Products</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
               
               <div className="flex gap-2">
                 <input
                   type="text"
                   placeholder="Search by product name..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    // If user clears the search, reload all products
+                    if (e.target.value === '') {
+                      loadProducts('*');
+                    }
+                  }}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={searchProducts}
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </button>
               </div>
               
               {error && (
-                <p className="mt-2 text-sm text-red-600">{error}</p>
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
               )}
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 bg-white">
               {loading ? (
                 <div className="text-center text-gray-500 py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                  <p>Loading products...</p>
+                  <p className="text-gray-900">Loading products...</p>
                 </div>
               ) : products.length === 0 && !error ? (
                 <div className="text-center text-gray-500 py-12">
-                  <p>Search for products or browse all available products</p>
-                </div>
-              ) : products.length === 0 && error ? (
-                <div className="text-center text-gray-500 py-12">
-                  <p>{error}</p>
+                  <p className="text-gray-900 mb-2">Search for products or browse all available products</p>
                   <button
                     type="button"
-                    onClick={() => loadProducts()}
-                    className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    onClick={() => loadProducts('*')}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                   >
                     Load all products
                   </button>
                 </div>
+              ) : products.length === 0 && error ? (
+                <div className="text-center text-gray-500 py-12">
+                  <p className="text-gray-900 mb-3">{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => loadProducts('*')}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    Try loading all products
+                  </button>
+                </div>
               ) : (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-3">
                   {products.map(product => (
                     <button
                       key={product.id}
                       type="button"
                       onClick={() => handleSelect(product)}
-                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors bg-white"
                     >
                       <div className="flex gap-4">
                         {product.featuredImage && (
-                          <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                          <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
                             <img
                               src={product.featuredImage.url}
                               alt={product.featuredImage.altText || product.title}
@@ -207,18 +227,15 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                         )}
                         
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{product.title}</h4>
+                          <h4 className="font-medium text-gray-900">{product.title}</h4>
                           <p className="text-sm text-gray-600 mt-1">
                             Handle: <span className="font-mono text-xs">{product.handle}</span>
                           </p>
                           {product.priceRangeV2 && (
                             <p className="text-sm text-gray-600 mt-1">
-                              From {product.priceRangeV2.minVariantPrice.currencyCode} {product.priceRangeV2.minVariantPrice.amount}
+                              From {product.priceRangeV2.minVariantPrice.currencyCode} ${product.priceRangeV2.minVariantPrice.amount}
                             </p>
                           )}
-                          <p className="text-xs text-gray-500 mt-1 font-mono truncate">
-                            {product.id}
-                          </p>
                         </div>
                       </div>
                     </button>
@@ -227,7 +244,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
               )}
             </div>
             
-            <div className="p-6 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
               <button
                 type="button"
                 onClick={() => {
@@ -236,7 +253,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                   setProducts([]);
                   setError('');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
               >
                 Cancel
               </button>

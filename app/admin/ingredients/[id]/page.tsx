@@ -2,19 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     latinName: '',
     origin: '',
-    category: 'flavor',
+    taxonomyCategory: '', // Changed from 'category'
     story: '',
     tastingNotes: '',
     supplier: '',
@@ -22,13 +23,13 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     seasonal: false,
     availableMonths: [] as number[],
     allergens: [] as string[],
+    animalDerived: false,
+    vegetarian: true,
     isOrganic: false,
     image: '',
     imageAlt: '',
   });
 
-  const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
-  const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs'];
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -51,6 +52,8 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           allergens: data.allergens || [],
           availableMonths: data.availableMonths || [],
           imageAlt: data.imageAlt || '',
+          animalDerived: data.animalDerived || false,
+          vegetarian: data.vegetarian !== false, // Default to true if not set
         });
       } else {
         alert('Ingredient not found');
@@ -91,15 +94,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     }
   };
 
-  const toggleAllergen = (allergen: string) => {
-    setFormData(prev => ({
-      ...prev,
-      allergens: prev.allergens.includes(allergen)
-        ? prev.allergens.filter(a => a !== allergen)
-        : [...prev.allergens, allergen]
-    }));
-  };
-
   const toggleMonth = (monthIndex: number) => {
     setFormData(prev => ({
       ...prev,
@@ -118,18 +112,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
   }
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <Link
-          href="/admin/ingredients"
-          className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block"
-        >
-          ← Back to Ingredients
-        </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Edit Ingredient</h1>
-        <p className="text-gray-600 mt-1">Update ingredient details and provenance</p>
-      </div>
-
+    <EditPageLayout
+      title="Edit Ingredient"
+      backHref="/admin/ingredients"
+      backLabel="Back to Ingredients"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onCancel={() => router.push('/admin/ingredients')}
+      saving={saving}
+    >
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="space-y-6">
           {/* Basic Info */}
@@ -175,23 +165,13 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TaxonomySelect
+              category="ingredientCategories"
+              value={formData.taxonomyCategory}
+              onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
+              label="Category"
+              required
+            />
           </div>
 
           {/* Story */}
@@ -209,19 +189,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Tasting Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tasting Notes
-            </label>
-            <input
-              type="text"
-              value={formData.tastingNotes}
-              onChange={(e) => setFormData({ ...formData, tastingNotes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="citrus, floral, bittersweet (comma separated)"
-            />
-            <p className="text-sm text-gray-500 mt-1">Separate multiple notes with commas</p>
-          </div>
+          <TaxonomyTagSelect
+            category="tastingNotes"
+            values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
+            onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
+            label="Tasting Notes"
+            description="Select common tasting note descriptors"
+            allowCreate={true}
+          />
 
           {/* Sourcing */}
           <div className="grid grid-cols-2 gap-4">
@@ -251,26 +226,41 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Allergens */}
+          <TaxonomyTagSelect
+            category="allergens"
+            values={formData.allergens}
+            onChange={(values) => setFormData({ ...formData, allergens: values })}
+            label="Allergens"
+          />
+
+          {/* Dietary Facts */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Allergens
+              Dietary Facts
             </label>
-            <div className="flex flex-wrap gap-2">
-              {commonAllergens.map((allergen) => (
-                <button
-                  key={allergen}
-                  type="button"
-                  onClick={() => toggleAllergen(allergen)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.allergens.includes(allergen)
-                      ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {allergen}
-                </button>
-              ))}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.animalDerived}
+                  onChange={(e) => setFormData({ ...formData, animalDerived: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Contains animal-derived ingredients</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.vegetarian}
+                  onChange={(e) => setFormData({ ...formData, vegetarian: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Suitable for vegetarians</span>
+              </label>
             </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
+            </p>
           </div>
 
           {/* Seasonal */}
@@ -334,23 +324,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
             required={false}
           />
         </div>
-
-        <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <Link
-            href="/admin/ingredients"
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </Link>
-        </div>
       </form>
-    </div>
+    </EditPageLayout>
   );
 }

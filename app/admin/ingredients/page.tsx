@@ -1,65 +1,91 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
+import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
+import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface Ingredient {
   id: string;
   name: string;
   latinName?: string;
   origin: string;
-  category: string;
+  category: string; // Legacy field
+  taxonomyCategory?: string; // New taxonomy field
   image?: string;
   allergens: string[];
   seasonal: boolean;
+  status?: string;
+}
+
+interface TaxonomyCategory {
+  id: string;
+  label: string;
+  value: string;
 }
 
 export default function IngredientsPage() {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [taxonomyCategories, setTaxonomyCategories] = useState<TaxonomyCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
+    show: false,
+    id: '',
+    name: '',
+  });
 
   useEffect(() => {
-    fetchIngredients();
-  }, [searchTerm, categoryFilter]);
+    fetchData();
+  }, []);
 
-  const fetchIngredients = async () => {
+  const fetchData = async () => {
     try {
-      const params = new URLSearchParams();
-      if (searchTerm) params.append('search', searchTerm);
-      if (categoryFilter !== 'all') params.append('category', categoryFilter);
-      
-      const response = await fetch(`/api/ingredients?${params.toString()}`);
-      if (response.ok) {
-        const data = await response.json();
-        // Handle paginated response
+      const [ingredientsRes, settingsRes] = await Promise.all([
+        fetch('/api/ingredients'),
+        fetch('/api/settings'),
+      ]);
+
+      if (ingredientsRes.ok) {
+        const data = await ingredientsRes.json();
         setIngredients(data.data || data);
       }
+
+      if (settingsRes.ok) {
+        const settings = await settingsRes.json();
+        setTaxonomyCategories(settings.ingredientCategories || []);
+      }
     } catch (error) {
-      console.error('Error fetching ingredients:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) {
-      return;
-    }
+  const handleDeleteClick = (ingredient: Ingredient) => {
+    setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name });
+  };
 
+  const handleDelete = async () => {
     try {
-      const response = await fetch(`/api/ingredients/${id}`, {
+      const response = await fetch(`/api/ingredients/${deleteConfirm.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        setIngredients(ingredients.filter((i) => i.id !== id));
+        setIngredients(ingredients.filter((i) => i.id !== deleteConfirm.id));
+        setDeleteConfirm({ show: false, id: '', name: '' });
       } else {
         const error = await response.json();
-        alert(error.message || 'Failed to delete ingredient');
+        if (error.blockers) {
+          alert(`Cannot delete ingredient:\n\n${error.blockers.join('\n')}`);
+        } else {
+          alert(error.error || 'Failed to delete ingredient');
+        }
       }
     } catch (error) {
       console.error('Error deleting ingredient:', error);
@@ -67,155 +93,182 @@ export default function IngredientsPage() {
     }
   };
 
+  const getCategoryLabel = (ingredient: Ingredient) => {
+    const categoryId = ingredient.taxonomyCategory || ingredient.category;
+    const taxonomy = taxonomyCategories.find(t => t.id === categoryId || t.value === categoryId);
+    return taxonomy?.label || categoryId || 'Uncategorized';
+  };
+
   const filteredIngredients = ingredients.filter((ingredient) => {
-    const matchesSearch = ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ingredient.origin?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || ingredient.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesSearch = 
+      ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ingredient.latinName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ingredient.origin?.toLowerCase().includes(searchTerm.toLowerCase());
+    const categoryId = ingredient.taxonomyCategory || ingredient.category;
+    const matchesCategory = categoryFilter === 'all' || categoryId === categoryFilter;
+    const matchesStatus = statusFilter === 'all' || ingredient.status === statusFilter;
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
+  const filters: FilterConfig[] = [
+    {
+      type: 'search',
+      placeholder: 'Search ingredients...',
+      value: searchTerm,
+      onChange: setSearchTerm,
+    },
+    {
+      type: 'select',
+      value: categoryFilter,
+      onChange: setCategoryFilter,
+      options: [
+        { value: 'all', label: 'All Categories' },
+        ...taxonomyCategories
+          .map((cat) => ({
+            value: cat.id,
+            label: cat.label,
+          })),
+      ],
+    },
+    {
+      type: 'select',
+      value: statusFilter,
+      onChange: setStatusFilter,
+      options: [
+        { value: 'all', label: 'All Status' },
+        { value: 'active', label: 'Active' },
+        { value: 'archived', label: 'Archived' },
+      ],
+    },
+  ];
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-gray-600">Loading ingredients...</div>
-      </div>
-    );
-  }
+  const columns: Column<Ingredient>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      render: (ingredient) => (
+        <div className="flex items-center gap-3">
+          {ingredient.image && (
+            <img
+              src={ingredient.image}
+              alt={ingredient.name}
+              className="w-10 h-10 rounded object-cover"
+            />
+          )}
+          <div>
+            <div className="font-medium text-gray-900">{ingredient.name}</div>
+            {ingredient.latinName && (
+              <div className="text-sm text-gray-500 italic">{ingredient.latinName}</div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      render: (ingredient) => (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {getCategoryLabel(ingredient)}
+        </span>
+      ),
+    },
+    {
+      key: 'origin',
+      label: 'Origin',
+      render: (ingredient) => (
+        <div className="text-sm text-gray-900">{ingredient.origin || '-'}</div>
+      ),
+    },
+    {
+      key: 'allergens',
+      label: 'Allergens',
+      render: (ingredient) => {
+        if (!ingredient.allergens || ingredient.allergens.length === 0) {
+          return <span className="text-sm text-gray-400">None</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {ingredient.allergens.slice(0, 3).map((allergen) => (
+              <span
+                key={allergen}
+                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
+              >
+                {allergen}
+              </span>
+            ))}
+            {ingredient.allergens.length > 3 && (
+              <span className="text-xs text-gray-500">
+                +{ingredient.allergens.length - 3}
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'properties',
+      label: 'Properties',
+      render: (ingredient) => (
+        <div className="flex flex-wrap gap-1">
+          {ingredient.seasonal && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              Seasonal
+            </span>
+          )}
+          {ingredient.status === 'archived' && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+              Archived
+            </span>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  const actions: Action<Ingredient>[] = [
+    {
+      label: 'Edit',
+      href: (ingredient) => `/admin/ingredients/${ingredient.id}`,
+      stopPropagation: true,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDeleteClick,
+      className: 'text-red-600 hover:text-red-900',
+      stopPropagation: true,
+    },
+  ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900">Ingredients</h1>
-          <p className="text-gray-600 mt-1">Manage your ingredient library</p>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href="/admin/ingredients/seed"
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Seed Data
-          </Link>
-          <Link
-            href="/admin/ingredients/create"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Add Ingredient
-          </Link>
-        </div>
-      </div>
+    <>
+      <DataTable
+        title="Ingredients"
+        description={`${filteredIngredients.length} ingredient${filteredIngredients.length !== 1 ? 's' : ''}`}
+        createButton={{ label: 'Add Ingredient', href: '/admin/ingredients/create' }}
+        secondaryButton={{ label: 'Seed Data', href: '/admin/ingredients/seed' }}
+        filters={<TableFilters filters={filters} />}
+        data={filteredIngredients}
+        columns={columns}
+        actions={actions}
+        keyExtractor={(ingredient) => ingredient.id}
+        onRowClick={(ingredient) => router.push(`/admin/ingredients/${ingredient.id}`)}
+        emptyMessage={
+          searchTerm || categoryFilter !== 'all' || statusFilter !== 'all'
+            ? 'No ingredients match your filters'
+            : 'No ingredients yet'
+        }
+        emptyAction={{ label: 'Add your first ingredient', href: '/admin/ingredients/create' }}
+        loading={loading}
+      />
 
-      <div className="bg-white rounded-lg border border-gray-200 mb-6 p-4">
-        <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search ingredients..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {filteredIngredients.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-600 mb-4">
-            {searchTerm || categoryFilter !== 'all' 
-              ? 'No ingredients match your filters' 
-              : 'No ingredients yet'}
-          </p>
-          <Link
-            href="/admin/ingredients/create"
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Add your first ingredient
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredIngredients.map((ingredient) => (
-            <div
-              key={ingredient.id}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-            >
-              {ingredient.image && (
-                <div className="aspect-video bg-gray-100">
-                  <img
-                    src={ingredient.image}
-                    alt={ingredient.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{ingredient.name}</h3>
-                    {ingredient.latinName && (
-                      <p className="text-sm text-gray-500 italic">{ingredient.latinName}</p>
-                    )}
-                  </div>
-                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
-                    {ingredient.category}
-                  </span>
-                </div>
-                
-                <p className="text-sm text-gray-600 mb-3">
-                  Origin: {ingredient.origin}
-                </p>
-
-                {ingredient.allergens && ingredient.allergens.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {ingredient.allergens.map((allergen) => (
-                      <span
-                        key={allergen}
-                        className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded"
-                      >
-                        {allergen}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {ingredient.seasonal && (
-                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded inline-block mb-3">
-                    Seasonal
-                  </span>
-                )}
-
-                <div className="flex gap-2 pt-3 border-t border-gray-200">
-                  <Link
-                    href={`/admin/ingredients/${ingredient.id}`}
-                    className="flex-1 text-center px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(ingredient.id, ingredient.name)}
-                    className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+      <DeleteModal
+        isOpen={deleteConfirm.show}
+        title="Delete Ingredient"
+        message={`Are you sure you want to delete "${deleteConfirm.name}"? This will check if the ingredient is used in any flavours.`}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+      />
+    </>
   );
 }

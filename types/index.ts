@@ -89,18 +89,24 @@ export type IngredientDescriptor = typeof ingredientDescriptorTags[number];
 
 export type Allergen = 
   | 'dairy' 
-  | 'eggs' 
-  | 'nuts' 
-  | 'soy' 
+  | 'egg' 
   | 'gluten' 
-  | 'sesame';
+  | 'tree-nuts' 
+  | 'peanuts' 
+  | 'sesame' 
+  | 'soy';
 
-export type DietaryFlag = 
-  | 'vegan' 
-  | 'vegetarian' 
-  | 'gluten-free' 
-  | 'dairy-free' 
-  | 'nut-free';
+// Dietary claims are computed from ingredient facts, not stored
+export type DietaryClaim = 
+  | 'contains-dairy'
+  | 'contains-egg'
+  | 'contains-gluten'
+  | 'contains-nuts'
+  | 'dairy-free'
+  | 'gluten-free'
+  | 'nut-free'
+  | 'vegan'
+  | 'vegetarian';
 
 export interface Ingredient {
   id: string;                       // UUID
@@ -110,11 +116,20 @@ export interface Ingredient {
   roles: IngredientRole[];          // Usage roles (multi-select)
   descriptors: IngredientDescriptor[]; // Descriptor tags (optional multi-select)
   origin: string;                   // Source/origin location
-  allergens: Allergen[];            // Allergen tags
-  dietaryFlags: DietaryFlag[];      // Dietary compatibility
+  allergens: Allergen[];            // Allergen flags (source of truth)
+  animalDerived?: boolean;          // Contains animal products
+  vegetarian?: boolean;             // Suitable for vegetarians
   seasonal: boolean;                // Seasonal availability
+  availableMonths?: number[];       // Month indices (0-11) when available
   image?: string;                   // Image URL (Vercel Blob or local)
+  imageAlt?: string;                // Image alt text
   description?: string;             // Additional information
+  story?: string;                   // Provenance story
+  tastingNotes?: string[];          // Tasting notes array
+  supplier?: string;                // Supplier name
+  farm?: string;                    // Farm name
+  isOrganic?: boolean;              // Organic certification
+  status?: 'active' | 'archived';   // Status
   createdAt: string;                // ISO 8601 timestamp
   updatedAt: string;                // ISO 8601 timestamp
 }
@@ -172,20 +187,17 @@ export interface Flavour {
   
   // Allergens & Dietary (calculated from ingredients)
   allergens: Allergen[];         // Auto-calculated
-  dietaryTags: DietaryFlag[];    // Auto-calculated
+  dietaryClaims?: DietaryClaim[]; // Auto-calculated (computed, not stored)
   
   // Display
   colour: string;                // Hex color code
   image?: string;                // Flavour image URL
   
   // Availability
-  season?: string;               // e.g., "Spring", "Summer"
   status: Status;                // Current availability status
   
-  // Format eligibility flags
-  canBeUsedInTwist: boolean;     // Eligible for twist combinations
-  canBeSoldAsPint: boolean;      // Available as packaged pint
-  canBeUsedInSandwich: boolean;  // Suitable for sandwich filling
+  // Availability
+  status: Status;                // Current availability status
   
   // Shopify Integration
   shopifyProductId?: string;     // Shopify product ID
@@ -232,11 +244,14 @@ export interface Format {
   maxFlavours: number;           // Maximum flavour count
   allowMixedTypes: boolean;      // Can mix gelato + sorbet?
   
+  // Eligibility rules
+  eligibleFlavourTypes?: string[]; // Array of flavourType taxonomy IDs this format accepts
+                                   // Empty or undefined = accepts all flavour types
+  
   // Configuration
   canIncludeAddOns: boolean;     // Supports toppings/add-ons?
   defaultSizes: string[];        // e.g., ["small", "medium", "large"]
   servingStyle: ServingStyle;    // How it's served
-  menuSection: string;           // Where it appears on menu
   
   // Display
   image?: string;                // Format image URL
@@ -386,7 +401,7 @@ export interface Component {
   
   // Allergens & Dietary
   allergens: Allergen[];         // Allergen tags
-  dietaryTags: DietaryFlag[];    // Dietary flags
+  dietaryClaims?: DietaryClaim[]; // Computed dietary claims
   
   // Pricing
   price?: number;                // Price if sold separately
@@ -396,6 +411,37 @@ export interface Component {
   
   // Availability
   status: Status;                // Current availability status
+  
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================================
+// Modifier Types
+// ============================================================================
+
+export interface Modifier {
+  id: string;                    // UUID
+  name: string;                  // Modifier name
+  slug: string;                  // URL-friendly identifier
+  type: string;                  // Modifier type (from taxonomy)
+  description?: string;          // Description
+  
+  // Allergens & Dietary (same model as ingredients)
+  allergens: Allergen[];         // Allergen flags (source of truth)
+  animalDerived?: boolean;       // Contains animal products
+  vegetarian?: boolean;          // Suitable for vegetarians
+  
+  // Pricing
+  price: number;                 // Price in cents
+  
+  // Display
+  image?: string;                // Modifier image
+  
+  // Availability
+  availableForFormatIds: string[]; // Format IDs this modifier is available for
+  status: 'active' | 'archived'; // Current availability status
   
   // Metadata
   createdAt: string;
@@ -462,7 +508,7 @@ export interface ProductMetafields {
   'custom.flavour_id': string;              // CMS flavour ID
   'custom.ingredient_ids': string[];        // Array of ingredient IDs
   'custom.allergens': Allergen[];           // Calculated allergen list
-  'custom.dietary_tags': DietaryFlag[];     // vegan, gluten-free, etc.
+  'custom.dietary_tags': DietaryClaim[];     // Computed dietary claims
   'custom.seasonal_ingredients': boolean;   // Has seasonal items
 }
 
@@ -558,6 +604,89 @@ export interface FormatWithUsage extends Format {
 
 export interface CollectionFull extends SeasonalCollection {
   offerings: OfferingFull[];
+}
+
+// ============================================================================
+// Product Generation Types
+// ============================================================================
+
+/**
+ * Detailed report of product generation results.
+ * Provides breakdown by format and flavour type, plus human-readable summary.
+ * 
+ * @example
+ * ```typescript
+ * const report: GenerationReport = {
+ *   success: true,
+ *   created: 8,
+ *   skipped: 2,
+ *   total: 15,
+ *   breakdown: {
+ *     byFormat: {
+ *       "Scoop": {
+ *         created: 4,
+ *         skipped: 0,
+ *         flavourTypes: ["gelato", "sorbet"]
+ *       },
+ *       "Sandwich": {
+ *         created: 2,
+ *         skipped: 1,
+ *         flavourTypes: ["gelato"]
+ *       },
+ *       "Twist": {
+ *         created: 2,
+ *         skipped: 1,
+ *         flavourTypes: ["gelato", "sorbet"]
+ *       }
+ *     },
+ *     byFlavourType: {
+ *       "gelato": 6,
+ *       "sorbet": 2
+ *     }
+ *   },
+ *   message: "Generated 8 new products across 3 formats. Skipped 2 combinations due to eligibility rules.",
+ *   details: {
+ *     skippedCombinations: [
+ *       {
+ *         formatName: "Sandwich",
+ *         flavourName: "Lemon Sorbet",
+ *         reason: "Flavour type 'sorbet' not eligible for format 'Sandwich'"
+ *       },
+ *       {
+ *         formatName: "Twist",
+ *         flavourName: "Chocolate Cookie",
+ *         reason: "Flavour type 'cookie' not eligible for format 'Twist'"
+ *       }
+ *     ]
+ *   }
+ * };
+ * ```
+ */
+export interface GenerationReport {
+  success: boolean;           // Overall success status
+  created: number;            // Number of new products created
+  skipped: number;            // Number of combinations skipped due to eligibility
+  total: number;              // Total products now associated with launch
+  breakdown: {
+    byFormat: {
+      [formatName: string]: {
+        created: number;        // Products created for this format
+        skipped: number;        // Combinations skipped for this format
+        flavourTypes: string[]; // Flavour types used in this format
+      };
+    };
+    byFlavourType: {
+      [flavourType: string]: number; // Count of products per flavour type
+    };
+  };
+  message: string;            // Human-readable summary message
+  details?: {
+    skippedCombinations: Array<{
+      formatName: string;
+      flavourName: string;
+      reason: string;
+    }>;
+  };
 }
 
 // ============================================================================

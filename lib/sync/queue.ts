@@ -2,7 +2,8 @@
 
 import { getFlavours, saveFlavours, getIngredients, getSyncJobs, saveSyncJobs, getSyncLogs, saveSyncLogs } from '@/lib/db';
 import { updateProductMetafields, type ProductMetafieldInput } from '@/lib/shopify/admin';
-import type { Flavour, Ingredient, SyncJob, SyncLog, Allergen, DietaryFlag } from '@/types';
+import { computeDietaryClaims } from '@/lib/dietary-claims';
+import type { Flavour, Ingredient, SyncJob, SyncLog, Allergen } from '@/types';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [1000, 5000, 15000]; // Exponential backoff in ms
@@ -21,50 +22,14 @@ function calculateAllergens(ingredientIds: string[], allIngredients: Ingredient[
   return Array.from(allergenSet);
 }
 
-// Helper function to determine dietary flags
-function calculateDietaryFlags(ingredientIds: string[], allIngredients: Ingredient[]): DietaryFlag[] {
-  const ingredients = ingredientIds
-    .map(id => allIngredients.find(ing => ing.id === id))
-    .filter(Boolean) as Ingredient[];
-  
-  if (ingredients.length === 0) return [];
-  
-  const flags: DietaryFlag[] = [];
-  
-  // Check if vegan
-  const hasAnimalProducts = ingredients.some(ing => 
-    ing.allergens.includes('dairy') || ing.allergens.includes('eggs')
-  );
-  if (!hasAnimalProducts) {
-    flags.push('vegan');
-    flags.push('vegetarian');
-  } else {
-    flags.push('vegetarian');
-  }
-  
-  // Check if gluten-free
-  if (!ingredients.some(ing => ing.allergens.includes('gluten'))) {
-    flags.push('gluten-free');
-  }
-  
-  // Check if dairy-free
-  if (!ingredients.some(ing => ing.allergens.includes('dairy'))) {
-    flags.push('dairy-free');
-  }
-  
-  // Check if nut-free
-  if (!ingredients.some(ing => ing.allergens.includes('nuts'))) {
-    flags.push('nut-free');
-  }
-  
-  return flags;
-}
-
 // Build metafield payload from flavour data
 export function buildMetafieldPayload(flavour: Flavour, allIngredients: Ingredient[]): ProductMetafieldInput[] {
   const ingredientIds = flavour.ingredients.map(fi => fi.ingredientId);
   const allergens = calculateAllergens(ingredientIds, allIngredients);
-  const dietaryFlags = calculateDietaryFlags(ingredientIds, allIngredients);
+  const ingredients = ingredientIds
+    .map(id => allIngredients.find(ing => ing.id === id))
+    .filter(Boolean) as Ingredient[];
+  const dietaryClaims = computeDietaryClaims(ingredients);
   const hasSeasonalIngredients = ingredientIds.some(id => {
     const ing = allIngredients.find(i => i.id === id);
     return ing?.seasonal;
@@ -92,7 +57,7 @@ export function buildMetafieldPayload(flavour: Flavour, allIngredients: Ingredie
     {
       namespace: 'custom',
       key: 'dietary_tags',
-      value: JSON.stringify(dietaryFlags),
+      value: JSON.stringify(dietaryClaims),
       type: 'json'
     },
     {

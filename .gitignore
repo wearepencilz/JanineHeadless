@@ -31,3 +31,6 @@ src/buildInfo.json
 # Next.js
 .next/
 out/
+
+# Test fixtures (generated during test runs)
+tests/fixtures/data/

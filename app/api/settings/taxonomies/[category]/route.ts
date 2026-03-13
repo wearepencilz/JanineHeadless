@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const values = await getTaxonomyValues(params.category)
-    return NextResponse.json(values)
+    return NextResponse.json({ values })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

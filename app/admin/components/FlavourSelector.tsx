@@ -13,24 +13,15 @@ export default function FlavourSelector({ format, flavours, selectedFlavourIds, 
   // Ensure flavours is an array
   const flavoursArray = Array.isArray(flavours) ? flavours : [];
   
-  // Filter flavours based on format eligibility
+  // Filter flavours based on format's eligible flavour types
   const eligibleFlavours = flavoursArray.filter(flavour => {
-    const formatName = format.name.toLowerCase();
-    
-    // Only filter by specific flags if the format requires it
-    if (formatName.includes('twist')) {
-      return flavour.canBeUsedInTwist;
-    }
-    if (formatName.includes('pint')) {
-      return flavour.canBeSoldAsPint;
-    }
-    if (formatName.includes('sandwich')) {
-      return flavour.canBeUsedInSandwich;
+    // If format has no eligibleFlavourTypes specified, accept all flavour types
+    if (!format.eligibleFlavourTypes || format.eligibleFlavourTypes.length === 0) {
+      return true;
     }
     
-    // For all other formats (Soft Serve, Tasting, etc.), show all flavours regardless of status
-    // This allows using archived flavours in new offerings
-    return true;
+    // Otherwise, only show flavours whose type is in the format's eligible list
+    return format.eligibleFlavourTypes.includes(flavour.type);
   });
 
   const handleToggle = (flavourId: string) => {

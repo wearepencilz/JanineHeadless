@@ -1,37 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOfferings } from '@/lib/db';
-import type { Offering, ErrorResponse } from '@/types';
+import { getFormats } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const offerings = await getOfferings() as Offering[];
+    const flavourId = params.id;
+    
+    // Get all offerings
+    const offerings = await getOfferings();
+    
+    // Get all formats for name lookup
+    const formats = await getFormats();
+    const formatMap = new Map(formats.map((f: any) => [f.id, f]));
     
     // Find offerings that use this flavour
-    const usedInOfferings = offerings.filter(offering => 
-      offering.primaryFlavourIds?.includes(params.id) ||
-      offering.secondaryFlavourIds?.includes(params.id)
-    );
+    const usageOfferings = offerings
+      .filter((offering: any) => 
+        offering.primaryFlavourIds?.includes(flavourId)
+      )
+      .map((offering: any) => {
+        const format = formatMap.get(offering.formatId);
+        return {
+          id: offering.id,
+          name: offering.publicName || offering.internalName,
+          formatName: format?.name || 'Unknown Format',
+          status: offering.status || 'draft',
+        };
+      });
     
-    const usageData = {
-      usageCount: usedInOfferings.length,
-      offerings: usedInOfferings.map(offering => ({
-        id: offering.id,
-        name: offering.publicName,
-        formatName: offering.formatId, // Will be resolved to format name in UI
-        status: offering.status
-      }))
-    };
-    
-    return NextResponse.json(usageData);
+    return NextResponse.json({
+      usageCount: usageOfferings.length,
+      offerings: usageOfferings,
+    });
   } catch (error) {
     console.error('Error fetching flavour usage:', error);
-    const errorResponse: ErrorResponse = {
-      error: 'Failed to fetch flavour usage',
-      timestamp: new Date().toISOString()
-    };
-    return NextResponse.json(errorResponse, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch flavour usage' },
+      { status: 500 }
+    );
   }
 }

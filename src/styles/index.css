@@ -1,17 +1,5 @@
 @import './theme.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  body {
-    font-family: var(--font-body);
-    color: var(--color-text-primary);
-    background-color: var(--color-bg-primary);
-  }
-}
-
 /* TipTap Editor Styles */
 .ProseMirror {
   outline: none;
@@ -111,4 +99,20 @@
   background-color: transparent;
   padding: 0;
   color: inherit;
+}
+
+/* Toast Animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
 }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
+import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface NewsItem {
   id: number;
@@ -12,8 +14,14 @@ interface NewsItem {
 }
 
 export default function NewsPage() {
+  const router = useRouter();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: number; title: string }>({
+    show: false,
+    id: 0,
+    title: '',
+  });
 
   useEffect(() => {
     fetchNews();
@@ -31,107 +39,89 @@ export default function NewsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this news item?')) return;
+  const handleDeleteClick = (item: NewsItem) => {
+    setDeleteConfirm({ show: true, id: item.id, title: item.title });
+  };
 
+  const handleDelete = async () => {
     try {
-      await fetch(`/api/news/${id}`, { method: 'DELETE' });
-      setNews(news.filter((n) => n.id !== id));
+      await fetch(`/api/news/${deleteConfirm.id}`, { method: 'DELETE' });
+      setNews(news.filter((n) => n.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: 0, title: '' });
     } catch (error) {
       console.error('Failed to delete news:', error);
+      alert('Failed to delete news article');
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const columns: Column<NewsItem>[] = [
+    {
+      key: 'title',
+      label: 'Article',
+      render: (item) => (
+        <div className="flex items-center">
+          {item.image && (
+            <img
+              src={item.image}
+              alt={item.title}
+              className="h-10 w-10 rounded object-cover mr-3"
+            />
+          )}
+          <div>
+            <div className="text-sm font-medium text-gray-900">{item.title}</div>
+            <div className="text-sm text-gray-500 line-clamp-1">{item.content}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'date',
+      label: 'Date',
+      render: (item) => (
+        <div className="text-sm text-gray-500">
+          {new Date(item.date).toLocaleDateString()}
+        </div>
+      ),
+    },
+  ];
+
+  const actions: Action<NewsItem>[] = [
+    {
+      label: 'Edit',
+      href: (item) => `/admin/news/${item.id}`,
+      stopPropagation: true,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDeleteClick,
+      className: 'text-red-600 hover:text-red-900',
+      stopPropagation: true,
+    },
+  ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900">News</h1>
-          <p className="text-gray-600 mt-2">Manage news articles and updates</p>
-        </div>
-        <Link
-          href="/admin/news/new"
-          className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm"
-        >
-          + New Article
-        </Link>
-      </div>
+    <>
+      <DataTable
+        title="News"
+        description="Manage news articles and updates"
+        createButton={{ label: 'New Article', href: '/admin/news/new' }}
+        data={news}
+        columns={columns}
+        actions={actions}
+        keyExtractor={(item) => String(item.id)}
+        onRowClick={(item) => router.push(`/admin/news/${item.id}`)}
+        emptyMessage="No news articles yet"
+        emptyAction={{ label: 'Create your first article', href: '/admin/news/new' }}
+        loading={loading}
+      />
 
-      {news.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-500 mb-4">No news articles yet</p>
-          <Link
-            href="/admin/news/new"
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm"
-          >
-            Create your first article
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Article
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {news.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      {item.image && (
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="h-10 w-10 rounded object-cover mr-3"
-                        />
-                      )}
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{item.title}</div>
-                        <div className="text-sm text-gray-500 line-clamp-1">{item.content}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(item.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                    <Link
-                      href={`/admin/news/${item.id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      <DeleteModal
+        isOpen={deleteConfirm.show}
+        title="Delete News Article"
+        message={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm({ show: false, id: 0, title: '' })}
+      />
+    </>
   );
 }

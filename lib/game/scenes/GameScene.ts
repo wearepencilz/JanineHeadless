@@ -21,6 +21,10 @@ interface GameSceneData {
     icecreamSpriteUrl?: string | null;
     ingredientSpriteUrl?: string | null;
     platformSpriteUrl?: string | null;
+    platformWoodSpriteUrl?: string | null;
+    platformStoneSpriteUrl?: string | null;
+    platformIceSpriteUrl?: string | null;
+    bridgeSpriteUrl?: string | null;
     backgroundUrl?: string | null;
     hazardSpriteUrl?: string | null;
   };
@@ -138,6 +142,21 @@ export class GameScene extends Phaser.Scene {
     if (this.assets?.platformSpriteUrl) {
       this.load.image('platform_custom', this.assets.platformSpriteUrl);
     }
+    
+    // Load new platform sprite variants
+    if (this.assets?.platformWoodSpriteUrl) {
+      this.load.image('platform_wood', this.assets.platformWoodSpriteUrl);
+    }
+    if (this.assets?.platformStoneSpriteUrl) {
+      this.load.image('platform_stone', this.assets.platformStoneSpriteUrl);
+    }
+    if (this.assets?.platformIceSpriteUrl) {
+      this.load.image('platform_ice', this.assets.platformIceSpriteUrl);
+    }
+    if (this.assets?.bridgeSpriteUrl) {
+      this.load.image('platform_bridge', this.assets.bridgeSpriteUrl);
+    }
+    
     if (this.assets?.backgroundUrl) {
       this.load.image('background_custom', this.assets.backgroundUrl);
     }
@@ -350,9 +369,37 @@ export class GameScene extends Phaser.Scene {
     
     if (!this.levelConfig) return;
     
-    // Create platforms from config - all same color
-    this.levelConfig.platforms.forEach((platform) => {
-      // Use custom texture if available
+    // Find highest platform for bridge sprite
+    const highestY = Math.min(...this.levelConfig.platforms.map(p => p.y));
+    
+    // Available platform sprite types
+    const platformSprites = [
+      this.textures.exists('platform_wood') ? 'platform_wood' : null,
+      this.textures.exists('platform_stone') ? 'platform_stone' : null,
+      this.textures.exists('platform_ice') ? 'platform_ice' : null,
+    ].filter(Boolean);
+    
+    const hasBridge = this.textures.exists('platform_bridge');
+    
+    // Create platforms from config with variety
+    this.levelConfig.platforms.forEach((platform, index) => {
+      const isHighest = platform.y === highestY;
+      
+      // Use bridge for highest platform if available
+      if (isHighest && hasBridge) {
+        this.createPlatformSprite(platform, 'platform_bridge');
+        return;
+      }
+      
+      // Use new platform sprites if available
+      if (platformSprites.length > 0) {
+        // Randomize platform type for variety
+        const spriteKey = platformSprites[index % platformSprites.length];
+        this.createPlatformSprite(platform, spriteKey!);
+        return;
+      }
+      
+      // Fallback to legacy single platform texture
       if (this.assets?.platformSpriteUrl && this.textures.exists('platform_custom')) {
         const sprite = this.add.tileSprite(
           platform.x + platform.width / 2,
@@ -362,21 +409,84 @@ export class GameScene extends Phaser.Scene {
           'platform_custom'
         );
         this.platforms!.add(sprite);
-      } else {
-        // Default platform color - brown for all platforms
-        const rect = this.add.rectangle(
-          platform.x + platform.width / 2,
-          platform.y + platform.height / 2,
-          platform.width,
-          platform.height,
-          0x8B4513 // Brown color for all platforms
-        );
-        this.platforms!.add(rect);
+        return;
       }
+      
+      // Default platform - brown rectangle (no sprites uploaded)
+      const rect = this.add.rectangle(
+        platform.x + platform.width / 2,
+        platform.y + platform.height / 2,
+        platform.width,
+        platform.height,
+        0x8B4513
+      );
+      rect.setOrigin(0.5, 0.5);
+      this.platforms!.add(rect);
     });
     
     // Refresh static body bounds
     this.platforms.refresh();
+  }
+  
+  private createPlatformSprite(platform: any, spriteKey: string) {
+    // Platform sprites are 60x20px with 3 sections of 20x20px each
+    // Structure: [left 20px][center 20px][right 20px]
+    const SECTION_SIZE = 20;
+    
+    const platformWidth = platform.width;
+    const platformHeight = platform.height;
+    
+    // For very small platforms, just use a scaled version
+    if (platformWidth < 40) {
+      const sprite = this.add.image(
+        platform.x + platformWidth / 2,
+        platform.y + platformHeight / 2,
+        spriteKey
+      );
+      sprite.setDisplaySize(platformWidth, platformHeight);
+      this.platforms!.add(sprite);
+      return;
+    }
+    
+    // Left section (0-20px of sprite)
+    const left = this.add.image(
+      platform.x + SECTION_SIZE / 2,
+      platform.y + platformHeight / 2,
+      spriteKey
+    );
+    left.setCrop(0, 0, SECTION_SIZE, SECTION_SIZE);
+    left.setDisplaySize(SECTION_SIZE, platformHeight);
+    this.platforms!.add(left);
+    
+    // Center section - repeat the middle 20px
+    const centerWidth = platformWidth - (SECTION_SIZE * 2);
+    let currentX = platform.x + SECTION_SIZE;
+    
+    while (currentX < platform.x + platformWidth - SECTION_SIZE) {
+      const remainingWidth = (platform.x + platformWidth - SECTION_SIZE) - currentX;
+      const thisWidth = Math.min(SECTION_SIZE, remainingWidth);
+      
+      const center = this.add.image(
+        currentX + thisWidth / 2,
+        platform.y + platformHeight / 2,
+        spriteKey
+      );
+      center.setCrop(SECTION_SIZE, 0, thisWidth, SECTION_SIZE);
+      center.setDisplaySize(thisWidth, platformHeight);
+      this.platforms!.add(center);
+      
+      currentX += thisWidth;
+    }
+    
+    // Right section (40-60px of sprite)
+    const right = this.add.image(
+      platform.x + platformWidth - SECTION_SIZE / 2,
+      platform.y + platformHeight / 2,
+      spriteKey
+    );
+    right.setCrop(SECTION_SIZE * 2, 0, SECTION_SIZE, SECTION_SIZE);
+    right.setDisplaySize(SECTION_SIZE, platformHeight);
+    this.platforms!.add(right);
   }
 
   /**

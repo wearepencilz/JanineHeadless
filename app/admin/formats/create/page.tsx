@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { FormatCategory, ServingStyle } from '@/types';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 
 export default function CreateFormatPage() {
   const router = useRouter();
@@ -16,7 +17,6 @@ export default function CreateFormatPage() {
     requiresFlavours: true,
     minFlavours: 1,
     maxFlavours: 1,
-    allowMixedTypes: false,
     canIncludeAddOns: false,
     defaultSizes: [] as string[],
     servingStyle: 'scoop' as ServingStyle,
@@ -107,23 +107,13 @@ export default function CreateFormatPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as FormatCategory })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TaxonomySelect
+              category="formatCategories"
+              value={formData.category}
+              onChange={(value) => setFormData({ ...formData, category: value as FormatCategory })}
+              label="Category"
+              required
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -217,18 +207,6 @@ export default function CreateFormatPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.allowMixedTypes}
-                      onChange={(e) => setFormData({ ...formData, allowMixedTypes: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Allow Mixed Types (gelato + sorbet)</span>
-                  </label>
                 </div>
               </>
             )}

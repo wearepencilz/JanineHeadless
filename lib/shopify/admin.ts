@@ -22,11 +22,8 @@ async function getOAuthAccessToken(): Promise<string> {
 
   // Return cached token if still valid
   if (cachedAccessToken && Date.now() < tokenExpiresAt) {
-    console.log('🔄 Using cached OAuth token');
     return cachedAccessToken;
   }
-
-  console.log('🔑 Fetching new OAuth access token...');
 
   // Exchange client credentials for access token
   const tokenUrl = `https://${shop}/admin/oauth/access_token`;
@@ -45,8 +42,7 @@ async function getOAuthAccessToken(): Promise<string> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ OAuth token exchange failed:', errorText);
-    throw new Error(`OAuth token exchange failed: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`OAuth token exchange failed: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
@@ -58,8 +54,6 @@ async function getOAuthAccessToken(): Promise<string> {
   cachedAccessToken = data.access_token;
   // Tokens typically expire in 24 hours, cache for 23 hours to be safe
   tokenExpiresAt = Date.now() + (23 * 60 * 60 * 1000);
-  
-  console.log('✅ OAuth access token obtained');
   
   if (!cachedAccessToken) {
     throw new Error('Failed to cache access token');
@@ -77,6 +71,7 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
 
   // Try direct access token first (for custom apps)
   let accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+  let authMethod = 'none';
   
   // If no direct token, try OAuth flow (for OAuth apps)
   if (!accessToken) {
@@ -84,7 +79,7 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
     const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
     
     if (clientId && clientSecret) {
-      console.log('🔐 Using OAuth client credentials flow');
+      authMethod = 'oauth';
       accessToken = await getOAuthAccessToken();
     } else {
       throw new Error(
@@ -94,8 +89,11 @@ async function getConfig(): Promise<ShopifyAdminConfig> {
       );
     }
   } else {
-    console.log('🔑 Using direct Admin API access token');
+    authMethod = 'direct_token';
   }
+  
+  // Log authentication method (first 10 chars of token for debugging)
+  console.log(`[Shopify Auth] Using ${authMethod}, token prefix: ${accessToken.substring(0, 10)}...`);
   
   return { shop, accessToken };
 }
@@ -104,15 +102,6 @@ async function shopifyAdminFetch(query: string, variables?: any) {
   const { shop, accessToken } = await getConfig();
   
   const url = `https://${shop}/admin/api/${SHOPIFY_ADMIN_API_VERSION}/graphql.json`;
-  
-  console.log('🔍 Shopify Admin API Request:', {
-    url,
-    shop,
-    hasAccessToken: !!accessToken,
-    accessTokenPrefix: accessToken.substring(0, 10) + '...',
-    query: query.substring(0, 100) + '...',
-    variables
-  });
   
   const response = await fetch(url, {
     method: 'POST',
@@ -123,28 +112,14 @@ async function shopifyAdminFetch(query: string, variables?: any) {
     body: JSON.stringify({ query, variables }),
   });
   
-  console.log('📡 Shopify Admin API Response:', {
-    status: response.status,
-    statusText: response.statusText,
-    ok: response.ok
-  });
-  
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Shopify Admin API Error Response:', errorText);
-    throw new Error(`Shopify Admin API error: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`Shopify Admin API error: ${response.status} ${response.statusText}`);
   }
   
   const data = await response.json();
   
-  console.log('✅ Shopify Admin API Data:', {
-    hasData: !!data.data,
-    hasErrors: !!data.errors,
-    errors: data.errors
-  });
-  
   if (data.errors) {
-    console.error('❌ GraphQL Errors:', JSON.stringify(data.errors, null, 2));
     throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
   }
   
@@ -233,9 +208,9 @@ export async function searchProducts(query: string, limit: number = 10) {
     }
   `;
   
-  // If query is wildcard or empty, search for all products
-  // Shopify GraphQL doesn't support empty queries, so we search for products with status:active
-  const searchTerm = query === '*' || !query ? 'status:active' : query;
+  // If query is wildcard or empty, search for all products (any status)
+  // Use -status:archived to exclude only archived products
+  const searchTerm = query === '*' || !query ? '-status:archived' : query;
   
   const variables = { query: searchTerm, first: limit };
   const data = await shopifyAdminFetch(searchQuery, variables);
@@ -280,30 +255,9 @@ export async function getProduct(productId: string) {
   return data.product;
 }
 
-export interface CreateProductInput {
-  title: string;
-  descriptionHtml?: string;
-  productType?: string;
-  vendor?: string;
-  tags?: string[];
-  status?: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
-  variants?: Array<{
-    price: string;
-    sku?: string;
-    inventoryQuantities?: Array<{
-      availableQuantity: number;
-      locationId: string;
-    }>;
-  }>;
-  images?: Array<{
-    src: string;
-    altText?: string;
-  }>;
-  metafields?: ProductMetafieldInput[];
-}
 
 export async function createProduct(input: CreateProductInput) {
-  // Step 1: Create the product without variants
+  // Create product without variants first
   const createMutation = `
     mutation productCreate($input: ProductInput!) {
       productCreate(input: $input) {
@@ -333,7 +287,7 @@ export async function createProduct(input: CreateProductInput) {
       }
     }
   `;
-  
+
   const createVariables = {
     input: {
       title: input.title,
@@ -346,31 +300,31 @@ export async function createProduct(input: CreateProductInput) {
       ...(input.metafields && input.metafields.length > 0 ? { metafields: input.metafields } : {})
     }
   };
-  
-  console.log('🔍 Creating product with input:', JSON.stringify(createVariables, null, 2));
-  
+
   const createData = await shopifyAdminFetch(createMutation, createVariables);
-  
+
   if (createData.productCreate.userErrors.length > 0) {
     throw new Error(
       `Shopify user errors: ${JSON.stringify(createData.productCreate.userErrors)}`
     );
   }
-  
+
   const product = createData.productCreate.product;
-  
-  // Step 2: Update the default variant with price and SKU if provided
+
+  // Update the default variant with price only (SKU not supported in bulk update)
   if (input.variants && input.variants.length > 0 && product.variants.edges.length > 0) {
     const variantId = product.variants.edges[0].node.id;
     const variantInput = input.variants[0];
-    
+
     const updateVariantMutation = `
-      mutation productVariantUpdate($input: ProductVariantInput!) {
-        productVariantUpdate(input: $input) {
-          productVariant {
+      mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+        productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+          product {
+            id
+          }
+          productVariants {
             id
             price
-            sku
           }
           userErrors {
             field
@@ -379,33 +333,25 @@ export async function createProduct(input: CreateProductInput) {
         }
       }
     `;
-    
+
     const updateVariables = {
-      input: {
+      productId: product.id,
+      variants: [{
         id: variantId,
-        price: variantInput.price,
-        ...(variantInput.sku ? { sku: variantInput.sku } : {}),
-        ...(variantInput.inventoryQuantities && variantInput.inventoryQuantities.length > 0 ? {
-          inventoryItem: {
-            tracked: true
-          },
-          inventoryQuantities: variantInput.inventoryQuantities
-        } : {})
-      }
+        price: variantInput.price
+      }]
     };
-    
-    console.log('🔍 Updating variant with input:', JSON.stringify(updateVariables, null, 2));
-    
+
     const updateData = await shopifyAdminFetch(updateVariantMutation, updateVariables);
-    
-    if (updateData.productVariantUpdate.userErrors.length > 0) {
-      console.warn('⚠️ Variant update errors:', updateData.productVariantUpdate.userErrors);
-      // Don't throw here, product was created successfully
+
+    if (updateData.productVariantsBulkUpdate.userErrors.length > 0) {
+      console.warn('Failed to update variant price:', updateData.productVariantsBulkUpdate.userErrors);
+      // Don't throw - product was created successfully
     }
   }
-  
-  // Step 3: Fetch the updated product to return complete data
+
+  // Fetch the complete product to return
   const finalProduct = await getProduct(product.id);
-  
+
   return finalProduct;
 }

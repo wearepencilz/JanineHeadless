@@ -321,3 +321,25 @@ This specification defines the transformation of the Janine CMS data model from 
 8. THE migration process SHALL preserve all existing images, ensuring no broken image links
 9. THE system SHALL maintain existing batch tracking relationships when flavours are migrated
 10. THE CMS SHALL provide a transition guide documenting changes and migration timeline for Admin_Users
+
+### Requirement 22: Quick-Create Products from Launch
+
+**User Story:** As an Admin_User, I want to quickly create products from a launch's featured flavours, so that I can efficiently build a menu for a new launch without manually creating each product.
+
+#### Acceptance Criteria
+
+1. WHEN viewing a Launch in edit mode, THE CMS SHALL display a "Quick Create Products" button
+2. WHEN "Quick Create Products" is clicked, THE CMS SHALL display a modal showing all featured flavours from the launch
+3. THE modal SHALL allow selecting one or more featured flavours to create products from
+4. THE modal SHALL allow selecting a format for each flavour (or apply same format to all)
+5. WHEN a format is selected, THE CMS SHALL validate that the flavour type is compatible with the format
+6. THE modal SHALL display a preview of products that will be created (format + flavour combinations)
+7. WHEN "Create Products" is confirmed, THE system SHALL create all products using the 3-step offering workflow logic
+8. THE system SHALL auto-generate internal names based on format and flavour names
+9. THE system SHALL auto-generate public names based on format and flavour names
+10. THE system SHALL set all quick-created products to "draft" status by default
+11. THE system SHALL automatically add the quick-created products to the launch's featuredProductIds
+12. WHEN quick-creation completes, THE CMS SHALL display a success message with links to edit each created product
+13. THE CMS SHALL allow bulk-editing common fields (price, status, tags) for all quick-created products
+14. THE quick-create workflow SHALL follow the same validation rules as the standard 3-step product creation
+15. THE quick-create workflow SHALL preserve the user experience of the current offerings creation (format selection → flavour selection → details)

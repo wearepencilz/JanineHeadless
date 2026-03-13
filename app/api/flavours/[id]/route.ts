@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getFlavours, saveFlavours, getIngredients } from '@/lib/db';
-import type { Flavour, Ingredient, Allergen, DietaryFlag, ErrorResponse } from '@/types';
+import { withDeleteProtection, withUpdateProtection } from '@/lib/api-middleware';
+import { createBackup } from '@/lib/data-protection';
+import type { Flavour, Ingredient, Allergen, DietaryClaim, ErrorResponse } from '@/types';
 
 // Helper function to calculate allergens from ingredients
 function calculateAllergens(ingredientIds: string[], allIngredients: Ingredient[]): Allergen[] {
@@ -18,23 +20,23 @@ function calculateAllergens(ingredientIds: string[], allIngredients: Ingredient[
 }
 
 // Helper function to determine dietary flags
-function calculateDietaryFlags(ingredientIds: string[], allIngredients: Ingredient[]): DietaryFlag[] {
+function calculateDietaryClaims(ingredientIds: string[], allIngredients: Ingredient[]): DietaryClaim[] {
   const ingredients = ingredientIds
     .map(id => allIngredients.find(ing => ing.id === id))
     .filter(Boolean) as Ingredient[];
   
   if (ingredients.length === 0) return [];
   
-  const flags: DietaryFlag[] = [];
+  const flags: DietaryClaim[] = [];
   
   // Check if vegan (no dairy, eggs, or animal products)
   const hasAnimalProducts = ingredients.some(ing => 
-    ing.allergens.includes('dairy') || ing.allergens.includes('eggs')
+    ing.allergens.includes('dairy') || ing.allergens.includes('egg')
   );
   if (!hasAnimalProducts) {
     flags.push('vegan');
     flags.push('vegetarian'); // vegan implies vegetarian
-  } else if (!ingredients.some(ing => ing.allergens.includes('eggs'))) {
+  } else if (!ingredients.some(ing => ing.allergens.includes('egg'))) {
     // Vegetarian if no meat (we assume no meat category exists, so just check it's not vegan)
     flags.push('vegetarian');
   }
@@ -52,7 +54,7 @@ function calculateDietaryFlags(ingredientIds: string[], allIngredients: Ingredie
   }
   
   // Check if nut-free
-  const hasNuts = ingredients.some(ing => ing.allergens.includes('nuts'));
+  const hasNuts = ingredients.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'));
   if (!hasNuts) {
     flags.push('nut-free');
   }
@@ -186,28 +188,23 @@ export async function DELETE(
     return NextResponse.json(errorResponse, { status: 401 });
   }
 
-  try {
+  return withDeleteProtection('flavour', params.id, async () => {
     const flavours = await getFlavours() as Flavour[];
     const filtered = flavours.filter(f => f.id !== params.id);
     
     if (filtered.length === flavours.length) {
-      const errorResponse: ErrorResponse = {
-        error: 'Flavour not found',
-        code: 'NOT_FOUND',
-        timestamp: new Date().toISOString()
-      };
-      return NextResponse.json(errorResponse, { status: 404 });
+      return NextResponse.json(
+        {
+          error: 'Flavour not found',
+          code: 'NOT_FOUND',
+          timestamp: new Date().toISOString()
+        },
+        { status: 404 }
+      );
     }
     
     await saveFlavours(filtered);
     
-    return NextResponse.json({ message: 'Flavour deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting flavour:', error);
-    const errorResponse: ErrorResponse = {
-      error: 'Failed to delete flavour',
-      timestamp: new Date().toISOString()
-    };
-    return NextResponse.json(errorResponse, { status: 500 });
-  }
+    return { message: 'Flavour deleted successfully' };
+  });
 }

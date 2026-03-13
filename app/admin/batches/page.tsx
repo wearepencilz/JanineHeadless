@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
+import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface Batch {
   id: string;
@@ -14,8 +16,14 @@ interface Batch {
 }
 
 export default function BatchesPage() {
+  const router = useRouter();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
+    show: false,
+    id: '',
+    name: '',
+  });
 
   useEffect(() => {
     fetchBatches();
@@ -33,114 +41,101 @@ export default function BatchesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this batch?')) return;
+  const handleDeleteClick = (batch: Batch) => {
+    setDeleteConfirm({ show: true, id: batch.id, name: batch.batchNumber });
+  };
 
+  const handleDelete = async () => {
     try {
-      await fetch(`/api/batches/${id}`, { method: 'DELETE' });
-      fetchBatches();
+      await fetch(`/api/batches/${deleteConfirm.id}`, { method: 'DELETE' });
+      setBatches(batches.filter((b) => b.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: '', name: '' });
     } catch (error) {
       console.error('Error deleting batch:', error);
+      alert('Failed to delete batch');
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
+  const columns: Column<Batch>[] = [
+    {
+      key: 'batchNumber',
+      label: 'Batch #',
+      render: (batch) => (
+        <div className="text-sm font-medium text-gray-900">{batch.batchNumber}</div>
+      ),
+    },
+    {
+      key: 'flavourName',
+      label: 'Flavour',
+      render: (batch) => (
+        <div className="text-sm text-gray-900">{batch.flavourName || 'Unknown'}</div>
+      ),
+    },
+    {
+      key: 'date',
+      label: 'Date',
+      render: (batch) => (
+        <div className="text-sm text-gray-500">
+          {new Date(batch.date).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (batch) => (
+        <span
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            batch.status === 'approved'
+              ? 'bg-green-100 text-green-800'
+              : batch.status === 'testing'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {batch.status}
+        </span>
+      ),
+    },
+  ];
+
+  const actions: Action<Batch>[] = [
+    {
+      label: 'Edit',
+      href: (batch) => `/admin/batches/${batch.id}`,
+      stopPropagation: true,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDeleteClick,
+      className: 'text-red-600 hover:text-red-900',
+      stopPropagation: true,
+    },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Test Kitchen Batches</h1>
-        <Link
-          href="/admin/batches/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Add Batch
-        </Link>
-      </div>
+    <>
+      <DataTable
+        title="Test Kitchen Batches"
+        description="Track and manage test kitchen batch iterations"
+        createButton={{ label: 'Add Batch', href: '/admin/batches/create' }}
+        data={batches}
+        columns={columns}
+        actions={actions}
+        keyExtractor={(batch) => batch.id}
+        onRowClick={(batch) => router.push(`/admin/batches/${batch.id}`)}
+        emptyMessage="No batches yet"
+        emptyAction={{ label: 'Create your first batch', href: '/admin/batches/create' }}
+        loading={loading}
+      />
 
-      {batches.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 mb-4">No batches yet</p>
-          <Link
-            href="/admin/batches/create"
-            className="text-blue-600 hover:text-blue-700"
-          >
-            Create your first batch
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Batch #
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Flavour
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {batches.map((batch) => (
-                <tr key={batch.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{batch.batchNumber}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{batch.flavourName || 'Unknown'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(batch.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        batch.status === 'approved'
-                          ? 'bg-green-100 text-green-800'
-                          : batch.status === 'testing'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {batch.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      href={`/admin/batches/${batch.id}`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(batch.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      <DeleteModal
+        isOpen={deleteConfirm.show}
+        title="Delete Batch"
+        message={`Are you sure you want to delete batch "${deleteConfirm.name}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+      />
+    </>
   );
 }

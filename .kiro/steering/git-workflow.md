@@ -20,9 +20,11 @@
 # Pull latest changes
 git pull origin main
 
-# Create feature branch (optional but recommended)
+# Create feature branch (REQUIRED - not optional!)
 git checkout -b feature/your-feature-name
 ```
+
+**CRITICAL**: Always work on feature branches, never directly on main. Main branch auto-deploys to production on Vercel.
 
 ### 2. During Development
 
@@ -88,15 +90,20 @@ git commit -m "refactor: extract validation logic to separate module"
 
 ### Main Branch
 
-- `main` - Production-ready code
-- Always deployable
+- `main` - **Production-ready code ONLY**
+- **Auto-deploys to Vercel production**
+- **NEVER push directly to main**
 - Protected (requires pull request)
+- Only merge via approved PRs
 
-### Feature Branches
+### Feature Branches (REQUIRED)
 
+- `feature/taxonomy-management` - Taxonomy system
 - `feature/launch-first-cms-model` - Major features
 - `feature/modifier-management` - Specific features
 - `fix/twist-validation-bug` - Bug fixes
+
+**ALWAYS work on feature branches!**
 
 ### Naming Convention
 
@@ -109,12 +116,21 @@ docs/<documentation-update>
 
 ## Pull Request Workflow
 
-1. Create feature branch
-2. Make changes and commit regularly
-3. Push to remote
-4. Create pull request when ready
-5. Request review (if working with team)
-6. Merge to main after approval
+**REQUIRED for all changes to main:**
+
+1. Create feature branch: `git checkout -b feature/your-feature-name`
+2. Make changes and commit regularly to feature branch
+3. Push feature branch: `git push origin feature/your-feature-name`
+4. **Run tests locally**: `npm test` (must pass!)
+5. **Build locally**: `npm run build` (must succeed!)
+6. Create pull request on GitHub from feature branch → main
+7. Review changes in PR preview
+8. Wait for CI/CD checks to pass
+9. Request review if working with team
+10. Merge to main only after approval and passing tests
+11. Delete feature branch after merge
+
+**NEVER push directly to main - it auto-deploys to production!**
 
 ## Protecting Against Data Loss
 
@@ -239,6 +255,34 @@ git push origin feature/your-branch
 ```
 
 ## Emergency Recovery
+
+### If You Accidentally Pushed to Main
+
+**DON'T PANIC** - but act quickly:
+
+```bash
+# 1. Check what was pushed
+git log origin/main --oneline -5
+
+# 2. If the code is broken, revert immediately
+git revert <commit-hash>
+git push origin main
+
+# 3. If the code works but wasn't reviewed:
+# - Create a feature branch from the commit before your changes
+# - Create a PR to document the changes
+# - Get it reviewed retroactively
+# - Add tests if missing
+
+# 4. For future work, create a feature branch
+git checkout -b feature/continue-work
+```
+
+**Prevention**: Always check your current branch before pushing:
+```bash
+git branch  # Shows current branch with *
+git status  # Shows current branch and changes
+```
 
 ### Lost Uncommitted Work
 

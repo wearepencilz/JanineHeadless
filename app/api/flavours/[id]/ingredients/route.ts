@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFlavours, getIngredients } from '@/lib/db';
-import type { Flavour, Ingredient, IngredientWithDetails, Allergen, DietaryFlag, ErrorResponse } from '@/types';
+import type { Flavour, Ingredient, IngredientWithDetails, Allergen, DietaryClaim, ErrorResponse } from '@/types';
 
 // Helper function to calculate allergens from ingredients
 function calculateAllergens(ingredients: Ingredient[]): Allergen[] {
@@ -11,36 +11,36 @@ function calculateAllergens(ingredients: Ingredient[]): Allergen[] {
   return Array.from(allergenSet);
 }
 
-// Helper function to determine dietary flags
-function calculateDietaryFlags(ingredients: Ingredient[]): DietaryFlag[] {
+// Helper function to determine dietary claims
+function calculateDietaryFlags(ingredients: Ingredient[]): DietaryClaim[] {
   if (ingredients.length === 0) return [];
   
-  const flags: DietaryFlag[] = [];
+  const claims: DietaryClaim[] = [];
   
   // Check if vegan (no dairy, eggs, or animal products)
   const hasAnimalProducts = ingredients.some(ing => 
-    ing.allergens.includes('dairy') || ing.allergens.includes('eggs')
+    ing.allergens.includes('dairy') || ing.allergens.includes('egg')
   );
   if (!hasAnimalProducts) {
-    flags.push('vegan');
-    flags.push('vegetarian');
+    claims.push('vegan');
+    claims.push('vegetarian');
   } else {
-    flags.push('vegetarian');
+    claims.push('vegetarian');
   }
   
   // Check if gluten-free
   const hasGluten = ingredients.some(ing => ing.allergens.includes('gluten'));
-  if (!hasGluten) flags.push('gluten-free');
+  if (!hasGluten) claims.push('gluten-free');
   
   // Check if dairy-free
   const hasDairy = ingredients.some(ing => ing.allergens.includes('dairy'));
-  if (!hasDairy) flags.push('dairy-free');
+  if (!hasDairy) claims.push('dairy-free');
   
   // Check if nut-free
-  const hasNuts = ingredients.some(ing => ing.allergens.includes('nuts'));
-  if (!hasNuts) flags.push('nut-free');
+  const hasNuts = ingredients.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'));
+  if (!hasNuts) claims.push('nut-free');
   
-  return flags;
+  return claims;
 }
 
 export async function GET(
