@@ -45,79 +45,54 @@ export default function TaxonomySelect({
   label,
   description
 }: TaxonomySelectProps) {
-  const [taxonomyValues, setTaxonomyValues] = useState<TaxonomyValue[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddNew, setShowAddNew] = useState(false);
-  const [newValue, setNewValue] = useState({ label: '', description: '' });
-  const [creating, setCreating] = useState(false);
-
-  const fetchTaxonomyValues = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/settings/taxonomies/${category}`);
-      if (!response.ok) throw new Error('Failed to fetch taxonomy values');
-      const data = await response.json();
-      setTaxonomyValues(data.values || []);
-    } catch (error) {
-      console.error('Error fetching taxonomy values:', error);
-      setTaxonomyValues([]); // Ensure we always have an array
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [options, setOptions] = useState<TaxonomyValue[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchTaxonomyValues();
+    let mounted = true;
+    
+    async function loadOptions() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/settings/taxonomies/${category}`);
+        
+        if (!response.ok) {
+          console.error('Failed to fetch taxonomy values');
+          if (mounted) {
+            setOptions([]);
+            setIsLoading(false);
+          }
+          return;
+        }
+        
+        const data = await response.json();
+        
+        if (mounted) {
+          setOptions(Array.isArray(data.values) ? data.values : []);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error loading taxonomy values:', error);
+        if (mounted) {
+          setOptions([]);
+          setIsLoading(false);
+        }
+      }
+    }
+    
+    loadOptions();
+    
+    return () => {
+      mounted = false;
+    };
   }, [category]);
 
-  const createNewValue = async () => {
-    if (!newValue.label.trim()) {
-      alert('Label is required');
-      return;
-    }
+  // Filter and sort options
+  const visibleOptions = options
+    .filter(opt => showArchived || !opt.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 
-    setCreating(true);
-    try {
-      const response = await fetch(`/api/settings/taxonomies/${category}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          label: newValue.label,
-          description: newValue.description
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create taxonomy value');
-      }
-
-      const created = await response.json();
-      
-      // Add to local list
-      setTaxonomyValues([...taxonomyValues, created]);
-      
-      // Select the newly created value
-      onChange(created.value);
-      
-      // Reset form
-      setNewValue({ label: '', description: '' });
-      setShowAddNew(false);
-    } catch (error) {
-      console.error('Error creating taxonomy value:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create taxonomy value');
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  // Filter out archived values unless showArchived is true
-  const filteredValues = taxonomyValues.filter(v => showArchived || !v.archived);
-  
-  // Sort by sortOrder
-  const sortedValues = [...filteredValues].sort((a, b) => a.sortOrder - b.sortOrder);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={className}>
         {label && (
@@ -144,74 +119,19 @@ export default function TaxonomySelect({
         <p className="text-sm text-gray-500 mb-2">{description}</p>
       )}
 
-      {!showAddNew ? (
-        <div className="space-y-2">
-          <select
-            value={value}
-            onChange={(e) => {
-              if (e.target.value === '__ADD_NEW__') {
-                setShowAddNew(true);
-              } else {
-                onChange(e.target.value);
-              }
-            }}
-            required={required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">{placeholder}</option>
-            {sortedValues.map((item) => (
-              <option key={item.id} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-            <option value="__ADD_NEW__" className="text-blue-600 font-medium">
-              + Add New
-            </option>
-          </select>
-        </div>
-      ) : (
-        <div className="border border-blue-300 rounded-lg p-4 bg-blue-50 space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-900">Add New Value</h4>
-            <button
-              type="button"
-              onClick={() => {
-                setShowAddNew(false);
-                setNewValue({ label: '', description: '' });
-              }}
-              className="text-sm text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-          </div>
-          
-          <input
-            type="text"
-            placeholder="Label *"
-            value={newValue.label}
-            onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            autoFocus
-          />
-          
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={newValue.description}
-            onChange={(e) => setNewValue({ ...newValue, description: e.target.value })}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          
-          <button
-            type="button"
-            onClick={createNewValue}
-            disabled={creating || !newValue.label.trim()}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 text-sm font-medium"
-          >
-            {creating ? 'Creating...' : 'Create & Select'}
-          </button>
-        </div>
-      )}
+      <select
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">{placeholder}</option>
+        {visibleOptions.map((item) => (
+          <option key={item.id} value={item.value}>
+            {item.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
