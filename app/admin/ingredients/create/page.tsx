@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
 
 export default function CreateIngredientPage() {
@@ -167,48 +169,23 @@ export default function CreateIngredientPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Primary Category *
-              </label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {ingredientCategoryOptions.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TaxonomySelect
+              category="ingredientCategories"
+              value={formData.category}
+              onChange={(value) => setFormData({ ...formData, category: value as any })}
+              label="Primary Category"
+              required
+            />
           </div>
 
           {/* Usage Roles */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Usage Roles (multi-select)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {ingredientRoleOptions.map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => toggleRole(role)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.roles.includes(role)
-                      ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500 mt-1">Select all applicable usage roles</p>
-          </div>
+          <TaxonomyMultiSelect
+            category="ingredientRoles"
+            values={formData.roles}
+            onChange={(values) => setFormData({ ...formData, roles: values })}
+            label="Usage Roles"
+            description="Select all applicable usage roles"
+          />
 
           {/* Descriptor Tags */}
           <div>
@@ -305,51 +282,21 @@ export default function CreateIngredientPage() {
           </div>
 
           {/* Allergens */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Allergens
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {commonAllergens.map((allergen) => (
-                <button
-                  key={allergen}
-                  type="button"
-                  onClick={() => toggleAllergen(allergen)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.allergens.includes(allergen)
-                      ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {allergen}
-                </button>
-              ))}
-            </div>
-          </div>
+          <TaxonomyMultiSelect
+            category="allergens"
+            values={formData.allergens}
+            onChange={(values) => setFormData({ ...formData, allergens: values })}
+            label="Allergens"
+          />
 
           {/* Dietary Flags */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Dietary Flags
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {dietaryOptions.map((flag) => (
-                <button
-                  key={flag}
-                  type="button"
-                  onClick={() => toggleDietaryFlag(flag)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.dietaryFlags.includes(flag)
-                      ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {flag}
-                </button>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500 mt-1">Select dietary compatibility tags</p>
-          </div>
+          <TaxonomyMultiSelect
+            category="dietaryFlags"
+            values={formData.dietaryFlags}
+            onChange={(values) => setFormData({ ...formData, dietaryFlags: values })}
+            label="Dietary Flags"
+            description="Select dietary compatibility tags"
+          />
 
           {/* Seasonal */}
           <div>

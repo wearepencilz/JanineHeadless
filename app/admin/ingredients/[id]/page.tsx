@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
+import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -175,23 +177,13 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TaxonomySelect
+              category="ingredientCategories"
+              value={formData.category}
+              onChange={(value) => setFormData({ ...formData, category: value })}
+              label="Category"
+              required
+            />
           </div>
 
           {/* Story */}
