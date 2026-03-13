@@ -6,7 +6,7 @@ import { Format, Flavour } from '@/types';
 import FormatSelector from '../../components/FormatSelector';
 import FlavourSelector from '../../components/FlavourSelector';
 
-export default function CreateOfferingPage() {
+export default function CreateProductPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -181,21 +181,21 @@ export default function CreateOfferingPage() {
         pickupOnly: formData.pickupOnly,
       };
 
-      const response = await fetch('/api/offerings', {
+      const response = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        router.push('/admin/offerings');
+        router.push('/admin/products');
       } else {
         const error = await response.json();
-        setErrors([error.error || 'Failed to create offering']);
+        setErrors([error.error || 'Failed to create product']);
       }
     } catch (error) {
-      console.error('Error creating offering:', error);
-      setErrors(['Failed to create offering']);
+      console.error('Error creating product:', error);
+      setErrors(['Failed to create product']);
     } finally {
       setLoading(false);
     }
@@ -204,7 +204,7 @@ export default function CreateOfferingPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create Offering</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Create Product</h1>
         <p className="mt-2 text-sm text-gray-600">
           Create a new sellable menu item by combining a format with flavours
         </p>
@@ -267,7 +267,7 @@ export default function CreateOfferingPage() {
                 type="button"
                 onClick={handleNext}
                 disabled={!selectedFormat}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -289,14 +289,14 @@ export default function CreateOfferingPage() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Back
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Next
               </button>
@@ -319,7 +319,7 @@ export default function CreateOfferingPage() {
                     type="text"
                     value={formData.internalName}
                     onChange={(e) => setFormData({ ...formData, internalName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Admin reference name"
                   />
                 </div>
@@ -332,7 +332,7 @@ export default function CreateOfferingPage() {
                     type="text"
                     value={formData.publicName}
                     onChange={(e) => setFormData({ ...formData, publicName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Customer-facing name"
                   />
                 </div>
@@ -346,7 +346,7 @@ export default function CreateOfferingPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Full description"
                 />
               </div>
@@ -359,7 +359,7 @@ export default function CreateOfferingPage() {
                   type="text"
                   value={formData.shortCardCopy}
                   onChange={(e) => setFormData({ ...formData, shortCardCopy: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Brief card text"
                 />
               </div>
@@ -374,7 +374,7 @@ export default function CreateOfferingPage() {
                     step="0.01"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
@@ -388,7 +388,7 @@ export default function CreateOfferingPage() {
                     step="0.01"
                     value={formData.compareAtPrice}
                     onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
@@ -401,7 +401,7 @@ export default function CreateOfferingPage() {
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="draft">Draft</option>
                   <option value="scheduled">Scheduled</option>
@@ -419,7 +419,7 @@ export default function CreateOfferingPage() {
                   type="text"
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="seasonal, featured, limited"
                 />
               </div>
@@ -430,7 +430,7 @@ export default function CreateOfferingPage() {
                     type="checkbox"
                     checked={formData.inventoryTracked}
                     onChange={(e) => setFormData({ ...formData, inventoryTracked: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">Track Inventory</span>
                 </label>
@@ -440,7 +440,7 @@ export default function CreateOfferingPage() {
                     type="checkbox"
                     checked={formData.onlineOrderable}
                     onChange={(e) => setFormData({ ...formData, onlineOrderable: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">Online Orderable</span>
                 </label>
@@ -450,7 +450,7 @@ export default function CreateOfferingPage() {
                     type="checkbox"
                     checked={formData.pickupOnly}
                     onChange={(e) => setFormData({ ...formData, pickupOnly: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">Pickup Only</span>
                 </label>
@@ -465,7 +465,7 @@ export default function CreateOfferingPage() {
                     type="number"
                     value={formData.inventoryQuantity}
                     onChange={(e) => setFormData({ ...formData, inventoryQuantity: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
@@ -476,16 +476,16 @@ export default function CreateOfferingPage() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? 'Creating...' : 'Create Offering'}
+                {loading ? 'Creating...' : 'Create Product'}
               </button>
             </div>
           </form>

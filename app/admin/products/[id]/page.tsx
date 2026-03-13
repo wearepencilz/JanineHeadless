@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Offering, Format, Flavour } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
 
-export default function EditOfferingPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [offering, setOffering] = useState<Offering | null>(null);
   const [format, setFormat] = useState<Format | null>(null);
@@ -40,7 +40,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
   async function fetchData() {
     try {
       const [offeringRes, flavoursRes] = await Promise.all([
-        fetch(`/api/offerings/${params.id}`),
+        fetch(`/api/products/${params.id}`),
         fetch('/api/flavours'),
       ]);
 
@@ -108,21 +108,21 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
         shopifyProductHandle: formData.shopifyProductHandle || undefined,
       };
 
-      const response = await fetch(`/api/offerings/${params.id}`, {
+      const response = await fetch(`/api/products/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        router.push('/admin/offerings');
+        router.push('/admin/products');
       } else {
         const error = await response.json();
-        setErrors([error.error || 'Failed to update offering']);
+        setErrors([error.error || 'Failed to update product']);
       }
     } catch (error) {
-      console.error('Error updating offering:', error);
-      setErrors(['Failed to update offering']);
+      console.error('Error updating product:', error);
+      setErrors(['Failed to update product']);
     } finally {
       setSaving(false);
     }
@@ -130,18 +130,18 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
 
   async function handleDelete() {
     try {
-      const response = await fetch(`/api/offerings/${params.id}`, {
+      const response = await fetch(`/api/products/${params.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        router.push('/admin/offerings');
+        router.push('/admin/products');
       } else {
-        setErrors(['Failed to delete offering']);
+        setErrors(['Failed to delete product']);
       }
     } catch (error) {
-      console.error('Error deleting offering:', error);
-      setErrors(['Failed to delete offering']);
+      console.error('Error deleting product:', error);
+      setErrors(['Failed to delete product']);
     }
   }
 
@@ -175,7 +175,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
     setErrors([]);
 
     try {
-      const response = await fetch(`/api/offerings/${params.id}/create-shopify-product`, {
+      const response = await fetch(`/api/products/${params.id}/create-shopify-product`, {
         method: 'POST',
       });
 
@@ -230,7 +230,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
   if (!offering || !format) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Offering not found</p>
+        <p className="text-gray-500">Product not found</p>
       </div>
     );
   }
@@ -240,9 +240,9 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Offering</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Update offering details and configuration
+          Update product details and configuration
         </p>
       </div>
 
@@ -291,7 +291,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                   type="text"
                   value={formData.internalName}
                   onChange={(e) => setFormData({ ...formData, internalName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -304,7 +304,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                   type="text"
                   value={formData.publicName}
                   onChange={(e) => setFormData({ ...formData, publicName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -318,7 +318,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -331,7 +331,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                 type="text"
                 value={formData.shortCardCopy}
                 onChange={(e) => setFormData({ ...formData, shortCardCopy: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -345,7 +345,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                   step="0.01"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -358,7 +358,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                   step="0.01"
                   value={formData.compareAtPrice}
                   onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
                 <option value="scheduled">Scheduled</option>
@@ -400,7 +400,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                     type="button"
                     onClick={handleCreateShopifyProduct}
                     disabled={creatingShopifyProduct || !formData.price || parseFloat(formData.price) <= 0}
-                    className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {creatingShopifyProduct ? 'Creating Product...' : '✨ Create New Shopify Product'}
                   </button>
@@ -441,7 +441,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -486,7 +486,7 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
                   type="number"
                   value={formData.inventoryQuantity}
                   onChange={(e) => setFormData({ ...formData, inventoryQuantity: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             )}
@@ -524,20 +524,20 @@ export default function EditOfferingPage({ params }: { params: { id: string } })
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Offering</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Product</h3>
             <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete this offering? This action cannot be undone.
+              Are you sure you want to delete this product? This action cannot be undone.
             </p>
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
               </button>
