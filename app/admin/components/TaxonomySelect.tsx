@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { Select, type SelectOption } from '@/app/admin/components/ui/select';
+import { Button } from '@/app/admin/components/ui/button';
 
-export type TaxonomyCategory = 
+export type TaxonomyCategory =
   | 'flavourTypes'
   | 'keyNotes'
   | 'ingredientCategories'
@@ -46,25 +48,22 @@ export default function TaxonomySelect({
   className = '',
   label,
   description,
-  allowCreate = true
+  allowCreate = true,
 }: TaxonomySelectProps) {
   const [options, setOptions] = useState<TaxonomyValue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let mounted = true;
-    
+
     async function loadOptions() {
       try {
         setIsLoading(true);
         const response = await fetch(`/api/settings/taxonomies/${category}`);
-        
+
         if (!response.ok) {
           console.error('Failed to fetch taxonomy values');
           if (mounted) {
@@ -73,9 +72,9 @@ export default function TaxonomySelect({
           }
           return;
         }
-        
+
         const data = await response.json();
-        
+
         if (mounted) {
           setOptions(Array.isArray(data.values) ? data.values : []);
           setIsLoading(false);
@@ -88,43 +87,33 @@ export default function TaxonomySelect({
         }
       }
     }
-    
+
     loadOptions();
-    
+
     return () => {
       mounted = false;
     };
   }, [category]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setShowCreateForm(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleCreateNew = async () => {
     if (!newLabel.trim()) return;
 
     setIsCreating(true);
     try {
-      // Generate value from label (lowercase, hyphenated)
-      const generatedValue = newLabel.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      
+      const generatedValue = newLabel
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
       const response = await fetch(`/api/settings/taxonomies/${category}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           label: newLabel.trim(),
           value: generatedValue,
-          description: ''
-        })
+          description: '',
+        }),
       });
 
       if (!response.ok) {
@@ -133,179 +122,112 @@ export default function TaxonomySelect({
       }
 
       const created = await response.json();
-      
-      // Add to options list
-      setOptions([...options, created]);
-      
-      // Select the newly created value
+
+      setOptions((prev) => [...prev, created]);
       onChange(created.value);
-      
-      // Reset form
       setNewLabel('');
       setShowCreateForm(false);
-      setIsOpen(false);
     } catch (error) {
       console.error('Error creating taxonomy value:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create taxonomy value');
+      alert(
+        error instanceof Error ? error.message : 'Failed to create taxonomy value'
+      );
     } finally {
       setIsCreating(false);
     }
   };
 
-  // Filter and sort options
+  // Filter and sort options, then convert to SelectOption format
   const visibleOptions = options
-    .filter(opt => showArchived || !opt.archived)
-    .filter(opt => 
-      searchQuery === '' || 
-      opt.label.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter((opt) => showArchived || !opt.archived)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectOptions: SelectOption[] = visibleOptions.map((opt) => ({
+    id: opt.value,
+    label: opt.label,
+    supportingText: opt.description,
+  }));
 
   if (isLoading) {
     return (
       <div className={className}>
-        {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {label} {required && <span className="text-red-500">*</span>}
-          </label>
-        )}
-        <div className="px-3 py-2 border border-gray-300 rounded-lg text-gray-500">
-          Loading...
-        </div>
+        <Select
+          label={label}
+          placeholder="Loading..."
+          isDisabled
+          isRequired={required}
+          helperText={description}
+          options={[]}
+        />
       </div>
     );
   }
 
   return (
-    <div className={className} ref={dropdownRef}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-      )}
-      
-      {description && (
-        <p className="text-sm text-gray-500 mb-2">{description}</p>
-      )}
+    <div className={className}>
+      <Select
+        label={label}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        options={selectOptions}
+        isRequired={required}
+        helperText={description}
+      />
 
-      <div className="relative">
-        {/* Selected value display / trigger */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white flex items-center justify-between"
-        >
-          <span className={selectedOption ? 'text-gray-900' : 'text-gray-500'}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        {/* Dropdown */}
-        {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-hidden">
-            {/* Search input */}
-            <div className="p-2 border-b border-gray-200">
+      {allowCreate && (
+        <div className="mt-2">
+          {!showCreateForm ? (
+            <button
+              type="button"
+              onClick={() => setShowCreateForm(true)}
+              className="text-sm font-medium text-brand-primary hover:text-brand-primary-dark"
+            >
+              + Create new
+            </button>
+          ) : (
+            <div className="rounded-lg border border-secondary p-3 space-y-2 bg-primary">
               <input
                 type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter label"
+                value={newLabel}
+                onChange={(e) => setNewLabel(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleCreateNew();
+                  } else if (e.key === 'Escape') {
+                    setShowCreateForm(false);
+                    setNewLabel('');
+                  }
+                }}
+                className="w-full rounded-lg border border-secondary bg-primary px-3 py-2 text-sm text-primary shadow-xs outline-none ring-inset focus:ring-2 focus:ring-brand"
                 autoFocus
               />
-            </div>
-
-            {/* Options list */}
-            <div className="max-h-60 overflow-y-auto">
-              {visibleOptions.length === 0 ? (
-                <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                  No options found
-                </div>
-              ) : (
-                visibleOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => {
-                      onChange(option.value);
-                      setIsOpen(false);
-                      setSearchQuery('');
-                    }}
-                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 ${
-                      option.value === value ? 'bg-blue-50 text-blue-700' : 'text-gray-900'
-                    }`}
-                  >
-                    <div className="font-medium">{option.label}</div>
-                    {option.description && (
-                      <div className="text-xs text-gray-500">{option.description}</div>
-                    )}
-                  </button>
-                ))
-              )}
-            </div>
-
-            {/* Create new option */}
-            {allowCreate && (
-              <div className="border-t border-gray-200">
-                {!showCreateForm ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateForm(true)}
-                    className="w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 font-medium"
-                  >
-                    + Create new
-                  </button>
-                ) : (
-                  <div className="p-3 bg-blue-50 space-y-2">
-                    <input
-                      type="text"
-                      placeholder="Enter label"
-                      value={newLabel}
-                      onChange={(e) => setNewLabel(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleCreateNew();
-                        } else if (e.key === 'Escape') {
-                          setShowCreateForm(false);
-                          setNewLabel('');
-                        }
-                      }}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      autoFocus
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCreateNew}
-                        disabled={isCreating || !newLabel.trim()}
-                        className="flex-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-                      >
-                        {isCreating ? 'Creating...' : 'Create'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowCreateForm(false);
-                          setNewLabel('');
-                        }}
-                        className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
+              <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleCreateNew}
+                  isDisabled={isCreating || !newLabel.trim()}
+                >
+                  {isCreating ? 'Creating...' : 'Create'}
+                </Button>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setNewLabel('');
+                  }}
+                >
+                  Cancel
+                </Button>
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -86,7 +86,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Run `npm run build` to confirm no compilation errors
 
 - [-] 4. Phase 2 - Select and Date Picker Components
-  - [-] 4.1 Add Untitled UI Select and MultiSelect components via CLI
+  - [x] 4.1 Add Untitled UI Select and MultiSelect components via CLI
     - Run `npx untitledui@latest add select` and `npx untitledui@latest add multi-select`
     - Verify or create Select wrapper supporting search/filter, option groups, custom option rendering
     - Verify or create MultiSelect wrapper supporting removable tags, search, option groups
@@ -98,7 +98,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify Select and MultiSelect support search/filter, option groups, and custom rendering
     - **Validates: Requirements 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.9**
 
-  - [ ] 4.3 Migrate TaxonomySelect to use Untitled UI Select
+  - [-] 4.3 Migrate TaxonomySelect to use Untitled UI Select
     - Refactor `app/admin/components/TaxonomySelect.tsx` to wrap Untitled UI Select
     - Preserve existing API (props interface) for backward compatibility
     - Add search/filter functionality
