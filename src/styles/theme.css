@@ -190,6 +190,11 @@
     --color-active-bg: var(--color-bg-active);
     --color-disabled-bg: var(--color-bg-disabled);
     
+    /* Background hover states - these should use actual background colors */
+    --color-primary-hover-bg: var(--color-bg-primary_hover);
+    --color-secondary-hover-bg: var(--color-bg-secondary_hover);
+    --color-tertiary-bg: var(--color-bg-tertiary);
+    
     /* Brand colors (bg-brand-*) */
     --color-brand-primary: var(--color-bg-brand-primary);
     --color-brand-primary_alt: var(--color-bg-brand-primary_alt);
