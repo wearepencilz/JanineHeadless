@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import { memo } from 'react';
 import { 
   Home05, 
   Rocket01, 
@@ -18,69 +19,69 @@ import {
 import { NavList } from '@/src/app/admin/components/ui/application/app-navigation/base-components/nav-list';
 import type { NavItemType } from '@/src/app/admin/components/ui/application/app-navigation/config';
 
-export default function Sidebar() {
-  const pathname = usePathname();
+const navItems: NavItemType[] = [
+  { 
+    label: 'Dashboard', 
+    href: '/admin', 
+    icon: Home05 
+  },
+  { 
+    label: 'Launches', 
+    href: '/admin/launches', 
+    icon: Rocket01 
+  },
+  { 
+    label: 'Menu Items', 
+    href: '/admin/products', 
+    icon: ShoppingCart01 
+  },
+  { 
+    label: 'Flavours', 
+    href: '/admin/flavours', 
+    icon: Heart 
+  },
+  { 
+    label: 'Ingredients', 
+    href: '/admin/ingredients', 
+    icon: Package 
+  },
+  { 
+    label: 'Formats', 
+    href: '/admin/formats', 
+    icon: FileCode01 
+  },
+  { 
+    label: 'Modifiers', 
+    href: '/admin/modifiers', 
+    icon: BarChart03 
+  },
+  { 
+    label: 'Batches', 
+    href: '/admin/batches', 
+    icon: Package 
+  },
+  { 
+    label: 'News', 
+    href: '/admin/news', 
+    icon: BookOpen01 
+  },
+  { 
+    label: 'Games', 
+    href: '/admin/games', 
+    icon: Target01 
+  },
+  { 
+    divider: true 
+  },
+  { 
+    label: 'Settings', 
+    href: '/admin/settings', 
+    icon: Settings01 
+  },
+];
 
-  const navItems: NavItemType[] = [
-    { 
-      label: 'Dashboard', 
-      href: '/admin', 
-      icon: Home05 
-    },
-    { 
-      label: 'Launches', 
-      href: '/admin/launches', 
-      icon: Rocket01 
-    },
-    { 
-      label: 'Menu Items', 
-      href: '/admin/products', 
-      icon: ShoppingCart01 
-    },
-    { 
-      label: 'Flavours', 
-      href: '/admin/flavours', 
-      icon: Heart 
-    },
-    { 
-      label: 'Ingredients', 
-      href: '/admin/ingredients', 
-      icon: Package 
-    },
-    { 
-      label: 'Formats', 
-      href: '/admin/formats', 
-      icon: FileCode01 
-    },
-    { 
-      label: 'Modifiers', 
-      href: '/admin/modifiers', 
-      icon: BarChart03 
-    },
-    { 
-      label: 'Batches', 
-      href: '/admin/batches', 
-      icon: Package 
-    },
-    { 
-      label: 'News', 
-      href: '/admin/news', 
-      icon: BookOpen01 
-    },
-    { 
-      label: 'Games', 
-      href: '/admin/games', 
-      icon: Target01 
-    },
-    { 
-      divider: true 
-    },
-    { 
-      label: 'Settings', 
-      href: '/admin/settings', 
-      icon: Settings01 
-    },
-  ];
+function Sidebar() {
+  const pathname = usePathname();
 
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col border-r border-gray-200 bg-white">
@@ -110,3 +111,5 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+export default memo(Sidebar);

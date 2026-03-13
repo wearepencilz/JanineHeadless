@@ -1,8 +1,8 @@
 "use client";
 
 import type { FC, HTMLAttributes, MouseEventHandler, ReactNode } from "react";
+import Link from "next/link";
 import { ChevronDown, Share04 } from "@untitledui/icons";
-import { Link as AriaLink } from "react-aria-components";
 import { Badge } from "@/src/app/admin/components/ui/base/badges/badges";
 import { cx, sortCx } from "@/src/utils/cx";
 
@@ -77,10 +77,10 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
 
     if (type === "collapsible-child") {
         return (
-            <AriaLink
+            <Link
                 href={href!}
                 target={isExternal ? "_blank" : "_self"}
-                rel="noopener noreferrer"
+                rel={isExternal ? "noopener noreferrer" : undefined}
                 className={cx("py-2 pr-3 pl-10", styles.root, current && styles.rootSelected)}
                 onClick={onClick}
                 aria-current={current ? "page" : undefined}
@@ -88,15 +88,15 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
                 {labelElement}
                 {externalIcon}
                 {badgeElement}
-            </AriaLink>
+            </Link>
         );
     }
 
     return (
-        <AriaLink
+        <Link
             href={href!}
             target={isExternal ? "_blank" : "_self"}
-            rel="noopener noreferrer"
+            rel={isExternal ? "noopener noreferrer" : undefined}
             className={cx("px-3 py-2", styles.root, current && styles.rootSelected)}
             onClick={onClick}
             aria-current={current ? "page" : undefined}
@@ -105,6 +105,6 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
             {labelElement}
             {externalIcon}
             {badgeElement}
-        </AriaLink>
+        </Link>
     );
 };
