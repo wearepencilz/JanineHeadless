@@ -1,7 +1,7 @@
 'use client';
 
 import { DatePicker as AriaDatePicker, DateInput, DateSegment, Dialog, Group, Label, Popover, Button, Calendar, CalendarGrid, CalendarCell, Heading } from 'react-aria-components';
-import { CalendarIcon, ChevronLeft, ChevronRight } from '@untitledui/icons';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from '@untitledui/icons';
 import type { DateValue } from '@internationalized/date';
 
 interface DatePickerProps {

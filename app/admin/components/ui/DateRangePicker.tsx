@@ -16,7 +16,7 @@ import {
   CalendarGridHeader,
   CalendarHeaderCell
 } from 'react-aria-components';
-import { CalendarIcon, ChevronLeft, ChevronRight } from '@untitledui/icons';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from '@untitledui/icons';
 import type { DateValue } from '@internationalized/date';
 
 interface DateRangeValue {
