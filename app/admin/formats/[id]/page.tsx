@@ -261,18 +261,6 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={format.allowMixedTypes}
-                      onChange={(e) => setFormat({ ...format, allowMixedTypes: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Allow Mixed Types (gelato + sorbet)</span>
-                  </label>
-                </div>
               </>
             )}
           </div>

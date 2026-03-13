@@ -106,10 +106,6 @@
     "image": "",
     "icon": "",
     "createdAt": "2026-03-13T16:52:46.680Z",
-    "updatedAt": "2026-03-13T16:53:29.111Z",
-    "eligibleFlavourTypes": [
-      "gelato",
-      "sorbet"
-    ]
+    "updatedAt": "2026-03-13T16:52:46.680Z"
   }
 ]
