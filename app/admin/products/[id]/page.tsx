@@ -55,6 +55,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         const formatRes = await fetch(`/api/formats/${offeringData.formatId}`);
         if (formatRes.ok) {
           setFormat(await formatRes.json());
+        } else {
+          console.error('Failed to fetch format:', offeringData.formatId, formatRes.status);
         }
 
         // Populate form
@@ -227,7 +229,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     );
   }
 
-  if (!offering || !format) {
+  if (!offering) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Product not found</p>
@@ -268,16 +270,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       )}
 
       {/* Format & Flavours Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">Format & Flavours</h3>
-        <div className="text-sm text-blue-800">
-          <p><span className="font-medium">Format:</span> {format.name}</p>
-          <p><span className="font-medium">Flavours:</span> {primaryFlavours.map(f => f.name).join(', ')}</p>
-          <p className="text-xs text-blue-600 mt-1">
-            Note: Format and flavours cannot be changed after creation. Create a new offering to use different format/flavours.
-          </p>
+      {format && (
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+          <h3 className="text-sm font-medium text-blue-900 mb-2">Format & Flavours</h3>
+          <div className="text-sm text-blue-800">
+            <p><span className="font-medium">Format:</span> {format.name}</p>
+            <p><span className="font-medium">Flavours:</span> {primaryFlavours.map(f => f.name).join(', ')}</p>
+            <p className="text-xs text-blue-600 mt-1">
+              Note: Format and flavours cannot be changed after creation. Create a new offering to use different format/flavours.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <form onSubmit={handleSubmit}>
