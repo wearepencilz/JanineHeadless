@@ -96,10 +96,7 @@ export default function CreateProductPage() {
       if (selectedFlavourIds.length !== 1) {
         newErrors.push('Pint format requires exactly 1 flavour');
       }
-      const ineligible = selectedFlavours.filter(f => !f.canBeSoldAsPint);
-      if (ineligible.length > 0) {
-        newErrors.push(`These flavours cannot be sold as pint: ${ineligible.map(f => f.name).join(', ')}`);
-      }
+      // Pint eligibility is now handled by format eligibleFlavourTypes rules
     }
 
     if (formatName.includes('sandwich')) {
