@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Format, FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -273,6 +274,37 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                   </label>
                 </div>
               </>
+            )}
+          </div>
+
+          {/* Format Eligibility */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Format Eligibility
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Select which flavour types this format accepts. Leave empty to accept all types.
+            </p>
+            
+            <TaxonomyMultiSelect
+              category="flavourTypes"
+              values={format.eligibleFlavourTypes || []}
+              onChange={(values) => setFormat({ 
+                ...format, 
+                eligibleFlavourTypes: values 
+              })}
+              label="Eligible Flavour Types"
+              description=""
+            />
+            
+            {format.requiresFlavours && 
+             (!format.eligibleFlavourTypes || format.eligibleFlavourTypes.length === 0) && (
+              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-800">
+                  ⚠️ This format requires flavours but accepts all types. 
+                  Consider specifying eligible types for better control.
+                </p>
+              </div>
             )}
           </div>
 

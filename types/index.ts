@@ -232,6 +232,10 @@ export interface Format {
   maxFlavours: number;           // Maximum flavour count
   allowMixedTypes: boolean;      // Can mix gelato + sorbet?
   
+  // Eligibility rules
+  eligibleFlavourTypes?: string[]; // Array of flavourType taxonomy IDs this format accepts
+                                   // Empty or undefined = accepts all flavour types
+  
   // Configuration
   canIncludeAddOns: boolean;     // Supports toppings/add-ons?
   defaultSizes: string[];        // e.g., ["small", "medium", "large"]
