@@ -144,7 +144,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 disabled:opacity-50"
+            className="px-4 py-2 border border-red-300 rounded-lg text-sm text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 transition-colors"
           >
             {deleting ? 'Deleting...' : 'Delete'}
           </button>
@@ -158,7 +158,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           )}
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
               Title *
             </label>
             <input
@@ -168,12 +168,12 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               required
               value={launch.title}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
               Slug
             </label>
             <input
@@ -182,12 +182,12 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               name="slug"
               value={launch.slug}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
             <select
@@ -195,7 +195,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               name="status"
               value={launch.status}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="upcoming">Upcoming</option>
               <option value="active">Active</option>
@@ -205,7 +205,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -214,12 +214,12 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               rows={3}
               value={launch.description || ''}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="story" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="story" className="block text-sm font-medium text-gray-700 mb-2">
               Story
             </label>
             <textarea
@@ -228,13 +228,13 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               rows={6}
               value={launch.story || ''}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="activeStart" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="activeStart" className="block text-sm font-medium text-gray-700 mb-2">
                 Active Start Date
               </label>
               <input
@@ -243,12 +243,12 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                 name="activeStart"
                 value={launch.activeStart || ''}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label htmlFor="activeEnd" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="activeEnd" className="block text-sm font-medium text-gray-700 mb-2">
                 Active End Date
               </label>
               <input
@@ -257,13 +257,13 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                 name="activeEnd"
                 value={launch.activeEnd || ''}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="heroImage" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="heroImage" className="block text-sm font-medium text-gray-700 mb-2">
               Hero Image URL
             </label>
             <input
@@ -272,7 +272,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               name="heroImage"
               value={launch.heroImage || ''}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {launch.heroImage && (
               <img src={launch.heroImage} alt="Hero preview" className="mt-2 h-32 w-auto rounded" />
@@ -286,27 +286,27 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
               name="featured"
               checked={launch.featured}
               onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
             />
             <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
               Featured on homepage
             </label>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Link
-              href="/admin/launches"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Cancel
-            </Link>
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
+            <Link
+              href="/admin/launches"
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </Link>
           </div>
         </form>
       </div>

@@ -172,7 +172,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 disabled:opacity-50"
+            className="px-4 py-2 border border-red-300 rounded-lg text-sm text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 transition-colors"
           >
             {deleting ? 'Deleting...' : 'Delete'}
           </button>
@@ -186,7 +186,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
               Name *
             </label>
             <input
@@ -196,12 +196,12 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               required
               value={modifier.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
               Slug
             </label>
             <input
@@ -210,12 +210,12 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               name="slug"
               value={modifier.slug}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
               Type *
             </label>
             <select
@@ -223,7 +223,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               name="type"
               value={modifier.type}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="topping">Topping</option>
               <option value="sauce">Sauce</option>
@@ -235,7 +235,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -244,12 +244,12 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               rows={3}
               value={modifier.description || ''}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
               Price (in cents) *
             </label>
             <input
@@ -261,7 +261,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               step="1"
               value={modifier.price}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="mt-1 text-sm text-gray-500">
               Current price: ${(modifier.price / 100).toFixed(2)}
@@ -269,7 +269,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
               Image URL
             </label>
             <input
@@ -278,7 +278,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               name="image"
               value={modifier.image || ''}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {modifier.image && (
               <img src={modifier.image} alt="Modifier preview" className="mt-2 h-32 w-auto rounded" />
@@ -289,14 +289,14 @@ export default function EditModifierPage({ params }: { params: { id: string } })
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Available for Formats
             </label>
-            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-3">
+            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
               {formats.map((format) => (
                 <label key={format.id} className="flex items-center">
                   <input
                     type="checkbox"
                     checked={modifier.availableForFormatIds.includes(format.id)}
                     onChange={() => handleFormatToggle(format.id)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">{format.name}</span>
                 </label>
@@ -305,7 +305,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
             <select
@@ -313,27 +313,27 @@ export default function EditModifierPage({ params }: { params: { id: string } })
               name="status"
               value={modifier.status}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="active">Active</option>
               <option value="archived">Archived</option>
             </select>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Link
-              href="/admin/modifiers"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Cancel
-            </Link>
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
+            <Link
+              href="/admin/modifiers"
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </Link>
           </div>
         </form>
       </div>

@@ -108,7 +108,7 @@ export default function NewModifierPage() {
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
               Name *
             </label>
             <input
@@ -118,12 +118,12 @@ export default function NewModifierPage() {
               required
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
               Slug
             </label>
             <input
@@ -133,12 +133,12 @@ export default function NewModifierPage() {
               value={formData.slug}
               onChange={handleChange}
               placeholder="Auto-generated from name if left empty"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
               Type *
             </label>
             <select
@@ -146,7 +146,7 @@ export default function NewModifierPage() {
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="topping">Topping</option>
               <option value="sauce">Sauce</option>
@@ -158,7 +158,7 @@ export default function NewModifierPage() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -167,12 +167,12 @@ export default function NewModifierPage() {
               rows={3}
               value={formData.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
               Price (in cents) *
             </label>
             <input
@@ -184,7 +184,7 @@ export default function NewModifierPage() {
               step="1"
               value={formData.price}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="mt-1 text-sm text-gray-500">
               Enter price in cents (e.g., 150 for $1.50)
@@ -192,7 +192,7 @@ export default function NewModifierPage() {
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
               Image URL
             </label>
             <input
@@ -201,7 +201,7 @@ export default function NewModifierPage() {
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -209,14 +209,14 @@ export default function NewModifierPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Available for Formats
             </label>
-            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-3">
+            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
               {formats.map((format) => (
                 <label key={format.id} className="flex items-center">
                   <input
                     type="checkbox"
                     checked={formData.availableForFormatIds.includes(format.id)}
                     onChange={() => handleFormatToggle(format.id)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">{format.name}</span>
                 </label>
@@ -225,7 +225,7 @@ export default function NewModifierPage() {
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
             <select
@@ -233,27 +233,27 @@ export default function NewModifierPage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="active">Active</option>
               <option value="archived">Archived</option>
             </select>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Link
-              href="/admin/modifiers"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Cancel
-            </Link>
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
             >
               {loading ? 'Creating...' : 'Create Modifier'}
             </button>
+            <Link
+              href="/admin/modifiers"
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </Link>
           </div>
         </form>
       </div>
