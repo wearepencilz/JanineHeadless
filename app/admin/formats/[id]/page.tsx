@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import type { Format, FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -112,18 +112,17 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <Link
-          href="/admin/formats"
-          className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block"
-        >
-          ← Back to Formats
-        </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Edit Format</h1>
-        <p className="text-gray-600 mt-1">Update format template</p>
-      </div>
-
+    <EditPageLayout
+      title="Edit Format"
+      backHref="/admin/formats"
+      backLabel="Back to Formats"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onDelete={handleDelete}
+      onCancel={() => router.push('/admin/formats')}
+      saving={saving}
+      deleteDisabled={usageCount > 0}
+      deleteDisabledReason={`Cannot delete format that is used in ${usageCount} offering(s)`}
+    >
       {usageCount > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
@@ -313,32 +312,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-
-        <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={usageCount > 0}
-            className="px-6 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title={usageCount > 0 ? 'Cannot delete format that is in use' : 'Delete format'}
-          >
-            Delete
-          </button>
-          <Link
-            href="/admin/formats"
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </Link>
-        </div>
       </form>
-    </div>
+    </EditPageLayout>
   );
 }

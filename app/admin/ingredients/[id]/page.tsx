@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -114,18 +114,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
   }
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <Link
-          href="/admin/ingredients"
-          className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block"
-        >
-          ← Back to Ingredients
-        </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Edit Ingredient</h1>
-        <p className="text-gray-600 mt-1">Update ingredient details and provenance</p>
-      </div>
-
+    <EditPageLayout
+      title="Edit Ingredient"
+      backHref="/admin/ingredients"
+      backLabel="Back to Ingredients"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onCancel={() => router.push('/admin/ingredients')}
+      saving={saving}
+    >
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="space-y-6">
           {/* Basic Info */}
@@ -335,23 +331,7 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
             required={false}
           />
         </div>
-
-        <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <Link
-            href="/admin/ingredients"
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </Link>
-        </div>
       </form>
-    </div>
+    </EditPageLayout>
   );
 }

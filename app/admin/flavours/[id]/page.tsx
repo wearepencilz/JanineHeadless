@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyMultiSelect from '@/app/admin/components/TaxonomyMultiSelect';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import type { Flavour, FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 
 export default function EditFlavourPage() {
@@ -83,18 +83,15 @@ export default function EditFlavourPage() {
   }
 
   return (
-    <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link 
-          href="/admin/flavours" 
-          className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block"
-        >
-          ← Back to Flavours
-        </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Edit Flavour</h1>
-        <p className="text-gray-600 mt-1">Update flavour details and Shopify integration</p>
-      </div>
-
+    <EditPageLayout
+      title="Edit Flavour"
+      backHref="/admin/flavours"
+      backLabel="Back to Flavours"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onCancel={() => router.push('/admin/flavours')}
+      saving={saving}
+      maxWidth="4xl"
+    >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info Card */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
@@ -291,24 +288,7 @@ export default function EditFlavourPage() {
 
         {/* Usage Tracking Card */}
         <FlavourUsagePanel flavourId={formData.id} />
-
-        {/* Actions */}
-        <div className="flex gap-3 pt-6 border-t border-gray-200">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-medium"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <Link
-            href="/admin/flavours"
-            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
-            Cancel
-          </Link>
-        </div>
       </form>
-    </div>
+    </EditPageLayout>
   );
 }
