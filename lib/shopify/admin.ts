@@ -255,30 +255,9 @@ export async function getProduct(productId: string) {
   return data.product;
 }
 
-export interface CreateProductInput {
-  title: string;
-  descriptionHtml?: string;
-  productType?: string;
-  vendor?: string;
-  tags?: string[];
-  status?: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
-  variants?: Array<{
-    price: string;
-    sku?: string;
-    inventoryQuantities?: Array<{
-      availableQuantity: number;
-      locationId: string;
-    }>;
-  }>;
-  images?: Array<{
-    src: string;
-    altText?: string;
-  }>;
-  metafields?: ProductMetafieldInput[];
-}
 
 export async function createProduct(input: CreateProductInput) {
-  // Step 1: Create the product without variants
+  // Create product with variant price and SKU in one mutation
   const createMutation = `
     mutation productCreate($input: ProductInput!) {
       productCreate(input: $input) {
@@ -308,7 +287,13 @@ export async function createProduct(input: CreateProductInput) {
       }
     }
   `;
-  
+
+  // Build variant input with price and SKU
+  const variantInput = input.variants && input.variants.length > 0 ? {
+    price: input.variants[0].price,
+    ...(input.variants[0].sku ? { sku: input.variants[0].sku } : {})
+  } : undefined;
+
   const createVariables = {
     input: {
       title: input.title,
@@ -318,64 +303,23 @@ export async function createProduct(input: CreateProductInput) {
       tags: input.tags,
       status: input.status || 'DRAFT',
       ...(input.images && input.images.length > 0 ? { images: input.images } : {}),
-      ...(input.metafields && input.metafields.length > 0 ? { metafields: input.metafields } : {})
+      ...(input.metafields && input.metafields.length > 0 ? { metafields: input.metafields } : {}),
+      ...(variantInput ? { variants: [variantInput] } : {})
     }
   };
-  
+
   const createData = await shopifyAdminFetch(createMutation, createVariables);
-  
+
   if (createData.productCreate.userErrors.length > 0) {
     throw new Error(
       `Shopify user errors: ${JSON.stringify(createData.productCreate.userErrors)}`
     );
   }
-  
+
   const product = createData.productCreate.product;
-  
-  // Step 2: Update the default variant with price and SKU if provided
-  if (input.variants && input.variants.length > 0 && product.variants.edges.length > 0) {
-    const variantId = product.variants.edges[0].node.id;
-    const variantInput = input.variants[0];
-    
-    const updateVariantMutation = `
-      mutation productVariantUpdate($input: ProductVariantInput!) {
-        productVariantUpdate(input: $input) {
-          productVariant {
-            id
-            price
-            sku
-          }
-          userErrors {
-            field
-            message
-          }
-        }
-      }
-    `;
-    
-    const updateVariables = {
-      input: {
-        id: variantId,
-        price: variantInput.price,
-        ...(variantInput.sku ? { sku: variantInput.sku } : {}),
-        ...(variantInput.inventoryQuantities && variantInput.inventoryQuantities.length > 0 ? {
-          inventoryItem: {
-            tracked: true
-          },
-          inventoryQuantities: variantInput.inventoryQuantities
-        } : {})
-      }
-    };
-    
-    const updateData = await shopifyAdminFetch(updateVariantMutation, updateVariables);
-    
-    if (updateData.productVariantUpdate.userErrors.length > 0) {
-      // Don't throw here, product was created successfully
-    }
-  }
-  
-  // Step 3: Fetch the updated product to return complete data
+
+  // Fetch the complete product to return
   const finalProduct = await getProduct(product.id);
-  
+
   return finalProduct;
 }
