@@ -208,9 +208,9 @@ export async function searchProducts(query: string, limit: number = 10) {
     }
   `;
   
-  // If query is wildcard or empty, search for all products
-  // Shopify GraphQL doesn't support empty queries, so we search for products with status:active
-  const searchTerm = query === '*' || !query ? 'status:active' : query;
+  // If query is wildcard or empty, search for all products (any status)
+  // Use -status:archived to exclude only archived products
+  const searchTerm = query === '*' || !query ? '-status:archived' : query;
   
   const variables = { query: searchTerm, first: limit };
   const data = await shopifyAdminFetch(searchQuery, variables);
