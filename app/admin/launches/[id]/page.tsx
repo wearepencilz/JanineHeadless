@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { generateSlug } from '@/lib/slug';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import FormatSelectionModal from '@/app/admin/components/FormatSelectionModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface Launch {
   id: string;
@@ -47,6 +49,7 @@ interface Format {
 
 export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -58,6 +61,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const [formats, setFormats] = useState<Format[]>([]);
   const [slugTouched, setSlugTouched] = useState(false);
   const [showFormatModal, setShowFormatModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     fetchLaunch();
@@ -211,10 +215,6 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this launch? This action cannot be undone.')) {
-      return;
-    }
-
     setDeleting(true);
     setError('');
 
@@ -224,15 +224,19 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
+        toast.success('Launch deleted', `${launch?.title} has been removed`);
         router.push('/admin/launches');
       } else {
         const data = await response.json();
         setError(data.error || 'Failed to delete launch');
+        toast.error('Delete failed', data.error || 'Unable to delete launch');
       }
     } catch (err) {
       setError('An error occurred while deleting the launch');
+      toast.error('Delete failed', 'Unable to delete launch');
     } finally {
       setDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -290,7 +294,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       backHref="/admin/launches"
       backLabel="Back to Launches"
       onSave={() => handleSubmit(new Event('submit') as any)}
-      onDelete={handleDelete}
+      onDelete={() => setShowDeleteModal(true)}
       onCancel={() => router.push('/admin/launches')}
       saving={saving}
       deleting={deleting}
@@ -535,6 +539,18 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
         formats={formats}
         selectedFlavours={flavours.filter(f => launch.featuredFlavourIds.includes(f.id))}
         isGenerating={generating}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        variant="danger"
+        title="Delete Launch"
+        message={`Are you sure you want to delete "${launch?.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
       />
     </EditPageLayout>
   );

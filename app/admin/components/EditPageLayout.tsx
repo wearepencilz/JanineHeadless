@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import Link from 'next/link';
 
 interface EditPageLayoutProps {
@@ -8,7 +8,7 @@ interface EditPageLayoutProps {
   backHref: string;
   backLabel: string;
   onSave: () => void | Promise<void>;
-  onDelete?: () => void | Promise<void>;
+  onDelete?: () => void;
   onCancel: () => void;
   saving?: boolean;
   deleting?: boolean;
@@ -34,20 +34,6 @@ export default function EditPageLayout({
   error,
   maxWidth = '3xl',
 }: EditPageLayoutProps) {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  // Handle ESC key to close delete confirmation modal
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showDeleteConfirm) {
-        setShowDeleteConfirm(false);
-      }
-    };
-    
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [showDeleteConfirm]);
-
   const handleDeleteClick = () => {
     if (deleteDisabled) {
       if (deleteDisabledReason) {
@@ -55,14 +41,9 @@ export default function EditPageLayout({
       }
       return;
     }
-    setShowDeleteConfirm(true);
-  };
-
-  const handleDeleteConfirm = async () => {
     if (onDelete) {
-      await onDelete();
+      onDelete();
     }
-    setShowDeleteConfirm(false);
   };
 
   const maxWidthClass = {
@@ -145,33 +126,6 @@ export default function EditPageLayout({
           Cancel
         </button>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete this item? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={deleting}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              >
-                {deleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
