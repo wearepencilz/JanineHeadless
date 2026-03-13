@@ -89,14 +89,15 @@ npm run deploy
 
 **CRITICAL**: All CMS components MUST follow Untitled UI design patterns (https://github.com/untitleduico).
 
-**Use Untitled UI React Components**: When building UI elements, always check if an appropriate Untitled UI React component exists first:
-- Date Pickers: https://www.untitledui.com/react/components/date-pickers
-- Form Inputs: https://www.untitledui.com/react/components/inputs
-- Buttons: https://www.untitledui.com/react/components/buttons
-- Selects: https://www.untitledui.com/react/components/selects
-- Modals: https://www.untitledui.com/react/components/modals
-- Tables: https://www.untitledui.com/react/components/tables
-- Full component library: https://www.untitledui.com/react/components
+**ALWAYS Use Untitled UI React Components First**: Before building any UI component, check if an appropriate Untitled UI React component exists:
+- Browse the full component library: https://www.untitledui.com/react/application-ui
+- Common components:
+  - Date Pickers: https://www.untitledui.com/react/components/date-pickers
+  - Form Inputs: https://www.untitledui.com/react/components/inputs
+  - Buttons: https://www.untitledui.com/react/components/buttons
+  - Selects: https://www.untitledui.com/react/components/selects
+  - Modals: https://www.untitledui.com/react/components/modals
+  - Tables: https://www.untitledui.com/react/components/tables
 
 **Adding Untitled UI Components**:
 ```bash
@@ -110,7 +111,7 @@ npx untitledui@latest add date-range-picker
 ```
 
 **Implementation Approach**:
-1. Check Untitled UI React components library first at https://www.untitledui.com/react/components
+1. **ALWAYS** check Untitled UI React components library first at https://www.untitledui.com/react/application-ui
 2. Use `npx untitledui@latest add [component-name]` to add the component
 3. Components will be added to `app/admin/components/ui/` directory
 4. Import and use the component throughout the CMS for consistency
@@ -126,7 +127,7 @@ npx untitledui@latest add date-range-picker
 - `button` - Button with variants
 - `modal` - Dialog/modal component
 - `table` - Data table component
-- And many more at https://www.untitledui.com/react/components
+- And many more at https://www.untitledui.com/react/application-ui
 
 Reference `.kiro/steering/untitled-ui-reference.md` for:
 - Component structure and styling patterns
