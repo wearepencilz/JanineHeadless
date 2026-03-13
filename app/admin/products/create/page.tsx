@@ -89,10 +89,7 @@ export default function CreateProductPage() {
       if (selectedFlavourIds.length !== 2) {
         newErrors.push('Twist format requires exactly 2 flavours');
       }
-      const ineligible = selectedFlavours.filter(f => !f.canBeUsedInTwist);
-      if (ineligible.length > 0) {
-        newErrors.push(`These flavours cannot be used in twist: ${ineligible.map(f => f.name).join(', ')}`);
-      }
+      // Twist eligibility is now handled by format eligibleFlavourTypes rules
     }
 
     if (formatName.includes('pint')) {
