@@ -24,7 +24,7 @@ interface TaxonomyMultiSelectProps {
 
 export default function TaxonomyMultiSelect({
   category,
-  values,
+  values = [],
   onChange,
   label,
   description,
@@ -36,6 +36,9 @@ export default function TaxonomyMultiSelect({
   const [showAddNew, setShowAddNew] = useState(false);
   const [newValue, setNewValue] = useState({ label: '', description: '' });
   const [creating, setCreating] = useState(false);
+  
+  // Ensure values is always an array
+  const safeValues = Array.isArray(values) ? values : [];
 
   useEffect(() => {
     fetchTaxonomyValues();
@@ -83,7 +86,7 @@ export default function TaxonomyMultiSelect({
       setTaxonomyValues([...taxonomyValues, created]);
       
       // Add to selected values
-      onChange([...values, created.value]);
+      onChange([...safeValues, created.value]);
       
       // Reset form
       setNewValue({ label: '', description: '' });
@@ -97,15 +100,15 @@ export default function TaxonomyMultiSelect({
   };
 
   const toggleValue = (value: string) => {
-    if (values.includes(value)) {
-      onChange(values.filter(v => v !== value));
+    if (safeValues.includes(value)) {
+      onChange(safeValues.filter(v => v !== value));
     } else {
-      onChange([...values, value]);
+      onChange([...safeValues, value]);
     }
   };
 
   const removeValue = (value: string) => {
-    onChange(values.filter(v => v !== value));
+    onChange(safeValues.filter(v => v !== value));
   };
 
   // Filter out archived values unless showArchived is true
@@ -115,7 +118,7 @@ export default function TaxonomyMultiSelect({
   const sortedValues = [...filteredValues].sort((a, b) => a.sortOrder - b.sortOrder);
 
   // Get selected taxonomy items for display
-  const selectedItems = taxonomyValues.filter(v => values.includes(v.value));
+  const selectedItems = taxonomyValues.filter(v => safeValues.includes(v.value));
 
   if (loading) {
     return (
