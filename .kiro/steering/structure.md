@@ -81,11 +81,14 @@
 - **API routes**: `route.ts` in appropriate directory
 
 ### Styling
-- Tailwind utility classes for all styling
+- **CRITICAL**: All CMS components MUST follow Untitled UI design patterns (https://github.com/untitleduico)
+- Tailwind utility classes for all styling (no custom CSS)
 - No CSS modules or styled-components
 - Global styles in `src/styles/index.css`
 - Design tokens configured in `tailwind.config.js`
-- Follow Untitled UI patterns for component design
+- Reference `.kiro/steering/untitled-ui-reference.md` for patterns
+- Maintain consistency with existing admin pages (flavours, ingredients, formats)
+- Use blue-600 for primary actions, gray tones for secondary elements
 
 ### State Management
 - **Server state**: React Server Components (default)

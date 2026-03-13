@@ -87,12 +87,27 @@ npm run deploy
 
 ## Design System
 
+**CRITICAL**: All CMS components MUST follow Untitled UI design patterns (https://github.com/untitleduico).
+
+Reference `.kiro/steering/untitled-ui-reference.md` for:
+- Component structure and styling patterns
+- Color system and semantic tokens
+- Typography scale and spacing
+- Accessibility requirements
+- Form and input patterns
+
 Customize design tokens in `tailwind.config.js`:
 - Colors: `theme.extend.colors`
 - Typography: `theme.extend.fontFamily` and `theme.fontSize`
 - Border radius: `theme.extend.borderRadius`
 
-Reference Untitled UI patterns for component design (see `.kiro/steering/untitled-ui-reference.md`)
+**Design Consistency Rules**:
+- Use Tailwind utility classes exclusively (no custom CSS)
+- Follow existing component patterns from flavours, ingredients, formats pages
+- Maintain consistent spacing, colors, and typography across all admin pages
+- Use blue-600 for primary actions, gray tones for secondary elements
+- Apply hover states and focus rings consistently
+- Keep form styling uniform (border-gray-300, focus:border-blue-500, focus:ring-blue-500)
 
 ## File Upload Configuration
 
