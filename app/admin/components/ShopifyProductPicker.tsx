@@ -30,7 +30,6 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   const loadProducts = async (query: string = '*') => {
     setLoading(true);
@@ -76,10 +75,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
 
   const handleModalOpen = () => {
     setShowModal(true);
-    if (!initialLoadDone) {
-      loadProducts('*'); // Auto-load all products on first open
-      setInitialLoadDone(true);
-    }
+    loadProducts('*'); // Always load fresh products when modal opens
   };
 
   const handleSelect = (product: ShopifyProduct) => {
@@ -142,7 +138,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
       {/* Search Modal */}
       {showModal && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4" 
           onClick={() => setShowModal(false)}
         >
           <div 
@@ -190,7 +186,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
               )}
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 bg-white">
               {loading ? (
                 <div className="text-center text-gray-500 py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
@@ -225,7 +221,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                       key={product.id}
                       type="button"
                       onClick={() => handleSelect(product)}
-                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                      className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors bg-white"
                     >
                       <div className="flex gap-4">
                         {product.featuredImage && (
@@ -256,7 +252,7 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
               )}
             </div>
             
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
               <button
                 type="button"
                 onClick={() => {
