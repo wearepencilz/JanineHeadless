@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle02, InfoCircle, AlertTriangle, X } from '@untitledui/icons';
 
 export type ModalVariant = 'danger' | 'warning' | 'success' | 'info';
 
@@ -30,13 +30,13 @@ const variantConfig = {
     buttonColor: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
   },
   success: {
-    icon: CheckCircle,
+    icon: CheckCircle02,
     iconColor: 'text-green-600',
     iconBg: 'bg-green-100',
     buttonColor: 'bg-green-600 hover:bg-green-700 focus:ring-green-500',
   },
   info: {
-    icon: Info,
+    icon: InfoCircle,
     iconColor: 'text-blue-600',
     iconBg: 'bg-blue-100',
     buttonColor: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',

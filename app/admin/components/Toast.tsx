@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { CheckCircle02, AlertCircle, InfoCircle, AlertTriangle, X } from '@untitledui/icons';
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -16,7 +16,7 @@ interface ToastProps {
 
 const variantConfig = {
   success: {
-    icon: CheckCircle,
+    icon: CheckCircle02,
     iconColor: 'text-green-600',
     bg: 'bg-green-50',
     border: 'border-green-200',
@@ -34,7 +34,7 @@ const variantConfig = {
     border: 'border-yellow-200',
   },
   info: {
-    icon: Info,
+    icon: InfoCircle,
     iconColor: 'text-blue-600',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
