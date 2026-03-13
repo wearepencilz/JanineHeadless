@@ -98,13 +98,13 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify Select and MultiSelect support search/filter, option groups, and custom rendering
     - **Validates: Requirements 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.9**
 
-  - [-] 4.3 Migrate TaxonomySelect to use Untitled UI Select
+  - [x] 4.3 Migrate TaxonomySelect to use Untitled UI Select
     - Refactor `app/admin/components/TaxonomySelect.tsx` to wrap Untitled UI Select
     - Preserve existing API (props interface) for backward compatibility
     - Add search/filter functionality
     - _Requirements: 9.1, 9.7_
 
-  - [ ] 4.4 Migrate TaxonomyMultiSelect and TaxonomyTagSelect to use Untitled UI MultiSelect
+  - [-] 4.4 Migrate TaxonomyMultiSelect and TaxonomyTagSelect to use Untitled UI MultiSelect
     - Refactor `app/admin/components/TaxonomyMultiSelect.tsx` to wrap Untitled UI MultiSelect
     - Refactor `app/admin/components/TaxonomyTagSelect.tsx` to wrap Untitled UI MultiSelect
     - Display selected items as removable tags
