@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isFormatEligibleForFlavour } from '@/lib/product-generation';
+import { isFormatEligibleForFlavour, isFormatEligibleForFlavours } from '@/lib/product-generation';
 
 describe('isFormatEligibleForFlavour', () => {
   describe('backward compatibility - formats without eligibility rules', () => {
@@ -109,6 +109,163 @@ describe('isFormatEligibleForFlavour', () => {
       expect(isFormatEligibleForFlavour(legacyFormat, anyFlavour1)).toBe(true);
       expect(isFormatEligibleForFlavour(legacyFormat, anyFlavour2)).toBe(true);
       expect(isFormatEligibleForFlavour(legacyFormat, anyFlavour3)).toBe(true);
+    });
+  });
+});
+
+describe('isFormatEligibleForFlavours', () => {
+  describe('backward compatibility - formats without eligibility rules', () => {
+    it('should accept all flavour combinations when format has no eligibleFlavourTypes field', () => {
+      const format = { allowMixedTypes: true };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(true);
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, gelatoFlavour])).toBe(true);
+    });
+
+    it('should accept all flavour combinations when format has empty eligibleFlavourTypes array', () => {
+      const format = { eligibleFlavourTypes: [], allowMixedTypes: true };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(true);
+    });
+  });
+
+  describe('single type combinations', () => {
+    it('should accept combinations where all flavours have the same eligible type', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: false 
+      };
+      const gelatoFlavour1 = { type: 'gelato' };
+      const gelatoFlavour2 = { type: 'gelato' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour1, gelatoFlavour2])).toBe(true);
+    });
+
+    it('should reject combinations where any flavour is ineligible', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato'],
+        allowMixedTypes: false 
+      };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(false);
+    });
+  });
+
+  describe('mixed type combinations', () => {
+    it('should accept mixed types when allowMixedTypes is true and all types are eligible', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: true 
+      };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(true);
+    });
+
+    it('should reject mixed types when allowMixedTypes is false', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: false 
+      };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(false);
+    });
+
+    it('should reject mixed types when one type is ineligible', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato'],
+        allowMixedTypes: true 
+      };
+      const gelatoFlavour = { type: 'gelato' };
+      const sorbetFlavour = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [gelatoFlavour, sorbetFlavour])).toBe(false);
+    });
+  });
+
+  describe('real-world scenarios', () => {
+    it('should handle twist format allowing mixed gelato and sorbet', () => {
+      const twistFormat = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: true 
+      };
+      const vanillaGelato = { type: 'gelato' };
+      const chocolateGelato = { type: 'gelato' };
+      const lemonSorbet = { type: 'sorbet' };
+
+      // Same type combinations
+      expect(isFormatEligibleForFlavours(twistFormat, [vanillaGelato, chocolateGelato])).toBe(true);
+      
+      // Mixed type combinations
+      expect(isFormatEligibleForFlavours(twistFormat, [vanillaGelato, lemonSorbet])).toBe(true);
+      expect(isFormatEligibleForFlavours(twistFormat, [chocolateGelato, lemonSorbet])).toBe(true);
+    });
+
+    it('should handle gelato-only twist format', () => {
+      const gelatoTwistFormat = { 
+        eligibleFlavourTypes: ['gelato'],
+        allowMixedTypes: false 
+      };
+      const vanillaGelato = { type: 'gelato' };
+      const chocolateGelato = { type: 'gelato' };
+      const lemonSorbet = { type: 'sorbet' };
+
+      // Gelato combinations should work
+      expect(isFormatEligibleForFlavours(gelatoTwistFormat, [vanillaGelato, chocolateGelato])).toBe(true);
+      
+      // Mixed with sorbet should fail
+      expect(isFormatEligibleForFlavours(gelatoTwistFormat, [vanillaGelato, lemonSorbet])).toBe(false);
+    });
+
+    it('should handle format that requires same type but accepts multiple types', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: false 
+      };
+      const vanillaGelato = { type: 'gelato' };
+      const chocolateGelato = { type: 'gelato' };
+      const lemonSorbet = { type: 'sorbet' };
+      const strawberrySorbet = { type: 'sorbet' };
+
+      // Same type combinations should work
+      expect(isFormatEligibleForFlavours(format, [vanillaGelato, chocolateGelato])).toBe(true);
+      expect(isFormatEligibleForFlavours(format, [lemonSorbet, strawberrySorbet])).toBe(true);
+      
+      // Mixed type should fail
+      expect(isFormatEligibleForFlavours(format, [vanillaGelato, lemonSorbet])).toBe(false);
+    });
+
+    it('should handle three-flavour combinations', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: true 
+      };
+      const vanillaGelato = { type: 'gelato' };
+      const chocolateGelato = { type: 'gelato' };
+      const lemonSorbet = { type: 'sorbet' };
+
+      expect(isFormatEligibleForFlavours(format, [vanillaGelato, chocolateGelato, lemonSorbet])).toBe(true);
+    });
+
+    it('should reject if any flavour in multi-flavour combination is ineligible', () => {
+      const format = { 
+        eligibleFlavourTypes: ['gelato', 'sorbet'],
+        allowMixedTypes: true 
+      };
+      const vanillaGelato = { type: 'gelato' };
+      const lemonSorbet = { type: 'sorbet' };
+      const softServe = { type: 'soft-serve-base' };
+
+      expect(isFormatEligibleForFlavours(format, [vanillaGelato, lemonSorbet, softServe])).toBe(false);
     });
   });
 });
