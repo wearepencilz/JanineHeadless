@@ -36,9 +36,7 @@ export default function EditPageLayout({
 }: EditPageLayoutProps) {
   const handleDeleteClick = () => {
     if (deleteDisabled) {
-      if (deleteDisabledReason) {
-        alert(deleteDisabledReason);
-      }
+      // Delete is disabled, do nothing (tooltip shows reason)
       return;
     }
     if (onDelete) {

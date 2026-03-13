@@ -53,8 +53,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async () => {
     if (!format) return;
     
     setSaving(true);
@@ -119,7 +118,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         title="Edit Format"
         backHref="/admin/formats"
         backLabel="Back to Formats"
-        onSave={() => handleSubmit(new Event('submit') as any)}
+        onSave={handleSave}
         onDelete={() => setShowDeleteModal(true)}
         onCancel={() => router.push('/admin/formats')}
         saving={saving}
@@ -134,7 +133,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
@@ -293,7 +292,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
             </p>
           </div>
         </div>
-      </form>
+      </div>
     </EditPageLayout>
 
     <ConfirmModal
