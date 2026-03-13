@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { generateSlug } from '@/lib/slug';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 
 interface Launch {
   id: string;
@@ -236,43 +236,33 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
 
   if (!launch) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error || 'Launch not found'}
-        </div>
-        <Link href="/admin/launches" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
-          ← Back to Launches
-        </Link>
-      </div>
+      <EditPageLayout
+        title="Edit Launch"
+        backHref="/admin/launches"
+        backLabel="Back to Launches"
+        onSave={() => {}}
+        onCancel={() => router.push('/admin/launches')}
+        error={error || 'Launch not found'}
+      >
+        <div />
+      </EditPageLayout>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-6">
-        <Link href="/admin/launches" className="text-blue-600 hover:text-blue-800 text-sm">
-          ← Back to Launches
-        </Link>
-      </div>
-
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Launch</h1>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="px-4 py-2 border border-red-300 rounded-lg text-sm text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 transition-colors"
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+    <EditPageLayout
+      title="Edit Launch"
+      backHref="/admin/launches"
+      backLabel="Back to Launches"
+      onSave={() => handleSubmit(new Event('submit') as any)}
+      onDelete={handleDelete}
+      onCancel={() => router.push('/admin/launches')}
+      saving={saving}
+      deleting={deleting}
+      error={error}
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white shadow rounded-lg px-6 py-4 space-y-6">
 
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
@@ -496,23 +486,8 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
             </p>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
-            <Link
-              href="/admin/launches"
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </Link>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </EditPageLayout>
   );
 }
