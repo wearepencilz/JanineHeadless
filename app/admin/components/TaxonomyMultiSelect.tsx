@@ -37,10 +37,6 @@ export default function TaxonomyMultiSelect({
   const [newValue, setNewValue] = useState({ label: '', description: '' });
   const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    fetchTaxonomyValues();
-  }, [category]);
-
   const fetchTaxonomyValues = async () => {
     setLoading(true);
     try {
@@ -50,10 +46,15 @@ export default function TaxonomyMultiSelect({
       setTaxonomyValues(data.values || []);
     } catch (error) {
       console.error('Error fetching taxonomy values:', error);
+      setTaxonomyValues([]); // Ensure we always have an array
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTaxonomyValues();
+  }, [category]);
 
   const createNewValue = async () => {
     if (!newValue.label.trim()) {
