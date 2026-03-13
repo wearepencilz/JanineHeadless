@@ -7,8 +7,8 @@ import { Badge } from "@/src/app/admin/components/ui/base/badges/badges";
 import { cx, sortCx } from "@/src/utils/cx";
 
 const styles = sortCx({
-    root: "group relative flex w-full cursor-pointer items-center rounded-md bg-primary outline-focus-ring transition duration-100 ease-linear select-none hover:bg-primary_hover focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2",
-    rootSelected: "bg-active hover:bg-secondary_hover",
+    root: "group relative flex w-full cursor-pointer items-center rounded-md bg-white outline-none transition duration-100 ease-linear select-none hover:bg-gray-50 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
+    rootSelected: "bg-gray-100 hover:bg-gray-100",
 });
 
 interface NavItemBaseProps {
@@ -35,7 +35,7 @@ interface NavItemBaseProps {
 }
 
 export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, truncate = true, onClick }: NavItemBaseProps) => {
-    const iconElement = Icon && <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-fg-quaternary transition-inherit-all" />;
+    const iconElement = Icon && <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-gray-600 transition-inherit-all" />;
 
     const badgeElement =
         badge && (typeof badge === "string" || typeof badge === "number") ? (
@@ -49,9 +49,9 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
     const labelElement = (
         <span
             className={cx(
-                "flex-1 text-md font-semibold text-secondary transition-inherit-all group-hover:text-secondary_hover",
+                "flex-1 text-md font-semibold text-gray-700 transition-inherit-all group-hover:text-gray-900",
                 truncate && "truncate",
-                current && "text-secondary_hover",
+                current && "text-gray-900",
             )}
         >
             {children}
@@ -59,7 +59,7 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
     );
 
     const isExternal = href && href.startsWith("http");
-    const externalIcon = isExternal && <Share04 className="size-4 stroke-[2.5px] text-fg-quaternary" />;
+    const externalIcon = isExternal && <Share04 className="size-4 stroke-[2.5px] text-gray-500" />;
 
     if (type === "collapsible") {
         return (
@@ -70,7 +70,7 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
 
                 {badgeElement}
 
-                <ChevronDown aria-hidden="true" className="ml-3 size-4 shrink-0 stroke-[2.5px] text-fg-quaternary in-open:-scale-y-100" />
+                <ChevronDown aria-hidden="true" className="ml-3 size-4 shrink-0 stroke-[2.5px] text-gray-500 in-open:-scale-y-100" />
             </summary>
         );
     }
