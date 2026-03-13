@@ -45,6 +45,7 @@ export default function SimpleSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive(item.href)
                       ? 'bg-gray-100 text-gray-900'
