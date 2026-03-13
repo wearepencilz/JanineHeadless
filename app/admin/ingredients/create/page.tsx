@@ -26,14 +26,14 @@ export default function CreateIngredientPage() {
     seasonal: false,
     availableMonths: [] as number[],
     allergens: [] as string[],
-    dietaryFlags: [] as string[],
+    animalDerived: false,
+    vegetarian: true,
     isOrganic: false,
     image: '',
     imageAlt: '',
   });
 
   const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs', 'sesame'];
-  const dietaryOptions = ['vegan', 'vegetarian', 'gluten-free', 'dairy-free', 'nut-free'];
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -90,15 +90,6 @@ export default function CreateIngredientPage() {
       allergens: prev.allergens.includes(allergen)
         ? prev.allergens.filter(a => a !== allergen)
         : [...prev.allergens, allergen]
-    }));
-  };
-
-  const toggleDietaryFlag = (flag: string) => {
-    setFormData(prev => ({
-      ...prev,
-      dietaryFlags: prev.dietaryFlags.includes(flag)
-        ? prev.dietaryFlags.filter(f => f !== flag)
-        : [...prev.dietaryFlags, flag]
     }));
   };
 
@@ -289,14 +280,35 @@ export default function CreateIngredientPage() {
             label="Allergens"
           />
 
-          {/* Dietary Flags */}
-          <TaxonomyMultiSelect
-            category="dietaryFlags"
-            values={formData.dietaryFlags}
-            onChange={(values) => setFormData({ ...formData, dietaryFlags: values })}
-            label="Dietary Flags"
-            description="Select dietary compatibility tags"
-          />
+          {/* Dietary Facts */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Dietary Facts
+            </label>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.animalDerived}
+                  onChange={(e) => setFormData({ ...formData, animalDerived: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Contains animal-derived ingredients</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.vegetarian}
+                  onChange={(e) => setFormData({ ...formData, vegetarian: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Suitable for vegetarians</span>
+              </label>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
+            </p>
+          </div>
 
           {/* Seasonal */}
           <div>

@@ -93,19 +93,16 @@ export async function validateTaxonomyDeletion(category: string, id: string): Pr
       break
       
     case 'allergens':
-    case 'dietaryFlags':
       // These are used in arrays, so we need to check all ingredients and flavours
       const allIngredients = await getIngredients()
       const allFlavours = await getFlavours()
       
       const ingredientsWithValue = allIngredients.filter((ing: any) => 
-        (category === 'allergens' && ing.allergens?.includes(id)) ||
-        (category === 'dietaryFlags' && ing.dietaryFlags?.includes(id))
+        ing.allergens?.includes(id)
       )
       
       const flavoursWithValue = allFlavours.filter((flav: any) => 
-        (category === 'allergens' && flav.allergens?.includes(id)) ||
-        (category === 'dietaryFlags' && flav.dietaryTags?.includes(id))
+        flav.allergens?.includes(id)
       )
       
       if (ingredientsWithValue.length > 0) {

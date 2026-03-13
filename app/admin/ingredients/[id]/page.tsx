@@ -24,13 +24,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     seasonal: false,
     availableMonths: [] as number[],
     allergens: [] as string[],
+    animalDerived: false,
+    vegetarian: true,
     isOrganic: false,
     image: '',
     imageAlt: '',
   });
 
   const categories = ['base', 'flavor', 'mix-in', 'topping', 'spice'];
-  const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs'];
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -53,6 +54,8 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           allergens: data.allergens || [],
           availableMonths: data.availableMonths || [],
           imageAlt: data.imageAlt || '',
+          animalDerived: data.animalDerived || false,
+          vegetarian: data.vegetarian !== false, // Default to true if not set
         });
       } else {
         alert('Ingredient not found');
@@ -91,15 +94,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     } finally {
       setSaving(false);
     }
-  };
-
-  const toggleAllergen = (allergen: string) => {
-    setFormData(prev => ({
-      ...prev,
-      allergens: prev.allergens.includes(allergen)
-        ? prev.allergens.filter(a => a !== allergen)
-        : [...prev.allergens, allergen]
-    }));
   };
 
   const toggleMonth = (monthIndex: number) => {
@@ -243,26 +237,41 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Allergens */}
+          <TaxonomyMultiSelect
+            category="allergens"
+            values={formData.allergens}
+            onChange={(values) => setFormData({ ...formData, allergens: values })}
+            label="Allergens"
+          />
+
+          {/* Dietary Facts */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Allergens
+              Dietary Facts
             </label>
-            <div className="flex flex-wrap gap-2">
-              {commonAllergens.map((allergen) => (
-                <button
-                  key={allergen}
-                  type="button"
-                  onClick={() => toggleAllergen(allergen)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.allergens.includes(allergen)
-                      ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {allergen}
-                </button>
-              ))}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.animalDerived}
+                  onChange={(e) => setFormData({ ...formData, animalDerived: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Contains animal-derived ingredients</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.vegetarian}
+                  onChange={(e) => setFormData({ ...formData, vegetarian: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Suitable for vegetarians</span>
+              </label>
             </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
+            </p>
           </div>
 
           {/* Seasonal */}
