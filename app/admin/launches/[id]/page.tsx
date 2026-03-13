@@ -7,6 +7,8 @@ import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import FormatSelectionModal from '@/app/admin/components/FormatSelectionModal';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
 import { useToast } from '@/app/admin/components/ToastContainer';
+import DateRangePicker from '@/app/admin/components/ui/DateRangePicker';
+import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
 interface Launch {
   id: string;
@@ -382,41 +384,33 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Active Period
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="activeStart" className="block text-xs text-gray-600 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  id="activeStart"
-                  name="activeStart"
-                  value={launch.activeStart || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="activeEnd" className="block text-xs text-gray-600 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  id="activeEnd"
-                  name="activeEnd"
-                  value={launch.activeEnd || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                />
-              </div>
-            </div>
-            <p className="mt-2 text-xs text-gray-500">
-              When this launch will be active and visible to customers
-            </p>
+            <DateRangePicker
+              label="Active Period"
+              value={
+                launch.activeStart && launch.activeEnd
+                  ? {
+                      start: stringToDateValue(launch.activeStart)!,
+                      end: stringToDateValue(launch.activeEnd)!,
+                    }
+                  : null
+              }
+              onChange={(range) => {
+                if (range) {
+                  setLaunch({
+                    ...launch,
+                    activeStart: dateValueToString(range.start),
+                    activeEnd: dateValueToString(range.end),
+                  });
+                } else {
+                  setLaunch({
+                    ...launch,
+                    activeStart: undefined,
+                    activeEnd: undefined,
+                  });
+                }
+              }}
+              description="When this launch will be active and visible to customers"
+            />
           </div>
 
           <div>
