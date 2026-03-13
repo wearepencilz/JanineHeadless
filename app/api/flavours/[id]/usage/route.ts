@@ -18,10 +18,10 @@ export async function GET(
     
     // Find offerings that use this flavour
     const usageOfferings = offerings
-      .filter(offering => 
+      .filter((offering: any) => 
         offering.primaryFlavourIds?.includes(flavourId)
       )
-      .map(offering => {
+      .map((offering: any) => {
         const format = formatMap.get(offering.formatId);
         return {
           id: offering.id,
