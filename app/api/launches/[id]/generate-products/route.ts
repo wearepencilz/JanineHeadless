@@ -47,13 +47,10 @@ export async function POST(
 
     // Get all formats
     const formats = await getFormats();
-    console.log('Formats fetched:', formats);
     const activeFormats = formats.filter((f: any) => f.status === 'active');
-    console.log('Active formats:', activeFormats);
 
     // If no active formats, use all formats
     const availableFormats = activeFormats.length > 0 ? activeFormats : formats;
-    console.log('Available formats:', availableFormats);
 
     if (availableFormats.length === 0) {
       return NextResponse.json(
@@ -70,9 +67,6 @@ export async function POST(
     const twistFormat = availableFormats.find((f: any) => 
       f.servingStyle?.toLowerCase() === 'twist' || f.category?.toLowerCase() === 'twist'
     );
-    
-    console.log('Scoop format:', scoopFormat);
-    console.log('Twist format:', twistFormat);
 
     if (!scoopFormat) {
       return NextResponse.json(
@@ -204,7 +198,7 @@ export async function POST(
 
           if (!existingProduct) {
             const newProduct = {
-              id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              id: `product-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
               internalName: names.internalName,
               publicName: names.publicName,
               slug: `${twistFormat.slug}-${gelatoFlavour.slug || gelatoFlavour.name.toLowerCase().replace(/\s+/g, '-')}-${sorbetFlavour.slug || sorbetFlavour.name.toLowerCase().replace(/\s+/g, '-')}`,

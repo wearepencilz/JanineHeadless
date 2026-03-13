@@ -27,7 +27,9 @@ interface Flavour {
 
 interface Product {
   id: string;
-  name: string;
+  internalName?: string;
+  publicName?: string;
+  name?: string; // Legacy field for backwards compatibility
   shopifyProductId?: string;
 }
 
@@ -479,7 +481,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
                         className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="ml-3 text-sm text-gray-700">
-                        {product.name}
+                        {product.name || product.publicName || product.internalName || 'Unnamed Product'}
                         {product.shopifyProductId && (
                           <span className="ml-2 text-xs text-gray-500">(Shopify)</span>
                         )}
