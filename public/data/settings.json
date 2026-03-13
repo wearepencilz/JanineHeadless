@@ -25,66 +25,150 @@
         "archived": false
       },
       {
-        "id": "smoky",
-        "label": "Smoky",
-        "value": "smoky",
+        "id": "rich",
+        "label": "Rich",
+        "value": "rich",
         "sortOrder": 2,
         "archived": false
       },
       {
-        "id": "summer",
-        "label": "Summer",
-        "value": "summer",
+        "id": "buttery",
+        "label": "Buttery",
+        "value": "buttery",
         "sortOrder": 3,
         "archived": false
       },
       {
-        "id": "nutty",
-        "label": "Nutty",
-        "value": "nutty",
+        "id": "caramelized",
+        "label": "Caramelized",
+        "value": "caramelized",
         "sortOrder": 4,
         "archived": false
       },
       {
-        "id": "floral",
-        "label": "Floral",
-        "value": "floral",
+        "id": "honeyed",
+        "label": "Honeyed",
+        "value": "honeyed",
         "sortOrder": 5,
         "archived": false
       },
       {
-        "id": "fruity",
-        "label": "Fruity",
-        "value": "fruity",
+        "id": "fresh",
+        "label": "Fresh",
+        "value": "fresh",
         "sortOrder": 6,
-        "archived": false
-      },
-      {
-        "id": "creamy",
-        "label": "Creamy",
-        "value": "creamy",
-        "sortOrder": 7,
-        "archived": false
-      },
-      {
-        "id": "tangy",
-        "label": "Tangy",
-        "value": "tangy",
-        "sortOrder": 8,
-        "archived": false
-      },
-      {
-        "id": "rich",
-        "label": "Rich",
-        "value": "rich",
-        "sortOrder": 9,
         "archived": false
       },
       {
         "id": "refreshing",
         "label": "Refreshing",
         "value": "refreshing",
+        "sortOrder": 7,
+        "archived": false
+      },
+      {
+        "id": "bright",
+        "label": "Bright",
+        "value": "bright",
+        "sortOrder": 8,
+        "archived": false
+      },
+      {
+        "id": "citrusy",
+        "label": "Citrusy",
+        "value": "citrusy",
+        "sortOrder": 9,
+        "archived": false
+      },
+      {
+        "id": "fruity",
+        "label": "Fruity",
+        "value": "fruity",
         "sortOrder": 10,
+        "archived": false
+      },
+      {
+        "id": "floral",
+        "label": "Floral",
+        "value": "floral",
+        "sortOrder": 11,
+        "archived": false
+      },
+      {
+        "id": "jammy",
+        "label": "Jammy",
+        "value": "jammy",
+        "sortOrder": 12,
+        "archived": false
+      },
+      {
+        "id": "savory",
+        "label": "Savory",
+        "value": "savory",
+        "sortOrder": 13,
+        "archived": false
+      },
+      {
+        "id": "earthy",
+        "label": "Earthy",
+        "value": "earthy",
+        "sortOrder": 14,
+        "archived": false
+      },
+      {
+        "id": "herbal",
+        "label": "Herbal",
+        "value": "herbal",
+        "sortOrder": 15,
+        "archived": false
+      },
+      {
+        "id": "green",
+        "label": "Green",
+        "value": "green",
+        "sortOrder": 16,
+        "archived": false
+      },
+      {
+        "id": "nutty",
+        "label": "Nutty",
+        "value": "nutty",
+        "sortOrder": 17,
+        "archived": false
+      },
+      {
+        "id": "toasted",
+        "label": "Toasted",
+        "value": "toasted",
+        "sortOrder": 18,
+        "archived": false
+      },
+      {
+        "id": "smoky",
+        "label": "Smoky",
+        "value": "smoky",
+        "sortOrder": 19,
+        "archived": false
+      },
+      {
+        "id": "spiced",
+        "label": "Spiced",
+        "value": "spiced",
+        "sortOrder": 20,
+        "archived": false
+      },
+      {
+        "id": "creamy",
+        "label": "Creamy",
+        "value": "creamy",
+        "sortOrder": 21,
+        "archived": false
+      },
+      {
+        "id": "light",
+        "label": "Light",
+        "value": "light",
+        "sortOrder": 22,
         "archived": false
       }
     ],
