@@ -1,4 +1,4 @@
 {
-  "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js",
-  "/admin/formats/create/page": "app/admin/formats/create/page.js"
+  "/admin/formats/create/page": "app/admin/formats/create/page.js",
+  "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js"
 }

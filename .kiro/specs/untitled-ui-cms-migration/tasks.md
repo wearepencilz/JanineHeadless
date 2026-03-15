@@ -242,8 +242,8 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Verify all tables and badges are migrated
   - Run `npm run build` to confirm no compilation errors
 
-- [ ] 10. Phase 5 - Accessibility, Performance, and Polish
-  - [ ] 10.1 Add keyboard navigation and ARIA labels across all components
+- [-] 10. Phase 5 - Accessibility, Performance, and Polish
+  - [x] 10.1 Add keyboard navigation and ARIA labels across all components
     - Audit all migrated components for keyboard accessibility
     - Add missing ARIA labels and roles to interactive elements
     - Ensure visible focus indicators on all focusable elements
@@ -267,7 +267,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Run axe-core against all migrated components
     - **Validates: Requirements 12.1, 12.5**
 
-  - [ ] 10.5 Optimize bundle size and performance
+  - [x] 10.5 Optimize bundle size and performance
     - Implement lazy loading for heavy components (Table, DatePicker, Modal)
     - Ensure tree-shaking works for unused Untitled UI components
     - Add React.memo to frequently re-rendered components

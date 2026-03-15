@@ -64,6 +64,9 @@ export default function Toast({
 
   return (
     <div
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
       className={`${config.bg} ${config.border} border rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}
     >
       <div className="flex items-start gap-3">

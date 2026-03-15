@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/app/admin/components/ui/button';
 
@@ -55,7 +55,7 @@ interface DataTableProps<T> {
   loading?: boolean;
 }
 
-export default function DataTable<T>({
+function DataTable<T>({
   title,
   description,
   createButton,
@@ -123,12 +123,13 @@ export default function DataTable<T>({
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200" role="table">
               <thead className="bg-gray-50">
-                <tr>
+                <tr role="row">
                   {columns.map((column) => (
                     <th
                       key={column.key}
+                      scope="col"
                       className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                         column.className || ''
                       }`}
@@ -137,18 +138,26 @@ export default function DataTable<T>({
                     </th>
                   ))}
                   {actions && actions.length > 0 && (
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200" role="rowgroup">
                 {data.map((item) => (
                   <tr
                     key={keyExtractor(item)}
+                    role="row"
                     onClick={() => onRowClick?.(item)}
-                    className={onRowClick ? 'hover:bg-gray-50 cursor-pointer' : 'hover:bg-gray-50'}
+                    onKeyDown={(e) => {
+                      if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        onRowClick(item);
+                      }
+                    }}
+                    tabIndex={onRowClick ? 0 : undefined}
+                    className={onRowClick ? 'hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-50' : 'hover:bg-gray-50'}
                   >
                     {columns.map((column) => (
                       <td
@@ -205,3 +214,5 @@ export default function DataTable<T>({
     </div>
   );
 }
+
+export default memo(DataTable) as typeof DataTable;
