@@ -145,8 +145,8 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Verify all selects, multi-selects, and date pickers are migrated
   - Run `npm run build` to confirm no compilation errors
 
-- [ ] 6. Phase 3 - Modal and Toast Components
-  - [ ] 6.1 Add Untitled UI Modal component via CLI
+- [x] 6. Phase 3 - Modal and Toast Components
+  - [x] 6.1 Add Untitled UI Modal component via CLI
     - Run `npx untitledui@latest add modal`
     - Verify or create Modal wrapper supporting sizes (sm, md, lg, xl, full), focus trapping, ESC key close, backdrop click close (configurable), header/body/footer sections, body scroll prevention
     - Export from `app/admin/components/ui/modal.tsx`
@@ -157,18 +157,18 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify focus trapping, ESC key handling, backdrop click behavior, body scroll prevention
     - **Validates: Requirements 7.1, 7.3, 7.4, 7.5, 7.8**
 
-  - [ ] 6.3 Migrate ConfirmModal and DeleteModal to use Untitled UI Modal
+  - [x] 6.3 Migrate ConfirmModal and DeleteModal to use Untitled UI Modal
     - Refactor `app/admin/components/ConfirmModal.tsx` to use Untitled UI Modal
     - Refactor `app/admin/components/DeleteModal.tsx` to use Untitled UI Modal
     - Preserve existing props API for backward compatibility
     - _Requirements: 7.7_
 
-  - [ ] 6.4 Migrate FormatSelectionModal to use Untitled UI Modal
+  - [x] 6.4 Migrate FormatSelectionModal to use Untitled UI Modal
     - Refactor `app/admin/components/FormatSelectionModal.tsx` to use Untitled UI Modal
     - Update internal components (checkboxes, badges) to use Untitled UI equivalents
     - _Requirements: 7.7_
 
-  - [ ] 6.5 Add Untitled UI Toast component and create useToast hook
+  - [x] 6.5 Add Untitled UI Toast component and create useToast hook
     - Run `npx untitledui@latest add toast` (or create custom Toast using Untitled UI patterns)
     - Create `app/admin/components/hooks/useToast.ts` hook with `success`, `error`, `warning`, `info` methods
     - Support auto-dismiss with configurable duration, manual dismissal, vertical stacking, smooth animations
@@ -180,13 +180,13 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify toast variants, auto-dismiss, manual dismissal, and stacking behavior
     - **Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5, 11.6**
 
-  - [ ] 6.7 Migrate existing Toast and ToastContainer to use Untitled UI Toast
+  - [x] 6.7 Migrate existing Toast and ToastContainer to use Untitled UI Toast
     - Replace `app/admin/components/Toast.tsx` with Untitled UI Toast
     - Replace `app/admin/components/ToastContainer.tsx` with new toast system
     - Update all pages that use toast notifications to use the new `useToast` hook
     - _Requirements: 11.7, 11.8_
 
-- [ ] 7. Checkpoint - Phase 3 Complete
+- [x] 7. Checkpoint - Phase 3 Complete
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all modals and toasts are migrated
   - Run `npm run build` to confirm no compilation errors
