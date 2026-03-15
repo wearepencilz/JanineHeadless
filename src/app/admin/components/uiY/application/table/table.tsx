@@ -21,10 +21,10 @@ import {
     TableHeader as AriaTableHeader,
     useTableOptions,
 } from "react-aria-components";
-import { Badge } from "@/src/app/admin/components/ui/base/badges/badges";
-import { Checkbox } from "@/src/app/admin/components/ui/base/checkbox/checkbox";
-import { Dropdown } from "@/src/app/admin/components/ui/base/dropdown/dropdown";
-import { Tooltip, TooltipTrigger } from "@/src/app/admin/components/ui/base/tooltip/tooltip";
+import { Badge } from "@/app/admin/components/uiY/base/badges/badges";
+import { Checkbox } from "@/app/admin/components/uiY/base/checkbox/checkbox";
+import { Dropdown } from "@/app/admin/components/uiY/base/dropdown/dropdown";
+import { Tooltip, TooltipTrigger } from "@/app/admin/components/uiY/base/tooltip/tooltip";
 import { cx } from "@/utils/cx";
 
 export const TableRowActionsDropdown = () => (

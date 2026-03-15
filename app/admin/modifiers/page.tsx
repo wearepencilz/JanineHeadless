@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
 import { Badge, BadgeWithDot } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
 
@@ -81,30 +82,34 @@ export default function ModifiersPage() {
           description="Manage toppings, sauces, and add-ons for products"
           contentTrailing={
             <div className="flex items-center gap-3">
-              {/* Type filter */}
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="rounded-lg border border-secondary bg-primary px-3 py-2 text-sm text-primary shadow-xs"
+              <Select
+                placeholder="All types"
+                selectedKey={typeFilter}
+                onSelectionChange={(key) => setTypeFilter(key as string)}
+                items={[
+                  { id: 'all', label: 'All types' },
+                  { id: 'topping', label: 'Topping' },
+                  { id: 'sauce', label: 'Sauce' },
+                  { id: 'crunch', label: 'Crunch' },
+                  { id: 'drizzle', label: 'Drizzle' },
+                  { id: 'premium-addon', label: 'Premium Add-on' },
+                  { id: 'pack-in', label: 'Pack-in' },
+                ]}
               >
-                <option value="all">All types</option>
-                <option value="topping">Topping</option>
-                <option value="sauce">Sauce</option>
-                <option value="crunch">Crunch</option>
-                <option value="drizzle">Drizzle</option>
-                <option value="premium-addon">Premium Add-on</option>
-                <option value="pack-in">Pack-in</option>
-              </select>
-              {/* Status filter */}
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-lg border border-secondary bg-primary px-3 py-2 text-sm text-primary shadow-xs"
+                {(item) => <Select.Item id={item.id} label={item.label} />}
+              </Select>
+              <Select
+                placeholder="All statuses"
+                selectedKey={statusFilter}
+                onSelectionChange={(key) => setStatusFilter(key as string)}
+                items={[
+                  { id: 'all', label: 'All statuses' },
+                  { id: 'active', label: 'Active' },
+                  { id: 'archived', label: 'Archived' },
+                ]}
               >
-                <option value="all">All statuses</option>
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
-              </select>
+                {(item) => <Select.Item id={item.id} label={item.label} />}
+              </Select>
               <Link href="/admin/modifiers/new">
                 <Button color="primary" size="sm">Create modifier</Button>
               </Link>

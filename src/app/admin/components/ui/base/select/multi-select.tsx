@@ -8,14 +8,14 @@ import type { ComboBoxProps as AriaComboBoxProps, GroupProps as AriaGroupProps, 
 import { ComboBox as AriaComboBox, Group as AriaGroup, Input as AriaInput, ListBox as AriaListBox, ComboBoxStateContext } from "react-aria-components";
 import type { ListData } from "react-stately";
 import { useListData } from "react-stately";
-import { Avatar } from "@/app/admin/components/ui/base/avatar/avatar";
-import type { IconComponentType } from "@/app/admin/components/ui/base/badges/badge-types";
-import { HintText } from "@/app/admin/components/ui/base/input/hint-text";
-import { Label } from "@/app/admin/components/ui/base/input/label";
-import { Popover } from "@/app/admin/components/ui/base/select/popover";
-import { type SelectItemType, sizes } from "@/app/admin/components/ui/base/select/select";
-import { TagCloseX } from "@/app/admin/components/ui/base/tags/base-components/tag-close-x";
-import { useResizeObserver } from "@/hooks/use-resize-observer";
+import { Avatar } from "@/src/app/admin/components/ui/base/avatar/avatar";
+import type { IconComponentType } from "@/src/app/admin/components/ui/base/badges/badge-types";
+import { HintText } from "@/src/app/admin/components/ui/base/input/hint-text";
+import { Label } from "@/src/app/admin/components/ui/base/input/label";
+import { Popover } from "@/src/app/admin/components/ui/base/select/popover";
+import { type SelectItemType, sizes } from "@/src/app/admin/components/ui/base/select/select";
+import { TagCloseX } from "@/src/app/admin/components/ui/base/tags/base-components/tag-close-x";
+import { useResizeObserver } from "@/src/hooks/use-resize-observer";
 import { cx } from "@/utils/cx";
 import { SelectItem } from "./select-item";
 
@@ -26,7 +26,7 @@ interface ComboBoxValueProps extends AriaGroupProps {
     placeholder?: string;
     shortcutClassName?: string;
     placeholderIcon?: IconComponentType | null;
-    ref?: RefObject<HTMLDivElement | null>;
+    ref?: RefObject<HTMLDivElement>;
     onFocus?: FocusEventHandler;
     onPointerEnter?: PointerEventHandler;
 }

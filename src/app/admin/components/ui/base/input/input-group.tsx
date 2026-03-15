@@ -1,10 +1,10 @@
 "use client";
 
 import { type HTMLAttributes, type ReactNode } from "react";
-import { HintText } from "@/app/admin/components/ui/base/input/hint-text";
-import type { InputBaseProps } from "@/app/admin/components/ui/base/input/input";
-import { TextField } from "@/app/admin/components/ui/base/input/input";
-import { Label } from "@/app/admin/components/ui/base/input/label";
+import { HintText } from "@/src/app/admin/components/ui/base/input/hint-text";
+import type { InputBaseProps } from "@/src/app/admin/components/ui/base/input/input";
+import { TextField } from "@/src/app/admin/components/ui/base/input/input";
+import { Label } from "@/src/app/admin/components/ui/base/input/label";
 import { cx, sortCx } from "@/utils/cx";
 
 interface InputPrefixProps extends HTMLAttributes<HTMLDivElement> {
