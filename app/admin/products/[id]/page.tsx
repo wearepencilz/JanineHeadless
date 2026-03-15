@@ -41,9 +41,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     shopifyProductHandle: '',
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [params.id]);
+  useEffect(() => { fetchData(); }, [params.id]);
 
   async function fetchData() {
     try {
@@ -52,25 +50,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         fetch('/api/flavours'),
         fetch('/api/ingredients'),
       ]);
-
       if (offeringRes.ok && flavoursRes.ok && ingredientsRes.ok) {
         const offeringData = await offeringRes.json();
         const flavoursData = await flavoursRes.json();
         const ingredientsData = await ingredientsRes.json();
-        
         setOffering(offeringData);
         setFlavours(flavoursData.data || flavoursData);
         setIngredients(ingredientsData.data || ingredientsData);
-
-        // Fetch format
         const formatRes = await fetch(`/api/formats/${offeringData.formatId}`);
-        if (formatRes.ok) {
-          setFormat(await formatRes.json());
-        } else {
-          console.error('Failed to fetch format:', offeringData.formatId, formatRes.status);
-        }
-
-        // Populate form
+        if (formatRes.ok) setFormat(await formatRes.json());
         setFormData({
           internalName: offeringData.internalName || '',
           publicName: offeringData.publicName || '',
@@ -99,11 +87,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     e.preventDefault();
     setSaving(true);
     setErrors([]);
-
     try {
       const price = formData.price ? Math.round(parseFloat(formData.price) * 100) : 0;
       const compareAtPrice = formData.compareAtPrice ? Math.round(parseFloat(formData.compareAtPrice) * 100) : undefined;
-
       const payload = {
         internalName: formData.internalName,
         publicName: formData.publicName,
@@ -120,17 +106,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         shopifyProductId: formData.shopifyProductId || undefined,
         shopifyProductHandle: formData.shopifyProductHandle || undefined,
       };
-
       const response = await fetch(`/api/products/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       if (response.ok) {
-        // Stay on the same page and show success message
-        const updatedProduct = await response.json();
-        setOffering(updatedProduct);
+        setOffering(await response.json());
         alert('Product updated successfully');
       } else {
         const error = await response.json();
@@ -146,10 +128,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   async function handleDelete() {
     try {
-      const response = await fetch(`/api/products/${params.id}`, {
-        method: 'DELETE',
-      });
-
+      const response = await fetch(`/api/products/${params.id}`, { method: 'DELETE' });
       if (response.ok) {
         router.push('/admin/products');
       } else {
@@ -163,71 +142,31 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   }
 
   async function handleCreateShopifyProduct() {
-    // Validate before attempting to create
     const validationErrors: string[] = [];
-    
     const currentPrice = formData.price ? parseFloat(formData.price) : 0;
-    if (!currentPrice || currentPrice <= 0) {
-      validationErrors.push('Price must be greater than $0 to create a Shopify product');
-    }
-    
-    if (!offering?.formatId) {
-      validationErrors.push('Offering must have a format');
-    }
-    
-    if (!offering?.primaryFlavourIds || offering.primaryFlavourIds.length === 0) {
-      validationErrors.push('Offering must have at least one flavour');
-    }
-    
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    if (!confirm('Create a new Shopify product for this offering?')) {
-      return;
-    }
+    if (!currentPrice || currentPrice <= 0) validationErrors.push('Price must be greater than $0 to create a Shopify product');
+    if (!offering?.formatId) validationErrors.push('Offering must have a format');
+    if (!offering?.primaryFlavourIds || offering.primaryFlavourIds.length === 0) validationErrors.push('Offering must have at least one flavour');
+    if (validationErrors.length > 0) { setErrors(validationErrors); return; }
+    if (!confirm('Create a new Shopify product for this offering?')) return;
 
     setCreatingShopifyProduct(true);
     setErrors([]);
-
     try {
-      const response = await fetch(`/api/products/${params.id}/create-shopify-product`, {
-        method: 'POST',
-      });
-
+      const response = await fetch(`/api/products/${params.id}/create-shopify-product`, { method: 'POST' });
       const data = await response.json();
-
       if (!response.ok) {
-        // Show detailed error message from API
-        const errorMessage = data.details 
+        const msg = data.details
           ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
           : data.error || 'Failed to create Shopify product';
-        throw new Error(errorMessage);
+        throw new Error(msg);
       }
-
-      // Update form data with new Shopify product info
-      setFormData(prev => ({
-        ...prev,
-        shopifyProductId: data.shopifyProduct.id,
-        shopifyProductHandle: data.shopifyProduct.handle,
-      }));
-
-      // Update offering state immediately
+      setFormData(prev => ({ ...prev, shopifyProductId: data.shopifyProduct.id, shopifyProductHandle: data.shopifyProduct.handle }));
       if (offering) {
-        setOffering({
-          ...offering,
-          shopifyProductId: data.shopifyProduct.id,
-          shopifyProductHandle: data.shopifyProduct.handle,
-          syncStatus: 'synced',
-          lastSyncedAt: data.offering.lastSyncedAt,
-        });
+        setOffering({ ...offering, shopifyProductId: data.shopifyProduct.id, shopifyProductHandle: data.shopifyProduct.handle, syncStatus: 'synced', lastSyncedAt: data.offering.lastSyncedAt });
       }
-
-      // Refresh offering data from server to ensure consistency
       await fetchData();
-
-      alert(`✅ Shopify product created successfully!\n\nTitle: ${data.shopifyProduct.title}\nHandle: ${data.shopifyProduct.handle}\n\nThe offering is now linked to this product.`);
+      alert(`Shopify product created!\n\nTitle: ${data.shopifyProduct.title}\nHandle: ${data.shopifyProduct.handle}`);
     } catch (error) {
       console.error('Error creating Shopify product:', error);
       setErrors([error instanceof Error ? error.message : 'Failed to create Shopify product']);
@@ -239,38 +178,24 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   if (!offering) {
     return (
-      <EditPageLayout
-        title="Edit Product"
-        backHref="/admin/products"
-        backLabel="Back to Products"
-        onSave={() => {}}
-        onCancel={() => router.push('/admin/products')}
-        error="Product not found"
-        maxWidth="7xl"
-      >
+      <EditPageLayout title="Edit Product" backHref="/admin/products" backLabel="Back to Products" onSave={() => {}} onCancel={() => router.push('/admin/products')} error="Product not found" maxWidth="7xl">
         <div />
       </EditPageLayout>
     );
   }
 
   const primaryFlavours = flavours.filter(f => offering.primaryFlavourIds.includes(f.id));
-
-  // Compute allergens and dietary claims from flavours and their ingredients
-  const flavourIngredientIds = primaryFlavours.flatMap(f => 
-    f.ingredients?.map(fi => fi.ingredientId) || []
-  );
-  const flavourIngredients = ingredients.filter(ing => 
-    flavourIngredientIds.includes(ing.id)
-  );
-  
+  const flavourIngredientIds = primaryFlavours.flatMap(f => f.ingredients?.map(fi => fi.ingredientId) || []);
+  const flavourIngredients = ingredients.filter(ing => flavourIngredientIds.includes(ing.id));
   const allergenData = computeProductAllergens(primaryFlavours, flavourIngredients, []);
+  const shopifyAdminBase = `https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}`;
 
   return (
     <EditPageLayout
@@ -284,191 +209,197 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       error={errors.length > 0 ? errors.join(', ') : undefined}
       maxWidth="7xl"
     >
+      {/* Product Details */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="mb-5">
+          <h2 className="text-sm font-semibold text-gray-900">Product details</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Update the name, description, pricing and availability.</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Internal Name" type="text" value={formData.internalName} onChange={(v) => setFormData({ ...formData, internalName: v })} isRequired />
+              <Input label="Public Name" type="text" value={formData.publicName} onChange={(v) => setFormData({ ...formData, publicName: v })} isRequired />
+            </div>
+            <Textarea label="Description" value={formData.description} onChange={(v) => setFormData({ ...formData, description: v })} rows={4} isRequired />
+            <Input label="Short Card Copy" type="text" value={formData.shortCardCopy} onChange={(v) => setFormData({ ...formData, shortCardCopy: v })} />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Price ($)" type="number" value={formData.price} onChange={(v) => setFormData({ ...formData, price: v })} />
+              <Input label="Compare At Price ($)" type="number" value={formData.compareAtPrice} onChange={(v) => setFormData({ ...formData, compareAtPrice: v })} />
+            </div>
+            <Select
+              label="Status"
+              value={formData.status}
+              onChange={(v) => setFormData({ ...formData, status: v })}
+              options={[
+                { id: 'draft', label: 'Draft' },
+                { id: 'scheduled', label: 'Scheduled' },
+                { id: 'active', label: 'Active' },
+                { id: 'sold-out', label: 'Sold Out' },
+                { id: 'archived', label: 'Archived' },
+              ]}
+            />
+            <Input label="Tags (comma-separated)" type="text" value={formData.tags} onChange={(v) => setFormData({ ...formData, tags: v })} />
+            <div className="flex items-center gap-6">
+              <Checkbox isSelected={formData.inventoryTracked} onChange={(v) => setFormData({ ...formData, inventoryTracked: v })} label="Track Inventory" />
+              <Checkbox isSelected={formData.onlineOrderable} onChange={(v) => setFormData({ ...formData, onlineOrderable: v })} label="Online Orderable" />
+              <Checkbox isSelected={formData.pickupOnly} onChange={(v) => setFormData({ ...formData, pickupOnly: v })} label="Pickup Only" />
+            </div>
+            {formData.inventoryTracked && (
+              <Input label="Inventory Quantity" type="number" value={formData.inventoryQuantity} onChange={(v) => setFormData({ ...formData, inventoryQuantity: v })} />
+            )}
+          </div>
+        </form>
+      </div>
 
-      {/* Shopify Integration Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Shopify Integration</h2>
+      {/* Shopify Integration */}
+      <div className="bg-white rounded-lg border border-gray-200 mb-6 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">Shopify integration</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Manage this product's connection to your Shopify store.</p>
+          </div>
           {formData.shopifyProductId ? (
-            <span className="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Linked to Shopify
-            </span>
+            <Badge color="success">Linked</Badge>
           ) : (
-            <span className="px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-600">
-              Not linked
-            </span>
+            <Badge color="gray">Not linked</Badge>
           )}
         </div>
-        
+
         {formData.shopifyProductId ? (
-          // Linked State
-          <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-green-900 mb-2">
-                    Connected to Shopify Product
-                  </p>
-                  <div className="space-y-1 text-sm text-green-700">
-                    <p>
-                      <span className="font-medium">Handle:</span>{' '}
-                      <span className="font-mono text-xs">{formData.shopifyProductHandle}</span>
-                    </p>
-                    <p className="text-xs text-green-600">
-                      Product ID: {formData.shopifyProductId}
-                    </p>
-                  </div>
-                  {formData.shopifyProductHandle && (
-                    <a
-                      href={`https://admin.shopify.com/store/${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN?.replace('.myshopify.com', '')}/products/${formData.shopifyProductHandle}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 mt-3 text-sm text-green-700 hover:text-green-900 font-medium"
-                    >
-                      View in Shopify Admin
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 font-mono">{formData.shopifyProductHandle}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">ID: {formData.shopifyProductId}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {formData.shopifyProductHandle && (
+                  <a href={`${shopifyAdminBase}/products/${formData.shopifyProductHandle}`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="secondary" size="sm">
+                      View in Shopify
+                      <svg className="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
-                    </a>
-                  )}
-                </div>
+                    </Button>
+                  </a>
+                )}
                 <Button
                   variant="danger"
                   size="sm"
                   onClick={() => {
-                    if (confirm('Are you sure you want to unlink this Shopify product? This will not delete the product from Shopify.')) {
-                      setFormData({
-                        ...formData,
-                        shopifyProductId: '',
-                        shopifyProductHandle: '',
-                      });
+                    if (confirm('Unlink this Shopify product? This will not delete it from Shopify.')) {
+                      setFormData({ ...formData, shopifyProductId: '', shopifyProductHandle: '' });
                     }
                   }}
-                  className="ml-4"
                 >
                   Unlink
                 </Button>
               </div>
             </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                💡 Changes to this product will be synced to Shopify when you save. To manage inventory, variants, or other Shopify-specific settings, use the Shopify Admin.
-              </p>
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+              <p className="text-xs text-gray-500">Changes sync to Shopify on save. Manage inventory and variants directly in Shopify Admin.</p>
             </div>
-          </div>
+          </>
         ) : (
-          // Not Linked State
-          <div className="space-y-4">
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 mb-3">
-                This product is not connected to Shopify. Choose one of the options below to enable online sales:
-              </p>
-              
-              {/* Create New Option */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4 mb-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 mb-1">Create New Shopify Product</h4>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Automatically create a new product in Shopify with this product's details
-                    </p>
-                    {(!formData.price || parseFloat(formData.price) <= 0) && (
-                      <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                        <p className="text-sm text-yellow-800">
-                          ⚠️ Set a price greater than $0 before creating a Shopify product
-                        </p>
-                      </div>
-                    )}
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={handleCreateShopifyProduct}
-                      isDisabled={creatingShopifyProduct || !formData.price || parseFloat(formData.price) <= 0}
-                      isLoading={creatingShopifyProduct}
-                    >
-                      {creatingShopifyProduct ? 'Creating...' : 'Create New Product'}
-                    </Button>
-                  </div>
+          <>
+            {/* Create new */}
+            <div className="px-6 py-4 flex items-start justify-between gap-6 border-b border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Create new Shopify product</p>
+                  <p className="text-sm text-gray-500 mt-0.5">Automatically generate a product in Shopify from this product's details.</p>
+                  {(!formData.price || parseFloat(formData.price) <= 0) && (
+                    <p className="text-xs text-amber-600 mt-1.5">A price greater than $0 is required.</p>
+                  )}
                 </div>
               </div>
-              
-              {/* Link Existing Option */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 mb-1">Link to Existing Product</h4>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Connect this product to an existing Shopify product
-                    </p>
-                    <ShopifyProductPicker
-                      selectedProductId={formData.shopifyProductId}
-                      selectedProductHandle={formData.shopifyProductHandle}
-                      onSelect={(product) => {
-                        if (product) {
-                          setFormData({
-                            ...formData,
-                            shopifyProductId: product.id,
-                            shopifyProductHandle: product.handle,
-                          });
-                        } else {
-                          setFormData({
-                            ...formData,
-                            shopifyProductId: '',
-                            shopifyProductHandle: '',
-                          });
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleCreateShopifyProduct}
+                isDisabled={creatingShopifyProduct || !formData.price || parseFloat(formData.price) <= 0}
+                isLoading={creatingShopifyProduct}
+                className="flex-shrink-0"
+              >
+                {creatingShopifyProduct ? 'Creating...' : 'Create product'}
+              </Button>
+            </div>
+
+            {/* Link existing */}
+            <div className="px-6 py-4 flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Link to existing product</p>
+                <p className="text-sm text-gray-500 mt-0.5 mb-3">Connect this product to an existing Shopify product.</p>
+                <ShopifyProductPicker
+                  selectedProductId={formData.shopifyProductId}
+                  selectedProductHandle={formData.shopifyProductHandle}
+                  onSelect={(product) => {
+                    setFormData({ ...formData, shopifyProductId: product?.id || '', shopifyProductHandle: product?.handle || '' });
+                  }}
+                />
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
-      {/* Product Composition Section */}
+      {/* Product Composition */}
       {format && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Composition</h2>
-          
-          {/* Format */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Format</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-              <p className="text-sm text-gray-900 font-medium">{format.name}</p>
-              <p className="text-xs text-gray-600 mt-1">{format.description}</p>
+        <div className="bg-white rounded-lg border border-gray-200 mb-6 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Product composition</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Format and flavours are fixed at creation time.</p>
+          </div>
+
+          <div className="px-6 py-4 border-b border-gray-100">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Format</p>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">{format.name}</p>
+                {format.description && <p className="text-xs text-gray-500 mt-0.5">{format.description}</p>}
+              </div>
             </div>
           </div>
 
-          {/* Flavours */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Flavours</h3>
-            <div className="space-y-2">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Flavours</p>
+            <div className="space-y-3">
               {primaryFlavours.map((flavour) => (
-                <div key={flavour.id} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900 font-medium">{flavour.name}</p>
-                      <p className="text-xs text-gray-600 mt-1">{flavour.shortDescription}</p>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        <Badge color="blue" size="sm">{flavour.type}</Badge>
-                        <Badge color="purple" size="sm">{flavour.baseStyle}</Badge>
-                      </div>
+                <div key={flavour.id} className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{flavour.name}</p>
+                    {flavour.shortDescription && <p className="text-xs text-gray-500 mt-0.5">{flavour.shortDescription}</p>}
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      <Badge color="blue" size="sm">{flavour.type}</Badge>
+                      <Badge color="purple" size="sm">{flavour.baseStyle}</Badge>
                     </div>
                   </div>
                 </div>
@@ -476,175 +407,35 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             </div>
           </div>
 
-          {/* Allergens & Dietary Claims - Computed */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Allergens & Dietary Information</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-xs text-gray-600 mb-3">
-                ℹ️ Computed from flavour ingredients
-              </p>
-              
-              {/* Allergens */}
-              {allergenData.allergens.length > 0 ? (
-                <div className="mb-3">
-                  <p className="text-xs font-medium text-gray-700 mb-2">Contains Allergens:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {allergenData.allergens.map(allergen => (
-                      <Badge key={allergen} color="error" size="sm">{formatAllergen(allergen)}</Badge>
+          <div className="px-6 py-4">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Allergens & dietary</p>
+            {allergenData.allergens.length > 0 ? (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500 mb-1.5">Contains allergens</p>
+                <div className="flex flex-wrap gap-1">
+                  {allergenData.allergens.map(allergen => (
+                    <Badge key={allergen} color="error" size="sm">{formatAllergen(allergen as any)}</Badge>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 mb-3">No allergens detected</p>
+            )}
+            {allergenData.dietaryClaims.filter((c: string) => !c.startsWith('contains-')).length > 0 && (
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">Dietary claims</p>
+                <div className="flex flex-wrap gap-1">
+                  {allergenData.dietaryClaims
+                    .filter((claim: string) => !claim.startsWith('contains-'))
+                    .map((claim: string) => (
+                      <Badge key={claim} color="success" size="sm">{formatDietaryClaim(claim as any)}</Badge>
                     ))}
-                  </div>
                 </div>
-              ) : (
-                <div className="mb-3">
-                  <p className="text-xs text-gray-600">No allergens detected</p>
-                </div>
-              )}
-              
-              {/* Dietary Claims */}
-              {allergenData.dietaryClaims.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-700 mb-2">Dietary Claims:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {allergenData.dietaryClaims
-                      .filter(claim => !claim.startsWith('contains-'))
-                      .map(claim => (
-                        <Badge key={claim} color="success" size="sm">{formatDietaryClaim(claim)}</Badge>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-xs text-blue-800">
-              💡 Format and flavours cannot be changed after creation. Create a new product to use different format/flavours.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Product Details Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Details</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Input
-                  label="Internal Name"
-                  type="text"
-                  value={formData.internalName}
-                  onChange={(value) => setFormData({ ...formData, internalName: value })}
-                  isRequired
-                />
-              </div>
-
-              <div>
-                <Input
-                  label="Public Name"
-                  type="text"
-                  value={formData.publicName}
-                  onChange={(value) => setFormData({ ...formData, publicName: value })}
-                  isRequired
-                />
-              </div>
-            </div>
-
-            <div>
-              <Textarea
-                label="Description"
-                value={formData.description}
-                onChange={(value) => setFormData({ ...formData, description: value })}
-                rows={4}
-                isRequired
-              />
-            </div>
-
-            <div>
-              <Input
-                label="Short Card Copy"
-                type="text"
-                value={formData.shortCardCopy}
-                onChange={(value) => setFormData({ ...formData, shortCardCopy: value })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Input
-                  label="Price ($)"
-                  type="number"
-                  value={formData.price}
-                  onChange={(value) => setFormData({ ...formData, price: value })}
-                />
-              </div>
-
-              <div>
-                <Input
-                  label="Compare At Price ($)"
-                  type="number"
-                  value={formData.compareAtPrice}
-                  onChange={(value) => setFormData({ ...formData, compareAtPrice: value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Select
-                label="Status"
-                value={formData.status}
-                onChange={(value) => setFormData({ ...formData, status: value })}
-                options={[
-                  { id: 'draft', label: 'Draft' },
-                  { id: 'scheduled', label: 'Scheduled' },
-                  { id: 'active', label: 'Active' },
-                  { id: 'sold-out', label: 'Sold Out' },
-                  { id: 'archived', label: 'Archived' },
-                ]}
-              />
-            </div>
-
-            <div>
-              <Input
-                label="Tags (comma-separated)"
-                type="text"
-                value={formData.tags}
-                onChange={(value) => setFormData({ ...formData, tags: value })}
-              />
-            </div>
-
-            <div className="flex items-center gap-6">
-              <Checkbox
-                isSelected={formData.inventoryTracked}
-                onChange={(v) => setFormData({ ...formData, inventoryTracked: v })}
-                label="Track Inventory"
-              />
-              <Checkbox
-                isSelected={formData.onlineOrderable}
-                onChange={(v) => setFormData({ ...formData, onlineOrderable: v })}
-                label="Online Orderable"
-              />
-              <Checkbox
-                isSelected={formData.pickupOnly}
-                onChange={(v) => setFormData({ ...formData, pickupOnly: v })}
-                label="Pickup Only"
-              />
-            </div>
-
-            {formData.inventoryTracked && (
-              <div>
-                <Input
-                  label="Inventory Quantity"
-                  type="number"
-                  value={formData.inventoryQuantity}
-                  onChange={(value) => setFormData({ ...formData, inventoryQuantity: value })}
-                />
               </div>
             )}
           </div>
-        </form>
-      </div>
+        </div>
+      )}
     </EditPageLayout>
   );
 }

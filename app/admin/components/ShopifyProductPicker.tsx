@@ -24,9 +24,10 @@ interface Props {
   selectedProductId?: string;
   selectedProductHandle?: string;
   onSelect: (product: ShopifyProduct | null) => void;
+  trigger?: React.ReactNode;
 }
 
-export default function ShopifyProductPicker({ selectedProductId, selectedProductHandle, onSelect }: Props) {
+export default function ShopifyProductPicker({ selectedProductId, selectedProductHandle, onSelect, trigger }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
@@ -114,14 +115,18 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={handleModalOpen}
-        className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
-      >
-        <p className="text-sm text-gray-700 font-medium">Search Shopify Products</p>
-        <p className="text-xs text-gray-500 mt-1">Browse and select an existing product from your store</p>
-      </button>
+      {trigger ? (
+        <div onClick={handleModalOpen} style={{ cursor: 'pointer', display: 'inline-block' }}>{trigger}</div>
+      ) : (
+        <button
+          type="button"
+          onClick={handleModalOpen}
+          className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+        >
+          <p className="text-sm text-gray-700 font-medium">Search Shopify Products</p>
+          <p className="text-xs text-gray-500 mt-1">Browse and select an existing product from your store</p>
+        </button>
+      )}
 
       {/* Search Modal */}
       {showModal && (

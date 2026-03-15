@@ -26,18 +26,13 @@ export default function SimpleSidebar() {
       ],
     },
     {
-      label: 'Launches & Campaigns',
-      items: [
-        { href: '/admin/launches', label: 'Launches', icon: '🚀' },
-      ],
-    },
-    {
       label: 'Product Catalog',
       items: [
+        { href: '/admin/launches', label: 'Launches', icon: '🚀' },
+        { href: '/admin/products', label: 'Products', icon: '🎁' },
         { href: '/admin/flavours', label: 'Flavours', icon: '🍦' },
         { href: '/admin/formats', label: 'Formats', icon: '📦' },
         { href: '/admin/modifiers', label: 'Modifiers', icon: '✨' },
-        { href: '/admin/products', label: 'Products', icon: '🎁' },
       ],
     },
     {
