@@ -76,6 +76,7 @@ export const MultiSelectBase = ({
 }: MultiSelectProps) => {
     const { contains } = useFilter({ sensitivity: "base" });
     const selectedKeys = selectedItems.items.map((item) => item.id);
+    const [isOpen, setIsOpen] = useState(false);
 
     const filter = useCallback(
         (item: SelectItemType, filterText: string) => {
@@ -134,50 +135,57 @@ export const MultiSelectBase = ({
                 onRemove,
             }}
         >
-            <AriaComboBox
-                allowsEmptyCollection
-                menuTrigger="focus"
-                items={accessibleList.items}
-                onInputChange={onInputChange}
-                inputValue={accessibleList.filterText}
-                // This keeps the combobox popover open and the input value unchanged when an item is selected.
-                selectedKey={null}
-                onSelectionChange={onSelectionChange}
-                {...props}
-            >
-                {(state) => (
-                    <div className="flex flex-col gap-1.5">
-                        {props.label && (
-                            <Label isRequired={state.isRequired} tooltip={props.tooltip}>
-                                {props.label}
-                            </Label>
-                        )}
+            <div className="flex flex-col gap-1.5">
+                {props.label && (
+                    <Label isRequired={props.isRequired} tooltip={props.tooltip}>
+                        {props.label}
+                    </Label>
+                )}
 
-                        {/* Relative wrapper so the dropdown positions against this element */}
-                        <div className="relative">
+                {/* relative wrapper — dropdown anchors to this */}
+                <div className="relative">
+                    <AriaComboBox
+                        allowsEmptyCollection
+                        menuTrigger="focus"
+                        items={accessibleList.items}
+                        onInputChange={onInputChange}
+                        inputValue={accessibleList.filterText}
+                        selectedKey={null}
+                        onSelectionChange={onSelectionChange}
+                        onOpenChange={setIsOpen}
+                        {...props}
+                        label={undefined}
+                    >
+                        {() => (
                             <MultiSelectTagsValue
                                 size={size}
                                 shortcut={shortcut}
                                 placeholder={placeholder}
                             />
+                        )}
+                    </AriaComboBox>
 
-                            {/* Inline dropdown — no portal, positions relative to the input */}
-                            {state.isOpen && (
-                                <div className={cx(
-                                    "absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/10 outline-none",
-                                    props?.popoverClassName,
-                                )}>
-                                    <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
-                                        {children}
-                                    </AriaListBox>
-                                </div>
-                            )}
+                    {/* Dropdown rendered as sibling to AriaComboBox, inside the relative wrapper */}
+                    {isOpen && (
+                        <div className={cx(
+                            "absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/10 outline-none",
+                            props?.popoverClassName,
+                        )}>
+                            <AriaListBox
+                                aria-label="Options"
+                                items={accessibleList.items}
+                                selectionMode="multiple"
+                                className="size-full outline-hidden"
+                                onAction={(key) => onSelectionChange(key)}
+                            >
+                                {children}
+                            </AriaListBox>
                         </div>
+                    )}
+                </div>
 
-                        {props.hint && <HintText isInvalid={state.isInvalid}>{props.hint}</HintText>}
-                    </div>
-                )}
-            </AriaComboBox>
+                {props.hint && <HintText isInvalid={props.isInvalid}>{props.hint}</HintText>}
+            </div>
         </ComboboxContext.Provider>
     );
 };
