@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
@@ -9,16 +10,23 @@ import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+
+interface UsedInFlavour {
+  id: string;
+  name: string;
+}
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [usedInFlavours, setUsedInFlavours] = useState<UsedInFlavour[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     latinName: '',
     origin: '',
-    taxonomyCategory: '', // Changed from 'category'
+    taxonomyCategory: '',
     story: '',
     tastingNotes: '',
     supplier: '',
@@ -35,36 +43,51 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
-  useEffect(() => {
-    fetchIngredient();
-  }, [params.id]);
+  useEffect(() => { fetchIngredient(); }, [params.id]);
 
   const fetchIngredient = async () => {
     try {
-      const response = await fetch(`/api/ingredients/${params.id}`);
-      if (response.ok) {
-        const data = await response.json();
+      const [ingredientRes, flavoursRes] = await Promise.all([
+        fetch(`/api/ingredients/${params.id}`),
+        fetch('/api/flavours'),
+      ]);
+      if (ingredientRes.ok) {
+        const data = await ingredientRes.json();
         setFormData({
-          ...data,
-          tastingNotes: Array.isArray(data.tastingNotes) 
-            ? data.tastingNotes.join(', ') 
-            : data.tastingNotes || '',
-          allergens: data.allergens || [],
+          name: data.name || '',
+          latinName: data.latinName || '',
+          origin: data.origin || '',
+          taxonomyCategory: data.taxonomyCategory || data.category || '',
+          story: data.story || '',
+          tastingNotes: Array.isArray(data.tastingNotes) ? data.tastingNotes.join(', ') : data.tastingNotes || '',
+          supplier: data.supplier || '',
+          farm: data.farm || '',
+          seasonal: data.seasonal || false,
           availableMonths: data.availableMonths || [],
-          imageAlt: data.imageAlt || '',
+          allergens: data.allergens || [],
           animalDerived: data.animalDerived || false,
-          vegetarian: data.vegetarian !== false, // Default to true if not set
+          vegetarian: data.vegetarian !== false,
+          isOrganic: data.isOrganic || false,
+          image: data.image || '',
+          imageAlt: data.imageAlt || '',
         });
       } else {
         alert('Ingredient not found');
         router.push('/admin/ingredients');
       }
+      if (flavoursRes.ok) {
+        const flavoursData = await flavoursRes.json();
+        const flavours = flavoursData.data || flavoursData;
+        const used = flavours.filter((f: any) =>
+          f.ingredients?.some((ing: any) => ing.ingredientId === params.id)
+        );
+        setUsedInFlavours(used.map((f: any) => ({ id: f.id, name: f.name })));
+      }
     } catch (error) {
       console.error('Error fetching ingredient:', error);
-      alert('Failed to load ingredient');
     } finally {
       setLoading(false);
     }
@@ -73,7 +96,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const response = await fetch(`/api/ingredients/${params.id}`, {
         method: 'PUT',
@@ -83,7 +105,6 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           tastingNotes: formData.tastingNotes.split(',').map(n => n.trim()).filter(Boolean),
         }),
       });
-
       if (response.ok) {
         router.push('/admin/ingredients');
       } else {
@@ -102,14 +123,14 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
       ...prev,
       availableMonths: prev.availableMonths.includes(monthIndex)
         ? prev.availableMonths.filter(m => m !== monthIndex)
-        : [...prev.availableMonths, monthIndex].sort((a, b) => a - b)
+        : [...prev.availableMonths, monthIndex].sort((a, b) => a - b),
     }));
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-600">Loading ingredient...</div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -123,159 +144,192 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
       onCancel={() => router.push('/admin/ingredients')}
       saving={saving}
     >
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <Input
-            label="Name"
-            type="text"
-            isRequired
-            value={formData.name}
-            onChange={(value) => setFormData({ ...formData, name: value })}
-            placeholder="e.g., Blood Orange"
-          />
+      <div className="space-y-6">
 
-          <Input
-            label="Latin Name"
-            type="text"
-            value={formData.latinName}
-            onChange={(value) => setFormData({ ...formData, latinName: value })}
-            placeholder="e.g., Citrus × sinensis"
-          />
+        {/* Usage tracking */}
+        {usedInFlavours.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900">Used in flavours</h2>
+              <p className="text-sm text-gray-500 mt-0.5">This ingredient appears in {usedInFlavours.length} flavour{usedInFlavours.length !== 1 ? 's' : ''}.</p>
+            </div>
+            <div className="px-6 py-4 flex flex-wrap gap-2">
+              {usedInFlavours.map(f => (
+                <Link key={f.id} href={`/admin/flavours/${f.id}`}>
+                  <Badge color="blue">{f.name}</Badge>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
-          <div className="grid grid-cols-2 gap-4">
+        {/* Main form */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Ingredient details</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Update the name, origin, story and sourcing information.</p>
+          </div>
+          <div className="px-6 py-6 space-y-6">
+
             <Input
-              label="Origin"
+              label="Name"
               type="text"
               isRequired
-              value={formData.origin}
-              onChange={(value) => setFormData({ ...formData, origin: value })}
-              placeholder="e.g., Sicily"
-            />
-
-            <TaxonomySelect
-              category="ingredientCategories"
-              value={formData.taxonomyCategory}
-              onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
-              label="Category"
-              required
-            />
-          </div>
-
-          {/* Story */}
-          <Textarea
-            label="Story & Provenance"
-            value={formData.story}
-            onChange={(value) => setFormData({ ...formData, story: value })}
-            rows={4}
-            placeholder="Tell the story of this ingredient..."
-          />
-
-          {/* Tasting Notes */}
-          <TaxonomyTagSelect
-            category="tastingNotes"
-            values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
-            onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
-            label="Tasting Notes"
-            description="Select common tasting note descriptors"
-            allowCreate={true}
-          />
-
-          {/* Sourcing */}
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Supplier"
-              type="text"
-              value={formData.supplier}
-              onChange={(value) => setFormData({ ...formData, supplier: value })}
+              value={formData.name}
+              onChange={(value) => setFormData({ ...formData, name: value })}
+              placeholder="e.g., Blood Orange"
             />
 
             <Input
-              label="Farm"
+              label="Latin Name"
               type="text"
-              value={formData.farm}
-              onChange={(value) => setFormData({ ...formData, farm: value })}
+              value={formData.latinName}
+              onChange={(value) => setFormData({ ...formData, latinName: value })}
+              placeholder="e.g., Citrus × sinensis"
             />
-          </div>
 
-          {/* Allergens */}
-          <TaxonomyTagSelect
-            category="allergens"
-            values={formData.allergens}
-            onChange={(values) => setFormData({ ...formData, allergens: values })}
-            label="Allergens"
-          />
-
-          {/* Dietary Facts */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Dietary Facts</p>
-            <div className="space-y-2">
-              <Checkbox
-                isSelected={formData.animalDerived}
-                onChange={(v) => setFormData({ ...formData, animalDerived: v })}
-                label="Contains animal-derived ingredients"
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Origin"
+                type="text"
+                isRequired
+                value={formData.origin}
+                onChange={(value) => setFormData({ ...formData, origin: value })}
+                placeholder="e.g., Sicily"
               />
-              <Checkbox
-                isSelected={formData.vegetarian}
-                onChange={(v) => setFormData({ ...formData, vegetarian: v })}
-                label="Suitable for vegetarians"
+              <TaxonomySelect
+                category="ingredientCategories"
+                value={formData.taxonomyCategory}
+                onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
+                label="Category"
+                required
               />
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
-            </p>
+
+            <Textarea
+              label="Story & Provenance"
+              value={formData.story}
+              onChange={(value) => setFormData({ ...formData, story: value })}
+              rows={4}
+              placeholder="Tell the story of this ingredient..."
+            />
+
+            <TaxonomyTagSelect
+              category="tastingNotes"
+              values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
+              onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
+              label="Tasting Notes"
+              description="Select common tasting note descriptors"
+              allowCreate={true}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Supplier"
+                type="text"
+                value={formData.supplier}
+                onChange={(value) => setFormData({ ...formData, supplier: value })}
+              />
+              <Input
+                label="Farm"
+                type="text"
+                value={formData.farm}
+                onChange={(value) => setFormData({ ...formData, farm: value })}
+              />
+            </div>
+
+            <TaxonomyTagSelect
+              category="allergens"
+              values={formData.allergens}
+              onChange={(values) => setFormData({ ...formData, allergens: values })}
+              label="Allergens"
+            />
+
           </div>
+        </form>
 
-          {/* Seasonal */}
-          <Checkbox
-            isSelected={formData.seasonal}
-            onChange={(v) => setFormData({ ...formData, seasonal: v })}
-            label="Seasonal Ingredient"
-          />
+        {/* Advanced options */}
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Advanced options</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Dietary facts, seasonality and organic status.</p>
+          </div>
+          <div className="px-6 py-6 space-y-6">
 
-          {formData.seasonal && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Available Months
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {months.map((month, index) => (
-                  <button
-                    key={month}
-                    type="button"
-                    onClick={() => toggleMonth(index)}
-                    className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                      formData.availableMonths.includes(index)
-                        ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                        : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                    }`}
-                  >
-                    {month}
-                  </button>
-                ))}
+              <p className="text-sm font-medium text-gray-700 mb-2">Dietary facts</p>
+              <div className="space-y-2">
+                <Checkbox
+                  isSelected={formData.animalDerived}
+                  onChange={(v) => setFormData({ ...formData, animalDerived: v })}
+                  label="Contains animal-derived ingredients"
+                />
+                <Checkbox
+                  isSelected={formData.vegetarian}
+                  onChange={(v) => setFormData({ ...formData, vegetarian: v })}
+                  label="Suitable for vegetarians"
+                />
               </div>
+              <p className="text-xs text-gray-500 mt-2">Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts.</p>
             </div>
-          )}
 
-          {/* Organic */}
-          <Checkbox
-            isSelected={formData.isOrganic}
-            onChange={(v) => setFormData({ ...formData, isOrganic: v })}
-            label="Organic"
-          />
+            <Checkbox
+              isSelected={formData.isOrganic}
+              onChange={(v) => setFormData({ ...formData, isOrganic: v })}
+              label="Organic"
+            />
 
-          {/* Image Upload */}
-          <ImageUploader
-            value={formData.image}
-            onChange={(url: string) => setFormData({ ...formData, image: url })}
-            altText={formData.imageAlt}
-            onAltTextChange={(alt: string) => setFormData({ ...formData, imageAlt: alt })}
-            aspectRatio="1:1"
-            label="Ingredient Image"
-            required={false}
-          />
+            <Checkbox
+              isSelected={formData.seasonal}
+              onChange={(v) => setFormData({ ...formData, seasonal: v })}
+              label="Seasonal ingredient"
+            />
+
+            {formData.seasonal && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Available months</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {months.map((month, index) => (
+                    <button
+                      key={month}
+                      type="button"
+                      onClick={() => toggleMonth(index)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                        formData.availableMonths.includes(index)
+                          ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                          : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                      }`}
+                    >
+                      {month}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
-      </form>
+
+        {/* Image */}
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Image</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Upload a photo of this ingredient.</p>
+          </div>
+          <div className="px-6 py-6">
+            <ImageUploader
+              value={formData.image}
+              onChange={(url: string) => setFormData({ ...formData, image: url })}
+              altText={formData.imageAlt}
+              onAltTextChange={(alt: string) => setFormData({ ...formData, imageAlt: alt })}
+              aspectRatio="1:1"
+              label="Ingredient Image"
+              required={false}
+            />
+          </div>
+        </div>
+
+      </div>
     </EditPageLayout>
   );
 }
