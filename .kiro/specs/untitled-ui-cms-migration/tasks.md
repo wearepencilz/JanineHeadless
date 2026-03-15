@@ -279,7 +279,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify only used components are included in production bundle
     - **Validates: Requirements 16.2**
 
-  - [ ] 10.7 Remove deprecated custom components and clean up
+  - [-] 10.7 Remove deprecated custom components and clean up
     - Remove old custom components that have been fully replaced (only after verifying no remaining imports)
     - Remove hardcoded color classes from any remaining files
     - Update `app/admin/components/` directory structure to reflect final state
@@ -295,7 +295,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify all UI components have complete TypeScript type definitions with no `any` types
     - **Validates: Requirements 1.5**
 
-  - [ ] 10.10 Update ImageUploader to use migrated Button and Input dependencies
+  - [x] 10.10 Update ImageUploader to use migrated Button and Input dependencies
     - Update `app/admin/components/ImageUploader.tsx` to import Button and Input from Untitled UI wrappers
     - Replace any remaining hardcoded styles
     - _Requirements: 4.1, 5.1_
