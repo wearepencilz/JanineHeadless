@@ -12,10 +12,8 @@ import { Avatar } from "@/src/app/admin/components/ui/base/avatar/avatar";
 import type { IconComponentType } from "@/src/app/admin/components/ui/base/badges/badge-types";
 import { HintText } from "@/src/app/admin/components/ui/base/input/hint-text";
 import { Label } from "@/src/app/admin/components/ui/base/input/label";
-import { Popover } from "@/src/app/admin/components/ui/base/select/popover";
 import { type SelectItemType, sizes } from "@/src/app/admin/components/ui/base/select/select";
 import { TagCloseX } from "@/src/app/admin/components/ui/base/tags/base-components/tag-close-x";
-import { useResizeObserver } from "@/src/hooks/use-resize-observer";
 import { cx } from "@/utils/cx";
 import { SelectItem } from "./select-item";
 
@@ -126,22 +124,6 @@ export const MultiSelectBase = ({
         accessibleList.setFilterText(value);
     };
 
-    const placeholderRef = useRef<HTMLDivElement>(null);
-    const [popoverWidth, setPopoverWidth] = useState("");
-
-    // Resize observer for popover width
-    const onResize = useCallback(() => {
-        if (!placeholderRef.current) return;
-        let divRect = placeholderRef.current?.getBoundingClientRect();
-        setPopoverWidth(divRect.width + "px");
-    }, [placeholderRef, setPopoverWidth]);
-
-    useResizeObserver({
-        ref: placeholderRef,
-        onResize: onResize,
-        box: "border-box",
-    });
-
     return (
         <ComboboxContext.Provider
             value={{
@@ -171,22 +153,26 @@ export const MultiSelectBase = ({
                             </Label>
                         )}
 
-                        <MultiSelectTagsValue
-                            size={size}
-                            shortcut={shortcut}
-                            ref={placeholderRef}
-                            placeholder={placeholder}
-                            // This is a workaround to correctly calculating the trigger width
-                            // while using ResizeObserver wasn't 100% reliable.
-                            onFocus={onResize}
-                            onPointerEnter={onResize}
-                        />
+                        {/* Relative wrapper so the dropdown positions against this element */}
+                        <div className="relative">
+                            <MultiSelectTagsValue
+                                size={size}
+                                shortcut={shortcut}
+                                placeholder={placeholder}
+                            />
 
-                        <Popover size={"md"} style={{ width: popoverWidth }} className={props?.popoverClassName}>
-                            <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
-                                {children}
-                            </AriaListBox>
-                        </Popover>
+                            {/* Inline dropdown — no portal, positions relative to the input */}
+                            {state.isOpen && (
+                                <div className={cx(
+                                    "absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/10 outline-none",
+                                    props?.popoverClassName,
+                                )}>
+                                    <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
+                                        {children}
+                                    </AriaListBox>
+                                </div>
+                            )}
+                        </div>
 
                         {props.hint && <HintText isInvalid={state.isInvalid}>{props.hint}</HintText>}
                     </div>
