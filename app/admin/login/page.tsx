@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -50,12 +52,11 @@ export default function AdminLogin() {
               <label htmlFor="username" className="block text-sm font-medium mb-1.5 text-gray-900">
                 Username
               </label>
-              <input
+              <Input
                 id="username"
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={(val) => setUsername(val)}
                 placeholder="Enter username"
                 required
               />
@@ -65,12 +66,11 @@ export default function AdminLogin() {
               <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-gray-900">
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={(val) => setPassword(val)}
                 placeholder="Enter password"
                 required
               />
@@ -82,10 +82,12 @@ export default function AdminLogin() {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm"
+              variant="primary"
+              size="md"
+              isDisabled={loading}
+              className="w-full"
             >
               {loading ? (
                 <>
@@ -98,7 +100,7 @@ export default function AdminLogin() {
               ) : (
                 'Sign In'
               )}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 text-center text-xs text-gray-500">

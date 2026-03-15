@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
 
 interface ShopifyProduct {
   id: string;
@@ -145,30 +147,27 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
                 </button>
               </div>
               
-              <div className="flex gap-2">
-                <input
+              <div className="flex gap-2" onKeyDown={handleKeyDown}>
+                <Input
                   type="text"
                   placeholder="Search by product name..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    // If user clears the search, reload all products
-                    if (e.target.value === '') {
-                      loadProducts('*');
-                    }
+                  onChange={(val) => {
+                    setSearchTerm(val);
+                    if (val === '') loadProducts('*');
                   }}
-                  onKeyDown={handleKeyDown}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   autoFocus
+                  className="flex-1"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
                   onClick={searchProducts}
-                  disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  isDisabled={loading}
                 >
                   {loading ? 'Searching...' : 'Search'}
-                </button>
+                </Button>
               </div>
               
               {error && (
@@ -245,18 +244,20 @@ export default function ShopifyProductPicker({ selectedProductId, selectedProduc
             </div>
             
             <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="md"
                 onClick={() => {
                   setShowModal(false);
                   setSearchTerm('');
                   setProducts([]);
                   setError('');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+                className="w-full"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </div>

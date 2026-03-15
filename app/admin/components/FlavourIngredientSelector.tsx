@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@/app/admin/components/ui/button';
 import type { Ingredient, FlavourIngredient, Allergen, DietaryClaim, IngredientCategory } from '@/types';
 
 interface Props {
@@ -372,14 +373,16 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
                     onChange={(e) => setNewIngredient({ ...newIngredient, origin: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="sm"
                     onClick={createIngredient}
-                    disabled={creating}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 text-sm font-medium"
+                    isDisabled={creating}
+                    className="w-full"
                   >
                     {creating ? 'Creating...' : 'Create & Add Ingredient'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

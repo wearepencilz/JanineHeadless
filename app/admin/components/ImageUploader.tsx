@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, DragEvent } from 'react';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
 
 interface ImageUploaderProps {
   value?: string;
@@ -208,7 +210,7 @@ export default function ImageUploader({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-[--color-brand-600] hover:text-[--color-brand-700] font-medium"
                 >
                   Click to upload
                 </button>{' '}
@@ -232,22 +234,24 @@ export default function ImageUploader({
               alt={altText || 'Preview'}
               className="w-full h-full object-cover"
             />
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="sm"
               onClick={handleDelete}
-              className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
-              title="Delete image"
+              className="absolute top-2 right-2 !rounded-full !p-2"
+              aria-label="Delete image"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </Button>
           </div>
 
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className="text-sm text-[--color-brand-600] hover:text-[--color-brand-700]"
           >
             Replace image
           </button>
@@ -275,12 +279,11 @@ export default function ImageUploader({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Alt Text <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="text"
             value={altText}
-            onChange={(e) => onAltTextChange(e.target.value)}
+            onChange={(val) => onAltTextChange(val)}
             placeholder="Describe the image for accessibility"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required={required}
           />
           <p className="text-xs text-gray-500 mt-1">
