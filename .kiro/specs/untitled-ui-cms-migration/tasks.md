@@ -104,18 +104,18 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Add search/filter functionality
     - _Requirements: 9.1, 9.7_
 
-  - [-] 4.4 Migrate TaxonomyMultiSelect and TaxonomyTagSelect to use Untitled UI MultiSelect
+  - [x] 4.4 Migrate TaxonomyMultiSelect and TaxonomyTagSelect to use Untitled UI MultiSelect
     - Refactor `app/admin/components/TaxonomyMultiSelect.tsx` to wrap Untitled UI MultiSelect
     - Refactor `app/admin/components/TaxonomyTagSelect.tsx` to wrap Untitled UI MultiSelect
     - Display selected items as removable tags
     - _Requirements: 9.2, 9.4, 9.7, 9.8_
 
-  - [ ] 4.5 Migrate FormatSelector and FlavourSelector to use Untitled UI Select/MultiSelect
+  - [x] 4.5 Migrate FormatSelector and FlavourSelector to use Untitled UI Select/MultiSelect
     - Refactor `app/admin/components/FormatSelector.tsx` to use Untitled UI Select
     - Refactor `app/admin/components/FlavourSelector.tsx` to use Untitled UI Select
     - _Requirements: 9.8_
 
-  - [ ] 4.6 Verify and configure Untitled UI DatePicker and DateRangePicker
+  - [x] 4.6 Verify and configure Untitled UI DatePicker and DateRangePicker
     - Components already exist in `app/admin/components/ui/date-picker/`
     - Verify DatePicker supports keyboard navigation, ISO 8601 formatting, min/max date constraints
     - Verify DateRangePicker supports start/end date selection
@@ -127,14 +127,14 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify keyboard navigation and ISO 8601 date formatting
     - **Validates: Requirements 6.5, 6.8**
 
-  - [ ] 4.8 Migrate date inputs across admin pages
+  - [x] 4.8 Migrate date inputs across admin pages
     - Replace native HTML date inputs in Launches pages with DatePicker/DateRangePicker
     - Migrate `app/admin/components/LaunchDateRangePicker.tsx` to use Untitled UI DateRangePicker
     - Migrate `app/admin/components/AvailabilityScheduler.tsx` date inputs
     - Replace date inputs in Batches, News pages
     - _Requirements: 6.1, 6.2, 6.7_
 
-  - [ ] 4.9 Update all form pages to use migrated Select/DatePicker components
+  - [x] 4.9 Update all form pages to use migrated Select/DatePicker components
     - Update Launches forms (new, edit) to use new Select and DatePicker components
     - Update Products forms to use new Select components
     - Update Ingredients, Modifiers, Formats forms

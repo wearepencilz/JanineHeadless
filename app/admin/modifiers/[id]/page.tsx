@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Select } from '@/app/admin/components/ui/select';
 
 interface Modifier {
   id: string;
@@ -120,15 +121,6 @@ export default function EditModifierPage({ params }: { params: { id: string } })
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    if (!modifier) return;
-    const { name, value, type } = e.target;
-    setModifier({
-      ...modifier,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
-    });
-  };
-
   const handleFormatToggle = (formatId: string) => {
     if (!modifier) return;
     setModifier({
@@ -199,23 +191,20 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-              Type *
-            </label>
-            <select
-              id="type"
-              name="type"
+            <Select
+              label="Type *"
+              isRequired
               value={modifier.type}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="topping">Topping</option>
-              <option value="sauce">Sauce</option>
-              <option value="crunch">Crunch</option>
-              <option value="drizzle">Drizzle</option>
-              <option value="premium-addon">Premium Add-on</option>
-              <option value="pack-in">Pack-in</option>
-            </select>
+              onChange={(value) => setModifier({ ...modifier, type: value })}
+              options={[
+                { id: 'topping', label: 'Topping' },
+                { id: 'sauce', label: 'Sauce' },
+                { id: 'crunch', label: 'Crunch' },
+                { id: 'drizzle', label: 'Drizzle' },
+                { id: 'premium-addon', label: 'Premium Add-on' },
+                { id: 'pack-in', label: 'Pack-in' },
+              ]}
+            />
           </div>
 
           <div>
@@ -273,19 +262,15 @@ export default function EditModifierPage({ params }: { params: { id: string } })
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
+            <Select
+              label="Status"
               value={modifier.status}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </select>
+              onChange={(value) => setModifier({ ...modifier, status: value })}
+              options={[
+                { id: 'active', label: 'Active' },
+                { id: 'archived', label: 'Archived' },
+              ]}
+            />
           </div>
 
         </div>

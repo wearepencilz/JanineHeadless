@@ -1,5 +1,8 @@
 'use client';
 
+import { parseDate } from '@internationalized/date';
+import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
+
 interface AvailabilitySchedulerProps {
   availabilityStart?: string;
   availabilityEnd?: string;
@@ -17,8 +20,6 @@ export default function AvailabilityScheduler({
   location,
   onUpdate,
 }: AvailabilitySchedulerProps) {
-  const today = new Date().toISOString().split('T')[0];
-
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Availability Schedule</h3>
@@ -26,41 +27,37 @@ export default function AvailabilityScheduler({
       <div className="space-y-4">
         {/* Availability Start Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg-secondary mb-1">
             Available From
           </label>
-          <input
-            type="date"
-            value={availabilityStart || ''}
-            onChange={(e) => onUpdate({
-              availabilityStart: e.target.value,
+          <DatePicker
+            value={availabilityStart ? parseDate(availabilityStart) : null}
+            onChange={(date) => onUpdate({
+              availabilityStart: date ? date.toString() : undefined,
               availabilityEnd,
               location,
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-tertiary">
             Leave blank for immediate availability
           </p>
         </div>
 
         {/* Availability End Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-fg-secondary mb-1">
             Available Until
           </label>
-          <input
-            type="date"
-            value={availabilityEnd || ''}
-            min={availabilityStart || today}
-            onChange={(e) => onUpdate({
+          <DatePicker
+            value={availabilityEnd ? parseDate(availabilityEnd) : null}
+            minValue={availabilityStart ? parseDate(availabilityStart) : undefined}
+            onChange={(date) => onUpdate({
               availabilityStart,
-              availabilityEnd: e.target.value,
+              availabilityEnd: date ? date.toString() : undefined,
               location,
             })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-tertiary">
             Leave blank for ongoing availability
           </p>
         </div>

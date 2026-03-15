@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/slug';
 import { Button } from '@/app/admin/components/ui/button';
+import { Select } from '@/app/admin/components/ui/select';
 import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
@@ -198,21 +199,17 @@ export default function NewLaunchPage() {
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
+            <Select
+              label="Status"
               value={formData.status}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="upcoming">Upcoming</option>
-              <option value="active">Active</option>
-              <option value="ended">Ended</option>
-              <option value="archived">Archived</option>
-            </select>
+              onChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+              options={[
+                { id: 'upcoming', label: 'Upcoming' },
+                { id: 'active', label: 'Active' },
+                { id: 'ended', label: 'Ended' },
+                { id: 'archived', label: 'Archived' },
+              ]}
+            />
           </div>
 
           <div>

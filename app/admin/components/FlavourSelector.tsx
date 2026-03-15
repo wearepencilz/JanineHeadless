@@ -66,7 +66,7 @@ export default function FlavourSelector({ format, flavours, selectedFlavourIds, 
             <button
               type="button"
               onClick={() => onSelect([])}
-              className="text-xs text-blue-600 hover:text-blue-700"
+              className="text-xs text-fg-brand-primary hover:text-fg-brand-primary-hover"
             >
               Clear All
             </button>
@@ -81,20 +81,20 @@ export default function FlavourSelector({ format, flavours, selectedFlavourIds, 
 
       {/* Twist Builder */}
       {isTwist && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h4 className="text-sm font-semibold text-blue-900 mb-2">Twist Combination</h4>
+        <div className="mb-4 p-4 bg-brand-primary border border-brand-primary rounded-lg">
+          <h4 className="text-sm font-semibold text-fg-brand-primary mb-2">Twist Combination</h4>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-xs text-blue-700 mb-1">Flavour A</p>
-              <div className="p-2 bg-white border border-blue-300 rounded text-sm">
+              <p className="text-xs text-fg-brand-secondary mb-1">Flavour A</p>
+              <div className="p-2 bg-primary border border-brand-primary rounded text-sm">
                 {selectedFlavourIds[0]
                   ? flavoursArray.find(f => f.id === selectedFlavourIds[0])?.name
                   : 'Not selected'}
               </div>
             </div>
             <div>
-              <p className="text-xs text-blue-700 mb-1">Flavour B</p>
-              <div className="p-2 bg-white border border-blue-300 rounded text-sm">
+              <p className="text-xs text-fg-brand-secondary mb-1">Flavour B</p>
+              <div className="p-2 bg-primary border border-brand-primary rounded text-sm">
                 {selectedFlavourIds[1]
                   ? flavoursArray.find(f => f.id === selectedFlavourIds[1])?.name
                   : 'Not selected'}

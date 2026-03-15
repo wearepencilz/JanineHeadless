@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
+import { Select } from '@/app/admin/components/ui/select';
 
 export default function CreateFormatPage() {
   const router = useRouter();
@@ -116,21 +117,16 @@ export default function CreateFormatPage() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Serving Style *
-              </label>
-              <select
-                required
+              <Select
+                label="Serving Style *"
+                isRequired
                 value={formData.servingStyle}
-                onChange={(e) => setFormData({ ...formData, servingStyle: e.target.value as ServingStyle })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {servingStyles.map((style) => (
-                  <option key={style} value={style}>
-                    {style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setFormData({ ...formData, servingStyle: value as ServingStyle })}
+                options={servingStyles.map((style) => ({
+                  id: style,
+                  label: style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                }))}
+              />
             </div>
           </div>
 

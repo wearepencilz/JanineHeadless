@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { Button } from '@/app/admin/components/ui/button';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
+import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
+import { parseDate } from '@internationalized/date';
 
 interface NewsItem {
   id?: number;
@@ -117,27 +122,23 @@ export default function NewsEditPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Title
+              Date
             </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+            <DatePicker
+              value={formData.date ? parseDate(formData.date) : null}
+              onChange={(date) => setFormData({ ...formData, date: date ? date.toString() : '' })}
+              isRequired
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-900">
-              Date
+              Title
             </label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+            <Input
+              value={formData.title}
+              onChange={(value) => setFormData({ ...formData, title: value })}
+              isRequired
             />
           </div>
 
@@ -145,12 +146,11 @@ export default function NewsEditPage() {
             <label className="block text-sm font-medium mb-1.5 text-gray-900">
               Content
             </label>
-            <textarea
+            <Textarea
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, content: value })}
               rows={8}
-              className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              isRequired
             />
           </div>
 
@@ -177,20 +177,20 @@ export default function NewsEditPage() {
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button
+          <Button
             type="submit"
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 text-sm disabled:opacity-50"
+            variant="primary"
+            isDisabled={saving}
+            isLoading={saving}
           >
             {saving ? 'Saving...' : 'Save Article'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => router.back()}
-            className="inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 h-10 px-4 text-sm"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </form>
     </div>

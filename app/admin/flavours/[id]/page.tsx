@@ -10,6 +10,7 @@ import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import type { Flavour, FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Select } from '@/app/admin/components/ui/select';
 
 export default function EditFlavourPage() {
   const router = useRouter();
@@ -120,18 +121,17 @@ export default function EditFlavourPage() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status *
-              </label>
-              <select
+              <Select
+                label="Status *"
+                isRequired
                 value={formData.status || 'active'}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as Status })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="active">Active</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="archived">Archived</option>
-              </select>
+                onChange={(value) => setFormData({ ...formData, status: value as Status })}
+                options={[
+                  { id: 'active', label: 'Active' },
+                  { id: 'upcoming', label: 'Upcoming' },
+                  { id: 'archived', label: 'Archived' },
+                ]}
+              />
             </div>
           </div>
 
@@ -160,19 +160,18 @@ export default function EditFlavourPage() {
           {/* Base - Only show for gelato or special types */}
           {(formData.type === 'gelato' || formData.type === 'special') && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Base *
-              </label>
-              <select
+              <Select
+                label="Base *"
+                isRequired
                 value={formData.baseStyle || 'dairy'}
-                onChange={(e) => setFormData({ ...formData, baseStyle: e.target.value as BaseStyle })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="dairy">Dairy</option>
-                <option value="non-dairy">Non-Dairy</option>
-                <option value="cheese">Cheese</option>
-                <option value="other">Other</option>
-              </select>
+                onChange={(value) => setFormData({ ...formData, baseStyle: value as BaseStyle })}
+                options={[
+                  { id: 'dairy', label: 'Dairy' },
+                  { id: 'non-dairy', label: 'Non-Dairy' },
+                  { id: 'cheese', label: 'Cheese' },
+                  { id: 'other', label: 'Other' },
+                ]}
+              />
             </div>
           )}
 

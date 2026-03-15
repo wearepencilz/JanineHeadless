@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Select } from '@/app/admin/components/ui/select';
+import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
+import { parseDate } from '@internationalized/date';
 
 interface Flavour {
   id: string;
@@ -75,22 +78,14 @@ export default function CreateBatchPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-md rounded-lg p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Flavour *
-          </label>
-          <select
-            required
+          <Select
+            label="Flavour *"
+            isRequired
+            placeholder="Select a flavour"
             value={formData.flavourId}
-            onChange={(e) => setFormData({ ...formData, flavourId: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a flavour</option>
-            {flavours.map((flavour) => (
-              <option key={flavour.id} value={flavour.id}>
-                {flavour.name}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setFormData({ ...formData, flavourId: value })}
+            options={flavours.map((f) => ({ id: f.id, label: f.name }))}
+          />
         </div>
 
         <div>
@@ -108,30 +103,24 @@ export default function CreateBatchPage() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Date *
           </label>
-          <input
-            type="date"
-            required
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <DatePicker
+            value={formData.date ? parseDate(formData.date) : null}
+            onChange={(date) => setFormData({ ...formData, date: date ? date.toString() : '' })}
+            isRequired
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Status
-          </label>
-          <select
+          <Select
+            label="Status"
             value={formData.status}
-            onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value as any })
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="testing">Testing</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
+            onChange={(value) => setFormData({ ...formData, status: value as 'testing' | 'approved' | 'rejected' })}
+            options={[
+              { id: 'testing', label: 'Testing' },
+              { id: 'approved', label: 'Approved' },
+              { id: 'rejected', label: 'Rejected' },
+            ]}
+          />
         </div>
 
         <div>

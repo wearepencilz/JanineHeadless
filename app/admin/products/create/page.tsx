@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Format, Flavour } from '@/types';
 import FormatSelector from '../../components/FormatSelector';
 import FlavourSelector from '../../components/FlavourSelector';
+import { Select } from '@/app/admin/components/ui/select';
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -398,20 +399,18 @@ export default function CreateProductPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
+                <Select
+                  label="Status"
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="active">Active</option>
-                  <option value="sold-out">Sold Out</option>
-                  <option value="archived">Archived</option>
-                </select>
+                  onChange={(value) => setFormData({ ...formData, status: value })}
+                  options={[
+                    { id: 'draft', label: 'Draft' },
+                    { id: 'scheduled', label: 'Scheduled' },
+                    { id: 'active', label: 'Active' },
+                    { id: 'sold-out', label: 'Sold Out' },
+                    { id: 'archived', label: 'Archived' },
+                  ]}
+                />
               </div>
 
               <div className="flex items-center space-x-6">

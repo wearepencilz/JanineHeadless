@@ -1,6 +1,7 @@
 'use client';
 
 import { Flavour } from '@/types';
+import { Select } from '@/app/admin/components/ui/select';
 
 interface TwistBuilderProps {
   flavours: Flavour[];
@@ -44,25 +45,18 @@ export default function TwistBuilder({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {/* Flavour A */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Flavour A *
-          </label>
-          <select
+          <Select
+            label="Flavour A *"
+            isRequired
+            placeholder="Select flavour..."
             value={selectedFlavourIds[0] || ''}
-            onChange={(e) => handleFlavourAChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select flavour...</option>
-            {twistEligibleFlavours.map((flavour) => (
-              <option
-                key={flavour.id}
-                value={flavour.id}
-                disabled={flavour.id === selectedFlavourIds[1]}
-              >
-                {flavour.name} ({flavour.type})
-              </option>
-            ))}
-          </select>
+            onChange={handleFlavourAChange}
+            options={twistEligibleFlavours.map((f) => ({
+              id: f.id,
+              label: `${f.name} (${f.type})`,
+              isDisabled: f.id === selectedFlavourIds[1],
+            }))}
+          />
           
           {flavourA && (
             <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
@@ -89,25 +83,18 @@ export default function TwistBuilder({
 
         {/* Flavour B */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Flavour B *
-          </label>
-          <select
+          <Select
+            label="Flavour B *"
+            isRequired
+            placeholder="Select flavour..."
             value={selectedFlavourIds[1] || ''}
-            onChange={(e) => handleFlavourBChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select flavour...</option>
-            {twistEligibleFlavours.map((flavour) => (
-              <option
-                key={flavour.id}
-                value={flavour.id}
-                disabled={flavour.id === selectedFlavourIds[0]}
-              >
-                {flavour.name} ({flavour.type})
-              </option>
-            ))}
-          </select>
+            onChange={handleFlavourBChange}
+            options={twistEligibleFlavours.map((f) => ({
+              id: f.id,
+              label: `${f.name} (${f.type})`,
+              isDisabled: f.id === selectedFlavourIds[0],
+            }))}
+          />
           
           {flavourB && (
             <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
