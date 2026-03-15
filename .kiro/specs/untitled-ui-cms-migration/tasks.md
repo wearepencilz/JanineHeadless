@@ -242,7 +242,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Verify all tables and badges are migrated
   - Run `npm run build` to confirm no compilation errors
 
-- [-] 10. Phase 5 - Accessibility, Performance, and Polish
+- [x] 10. Phase 5 - Accessibility, Performance, and Polish
   - [x] 10.1 Add keyboard navigation and ARIA labels across all components
     - Audit all migrated components for keyboard accessibility
     - Add missing ARIA labels and roles to interactive elements
@@ -279,7 +279,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify only used components are included in production bundle
     - **Validates: Requirements 16.2**
 
-  - [-] 10.7 Remove deprecated custom components and clean up
+  - [x] 10.7 Remove deprecated custom components and clean up
     - Remove old custom components that have been fully replaced (only after verifying no remaining imports)
     - Remove hardcoded color classes from any remaining files
     - Update `app/admin/components/` directory structure to reflect final state
@@ -300,8 +300,8 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Replace any remaining hardcoded styles
     - _Requirements: 4.1, 5.1_
 
-- [ ] 11. Documentation
-  - [ ] 11.1 Create component usage documentation
+- [x] 11. Documentation
+  - [x] 11.1 Create component usage documentation
     - Document each Untitled UI component with usage examples in `app/admin/components/ui/README.md`
     - Document design token system and how to use semantic tokens
     - Document component addition process via `npx untitledui@latest add [component-name]`
@@ -310,7 +310,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Provide migration guide for converting remaining custom components
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 15.7, 1.6_
 
-- [ ] 12. Final Checkpoint - Migration Complete
+- [-] 12. Final Checkpoint - Migration Complete
   - Ensure all tests pass, ask the user if questions arise.
   - Run full test suite: unit tests, property tests, accessibility tests
   - Run `npm run build` to confirm clean production build

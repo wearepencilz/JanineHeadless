@@ -284,7 +284,7 @@ export default function ImageUploader({
             value={altText}
             onChange={(val) => onAltTextChange(val)}
             placeholder="Describe the image for accessibility"
-            required={required}
+            isRequired={required}
           />
           <p className="text-xs text-gray-500 mt-1">
             Example: "Blood orange sorbet soft serve twist"

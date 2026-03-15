@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/app/admin/components/ui/button';
-import { Input } from '@/app/admin/components/ui/input';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -52,11 +51,12 @@ export default function AdminLogin() {
               <label htmlFor="username" className="block text-sm font-medium mb-1.5 text-gray-900">
                 Username
               </label>
-              <Input
+              <input
                 id="username"
                 type="text"
                 value={username}
-                onChange={(val) => setUsername(val)}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[--color-brand-500] focus:border-[--color-brand-500]"
                 placeholder="Enter username"
                 required
               />
@@ -66,11 +66,12 @@ export default function AdminLogin() {
               <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-gray-900">
                 Password
               </label>
-              <Input
+              <input
                 id="password"
                 type="password"
                 value={password}
-                onChange={(val) => setPassword(val)}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[--color-brand-500] focus:border-[--color-brand-500]"
                 placeholder="Enter password"
                 required
               />
