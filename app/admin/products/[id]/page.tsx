@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
-import { computeProductAllergens, formatAllergen, formatDietaryClaim, getAllergenBadgeColor, getDietaryClaimBadgeColor } from '@/lib/product-allergens';
+import { computeProductAllergens, formatAllergen, formatDietaryClaim } from '@/lib/product-allergens';
+import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
@@ -464,12 +465,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                       <p className="text-sm text-gray-900 font-medium">{flavour.name}</p>
                       <p className="text-xs text-gray-600 mt-1">{flavour.shortDescription}</p>
                       <div className="flex flex-wrap gap-1 mt-2">
-                        <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
-                          {flavour.type}
-                        </span>
-                        <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">
-                          {flavour.baseStyle}
-                        </span>
+                        <Badge color="blue" size="sm">{flavour.type}</Badge>
+                        <Badge color="purple" size="sm">{flavour.baseStyle}</Badge>
                       </div>
                     </div>
                   </div>
@@ -492,12 +489,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <p className="text-xs font-medium text-gray-700 mb-2">Contains Allergens:</p>
                   <div className="flex flex-wrap gap-1">
                     {allergenData.allergens.map(allergen => (
-                      <span
-                        key={allergen}
-                        className={`px-2 py-1 text-xs font-medium rounded ${getAllergenBadgeColor(allergen)}`}
-                      >
-                        {formatAllergen(allergen)}
-                      </span>
+                      <Badge key={allergen} color="error" size="sm">{formatAllergen(allergen)}</Badge>
                     ))}
                   </div>
                 </div>
@@ -513,14 +505,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <p className="text-xs font-medium text-gray-700 mb-2">Dietary Claims:</p>
                   <div className="flex flex-wrap gap-1">
                     {allergenData.dietaryClaims
-                      .filter(claim => !claim.startsWith('contains-')) // Show only positive claims
+                      .filter(claim => !claim.startsWith('contains-'))
                       .map(claim => (
-                        <span
-                          key={claim}
-                          className={`px-2 py-1 text-xs font-medium rounded ${getDietaryClaimBadgeColor(claim)}`}
-                        >
-                          {formatDietaryClaim(claim)}
-                        </span>
+                        <Badge key={claim} color="success" size="sm">{formatDietaryClaim(claim)}</Badge>
                       ))}
                   </div>
                 </div>

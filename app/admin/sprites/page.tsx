@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { findAll } from '@/lib/db-game';
 import type { WalkingSprite } from '@/types/sprite';
+import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,9 +49,7 @@ export default async function SpritesPage() {
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-xl font-semibold">{sprite.name}</h3>
                 {!sprite.is_active && (
-                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
-                    Inactive
-                  </span>
+                  <Badge color="gray" size="sm">Inactive</Badge>
                 )}
               </div>
 

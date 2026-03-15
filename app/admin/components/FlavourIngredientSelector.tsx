@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/admin/components/ui/button';
+import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 import type { Ingredient, FlavourIngredient, Allergen, DietaryClaim, IngredientCategory } from '@/types';
 
 interface Props {
@@ -296,9 +297,7 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
               <p className="text-xs text-blue-700 mb-1">Allergens:</p>
               <div className="flex flex-wrap gap-1">
                 {calculatedAllergens.map(allergen => (
-                  <span key={allergen} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">
-                    {allergen}
-                  </span>
+                  <Badge key={allergen} color="error" size="sm">{allergen}</Badge>
                 ))}
               </div>
             </div>
@@ -309,9 +308,7 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
               <p className="text-xs text-blue-700 mb-1">Dietary Flags:</p>
               <div className="flex flex-wrap gap-1">
                 {calculatedDietaryFlags.map(flag => (
-                  <span key={flag} className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                    {flag}
-                  </span>
+                  <Badge key={flag} color="success" size="sm">{flag}</Badge>
                 ))}
               </div>
             </div>
@@ -421,9 +418,7 @@ export default function FlavourIngredientSelector({ selectedIngredients, onChang
                               {ingredient.category} • {ingredient.origin}
                             </p>
                           </div>
-                          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
-                            {ingredient.category}
-                          </span>
+                          <Badge color="gray" size="sm">{ingredient.category}</Badge>
                         </div>
                         
                         {ingredient.allergens.length > 0 && (
