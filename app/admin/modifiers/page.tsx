@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
-import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
+import Link from 'next/link';
+import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
+import { Badge, BadgeWithDot } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
-import { Badge } from '@/app/admin/components/ui/badge';
 
 interface Modifier {
   id: string;
@@ -20,17 +21,22 @@ interface Modifier {
   image?: string;
 }
 
+const TYPE_COLORS: Record<string, 'purple' | 'blue' | 'orange' | 'success' | 'gray'> = {
+  topping: 'purple',
+  sauce: 'orange',
+  crunch: 'orange',
+  drizzle: 'blue',
+  'premium-addon': 'blue',
+  'pack-in': 'success',
+};
+
 export default function ModifiersPage() {
   const router = useRouter();
   const [modifiers, setModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
-    show: false,
-    id: '',
-    name: '',
-  });
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', name: '' });
 
   useEffect(() => {
     fetchModifiers();
@@ -41,176 +47,144 @@ export default function ModifiersPage() {
       const params = new URLSearchParams();
       if (typeFilter !== 'all') params.append('type', typeFilter);
       if (statusFilter !== 'all') params.append('status', statusFilter);
-      
-      const response = await fetch(`/api/modifiers?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setModifiers(data);
-      }
-    } catch (error) {
-      console.error('Error fetching modifiers:', error);
+      const res = await fetch(`/api/modifiers?${params}`);
+      if (res.ok) setModifiers(await res.json());
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const typeVariant = (type: string): 'purple' | 'info' | 'warning' | 'success' | 'gray' => {
-    const map: Record<string, 'purple' | 'info' | 'warning' | 'success' | 'gray'> = {
-      topping: 'purple',
-      sauce: 'warning',
-      crunch: 'warning',
-      drizzle: 'info',
-      'premium-addon': 'info',
-      'pack-in': 'success',
-    };
-    return map[type] ?? 'gray';
-  };
-
-  const formatPrice = (cents: number) => {
-    return `${(cents / 100).toFixed(2)}`;
-  };
-
-  const handleDeleteClick = (modifier: Modifier) => {
-    setDeleteConfirm({ show: true, id: modifier.id, name: modifier.name });
-  };
-
   const handleDelete = async () => {
-    try {
-      const response = await fetch(`/api/modifiers/${deleteConfirm.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setModifiers(modifiers.filter((m) => m.id !== deleteConfirm.id));
-        setDeleteConfirm({ show: false, id: '', name: '' });
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to delete modifier');
-      }
-    } catch (error) {
-      console.error('Error deleting modifier:', error);
-      alert('Failed to delete modifier');
+    const res = await fetch(`/api/modifiers/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (res.ok) {
+      setModifiers(modifiers.filter((m) => m.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: '', name: '' });
     }
   };
 
-  const filters: FilterConfig[] = [
-    {
-      type: 'select',
-      label: 'Type',
-      value: typeFilter,
-      onChange: setTypeFilter,
-      options: [
-        { value: 'all', label: 'All' },
-        { value: 'topping', label: 'Topping' },
-        { value: 'sauce', label: 'Sauce' },
-        { value: 'crunch', label: 'Crunch' },
-        { value: 'drizzle', label: 'Drizzle' },
-        { value: 'premium-addon', label: 'Premium Add-on' },
-        { value: 'pack-in', label: 'Pack-in' },
-      ],
-    },
-    {
-      type: 'select',
-      label: 'Status',
-      value: statusFilter,
-      onChange: setStatusFilter,
-      options: [
-        { value: 'all', label: 'All' },
-        { value: 'active', label: 'Active' },
-        { value: 'archived', label: 'Archived' },
-      ],
-    },
-  ];
+  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
-  const columns: Column<Modifier>[] = [
-    {
-      key: 'name',
-      label: 'Name',
-      render: (modifier) => (
-        <div className="flex items-center">
-          {modifier.image && (
-            <img
-              src={modifier.image}
-              alt={modifier.name}
-              className="h-10 w-10 rounded object-cover mr-3"
-            />
-          )}
-          <div>
-            <div className="text-sm font-medium text-gray-900">{modifier.name}</div>
-            <div className="text-sm text-gray-500">{modifier.slug}</div>
-          </div>
-        </div>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'type',
-      label: 'Type',
-      render: (modifier) => (
-        <Badge variant={typeVariant(modifier.type)}>{modifier.type}</Badge>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'price',
-      label: 'Price',
-      render: (modifier) => (
-        <div className="text-sm text-gray-900">{formatPrice(modifier.price)}</div>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (modifier) => (
-        <Badge variant={modifier.status === 'active' ? 'success' : 'gray'}>
-          {modifier.status}
-        </Badge>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'formats',
-      label: 'Formats',
-      render: (modifier) => (
-        <div className="text-sm text-gray-500">
-          {modifier.availableForFormatIds.length} format(s)
-        </div>
-      ),
-      className: 'whitespace-nowrap',
-    },
-  ];
-
-  const actions: Action<Modifier>[] = [
-    {
-      label: 'Edit',
-      href: (modifier) => `/admin/modifiers/${modifier.id}`,
-      stopPropagation: true,
-    },
-    {
-      label: 'Delete',
-      onClick: handleDeleteClick,
-      className: 'text-red-600 hover:text-red-900',
-      stopPropagation: true,
-    },
-  ];
+  const filtered = modifiers.filter((m) => {
+    if (typeFilter !== 'all' && m.type !== typeFilter) return false;
+    if (statusFilter !== 'all' && m.status !== statusFilter) return false;
+    return true;
+  });
 
   return (
     <>
-      <DataTable
-        title="Modifiers"
-        description="Manage toppings, sauces, and add-ons for products"
-        createButton={{ label: 'Create Modifier', href: '/admin/modifiers/new' }}
-        filters={<TableFilters filters={filters} />}
-        data={modifiers}
-        columns={columns}
-        actions={actions}
-        keyExtractor={(modifier) => modifier.id}
-        onRowClick={(modifier) => router.push(`/admin/modifiers/${modifier.id}`)}
-        emptyMessage="No modifiers found"
-        emptyAction={{ label: 'Create your first modifier', href: '/admin/modifiers/new' }}
-        loading={loading}
-      />
+      <TableCard.Root>
+        <TableCard.Header
+          title="Modifiers"
+          badge={filtered.length}
+          description="Manage toppings, sauces, and add-ons for products"
+          contentTrailing={
+            <div className="flex items-center gap-3">
+              {/* Type filter */}
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="rounded-lg border border-secondary bg-primary px-3 py-2 text-sm text-primary shadow-xs"
+              >
+                <option value="all">All types</option>
+                <option value="topping">Topping</option>
+                <option value="sauce">Sauce</option>
+                <option value="crunch">Crunch</option>
+                <option value="drizzle">Drizzle</option>
+                <option value="premium-addon">Premium Add-on</option>
+                <option value="pack-in">Pack-in</option>
+              </select>
+              {/* Status filter */}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-lg border border-secondary bg-primary px-3 py-2 text-sm text-primary shadow-xs"
+              >
+                <option value="all">All statuses</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+              <Link href="/admin/modifiers/new">
+                <Button color="primary" size="sm">Create modifier</Button>
+              </Link>
+            </div>
+          }
+        />
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-sm text-tertiary">No modifiers found</p>
+            <Link href="/admin/modifiers/new">
+              <Button color="secondary" size="sm">Create your first modifier</Button>
+            </Link>
+          </div>
+        ) : (
+          <Table aria-label="Modifiers">
+            <Table.Header>
+              <Table.Head isRowHeader label="Name" />
+              <Table.Head label="Type" />
+              <Table.Head label="Price" />
+              <Table.Head label="Status" />
+              <Table.Head label="Formats" />
+              <Table.Head label="" />
+            </Table.Header>
+            <Table.Body items={filtered}>
+              {(modifier) => (
+                <Table.Row
+                  key={modifier.id}
+                  id={modifier.id}
+                  onAction={() => router.push(`/admin/modifiers/${modifier.id}`)}
+                >
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      {modifier.image && (
+                        <img src={modifier.image} alt={modifier.name} className="h-10 w-10 rounded-lg object-cover" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-primary">{modifier.name}</p>
+                        <p className="text-xs text-tertiary">{modifier.slug}</p>
+                      </div>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Badge color={TYPE_COLORS[modifier.type] ?? 'gray'}>{modifier.type}</Badge>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className="text-sm font-medium text-primary">{formatPrice(modifier.price)}</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <BadgeWithDot color={modifier.status === 'active' ? 'success' : 'gray'}>
+                      {modifier.status}
+                    </BadgeWithDot>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className="text-sm text-tertiary">{modifier.availableForFormatIds.length} format{modifier.availableForFormatIds.length !== 1 ? 's' : ''}</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/admin/modifiers/${modifier.id}`}>
+                        <Button color="secondary" size="sm">Edit</Button>
+                      </Link>
+                      <Button
+                        color="primary-destructive"
+                        size="sm"
+                        onClick={() => setDeleteConfirm({ show: true, id: modifier.id, name: modifier.name })}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
+      </TableCard.Root>
 
       <DeleteModal
         isOpen={deleteConfirm.show}
