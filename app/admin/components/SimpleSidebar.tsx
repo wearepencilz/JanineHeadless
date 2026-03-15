@@ -26,19 +26,18 @@ export default function SimpleSidebar() {
       ],
     },
     {
-      label: 'Product Catalog',
+      label: 'Commerce',
       items: [
         { href: '/admin/launches', label: 'Launches', icon: '🚀' },
         { href: '/admin/products', label: 'Products', icon: '🎁' },
-        { href: '/admin/flavours', label: 'Flavours', icon: '🍦' },
-        { href: '/admin/formats', label: 'Formats', icon: '📦' },
-        { href: '/admin/modifiers', label: 'Modifiers', icon: '✨' },
       ],
     },
     {
-      label: 'Ingredients',
+      label: 'Archive',
       items: [
+        { href: '/admin/flavours', label: 'Flavours', icon: '🍦' },
         { href: '/admin/ingredients', label: 'Ingredients', icon: '🌿' },
+        { href: '/admin/modifiers', label: 'Modifiers', icon: '✨' },
       ],
     },
     {
@@ -64,15 +63,15 @@ export default function SimpleSidebar() {
     {
       label: 'System',
       items: [
+        { href: '/admin/taxonomies', label: 'Taxonomies', icon: '🏷️' },
+        { href: '/admin/formats', label: 'Formats', icon: '📦' },
         { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
       ],
     },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/admin') {
-      return pathname === '/admin';
-    }
+    if (href === '/admin') return pathname === '/admin';
     return pathname?.startsWith(href);
   };
 
@@ -91,9 +90,7 @@ export default function SimpleSidebar() {
             <div className="px-3 space-y-1">
               {navCategories.map((category, categoryIndex) => (
                 <div key={category.label}>
-                  {categoryIndex > 0 && (
-                    <div className="my-3 border-t border-gray-200" />
-                  )}
+                  {categoryIndex > 0 && <div className="my-3 border-t border-gray-200" />}
                   <h3 className="px-3 pt-3 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     {category.label}
                   </h3>
@@ -109,9 +106,7 @@ export default function SimpleSidebar() {
                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
-                        {item.icon && (
-                          <span className="text-lg flex-shrink-0">{item.icon}</span>
-                        )}
+                        {item.icon && <span className="text-lg flex-shrink-0">{item.icon}</span>}
                         <span>{item.label}</span>
                       </Link>
                     ))}
