@@ -7,6 +7,7 @@ import type { WalkingSprite } from '@/types/sprite';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function EditSpritePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -176,17 +177,11 @@ export default function EditSpritePage({ params }: { params: { id: string } }) {
           />
         </div>
 
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={formData.is_active}
-              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="mr-2"
-            />
-            <span className="text-sm font-medium text-gray-700">Active</span>
-          </label>
-        </div>
+        <Checkbox
+          isSelected={formData.is_active}
+          onChange={(v) => setFormData({ ...formData, is_active: v })}
+          label="Active"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>

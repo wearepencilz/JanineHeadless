@@ -8,6 +8,7 @@ import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -207,28 +208,18 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
 
           {/* Dietary Facts */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Dietary Facts
-            </label>
+            <p className="text-sm font-medium text-gray-700 mb-2">Dietary Facts</p>
             <div className="space-y-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.animalDerived}
-                  onChange={(e) => setFormData({ ...formData, animalDerived: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Contains animal-derived ingredients</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.vegetarian}
-                  onChange={(e) => setFormData({ ...formData, vegetarian: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Suitable for vegetarians</span>
-              </label>
+              <Checkbox
+                isSelected={formData.animalDerived}
+                onChange={(v) => setFormData({ ...formData, animalDerived: v })}
+                label="Contains animal-derived ingredients"
+              />
+              <Checkbox
+                isSelected={formData.vegetarian}
+                onChange={(v) => setFormData({ ...formData, vegetarian: v })}
+                label="Suitable for vegetarians"
+              />
             </div>
             <p className="text-sm text-gray-500 mt-1">
               Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
@@ -236,17 +227,11 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           </div>
 
           {/* Seasonal */}
-          <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.seasonal}
-                onChange={(e) => setFormData({ ...formData, seasonal: e.target.checked })}
-                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">Seasonal Ingredient</span>
-            </label>
-          </div>
+          <Checkbox
+            isSelected={formData.seasonal}
+            onChange={(v) => setFormData({ ...formData, seasonal: v })}
+            label="Seasonal Ingredient"
+          />
 
           {formData.seasonal && (
             <div>
@@ -273,17 +258,11 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           )}
 
           {/* Organic */}
-          <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isOrganic}
-                onChange={(e) => setFormData({ ...formData, isOrganic: e.target.checked })}
-                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">Organic</span>
-            </label>
-          </div>
+          <Checkbox
+            isSelected={formData.isOrganic}
+            onChange={(v) => setFormData({ ...formData, isOrganic: v })}
+            label="Organic"
+          />
 
           {/* Image Upload */}
           <ImageUploader

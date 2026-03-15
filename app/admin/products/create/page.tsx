@@ -6,6 +6,7 @@ import { Format, Flavour } from '@/types';
 import FormatSelector from '../../components/FormatSelector';
 import FlavourSelector from '../../components/FlavourSelector';
 import { Select } from '@/app/admin/components/ui/select';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -413,36 +414,22 @@ export default function CreateProductPage() {
                 />
               </div>
 
-              <div className="flex items-center space-x-6">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.inventoryTracked}
-                    onChange={(e) => setFormData({ ...formData, inventoryTracked: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Track Inventory</span>
-                </label>
-
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.onlineOrderable}
-                    onChange={(e) => setFormData({ ...formData, onlineOrderable: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Online Orderable</span>
-                </label>
-
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.pickupOnly}
-                    onChange={(e) => setFormData({ ...formData, pickupOnly: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Pickup Only</span>
-                </label>
+              <div className="flex items-center gap-6">
+                <Checkbox
+                  isSelected={formData.inventoryTracked}
+                  onChange={(v) => setFormData({ ...formData, inventoryTracked: v })}
+                  label="Track Inventory"
+                />
+                <Checkbox
+                  isSelected={formData.onlineOrderable}
+                  onChange={(v) => setFormData({ ...formData, onlineOrderable: v })}
+                  label="Online Orderable"
+                />
+                <Checkbox
+                  isSelected={formData.pickupOnly}
+                  onChange={(v) => setFormData({ ...formData, pickupOnly: v })}
+                  label="Pickup Only"
+                />
               </div>
 
               {formData.inventoryTracked && (

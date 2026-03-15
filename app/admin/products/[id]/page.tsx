@@ -11,6 +11,7 @@ import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -613,36 +614,22 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               />
             </div>
 
-            <div className="flex items-center space-x-6">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.inventoryTracked}
-                  onChange={(e) => setFormData({ ...formData, inventoryTracked: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="ml-2 text-sm text-gray-700">Track Inventory</span>
-              </label>
-
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.onlineOrderable}
-                  onChange={(e) => setFormData({ ...formData, onlineOrderable: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="ml-2 text-sm text-gray-700">Online Orderable</span>
-              </label>
-
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.pickupOnly}
-                  onChange={(e) => setFormData({ ...formData, pickupOnly: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="ml-2 text-sm text-gray-700">Pickup Only</span>
-              </label>
+            <div className="flex items-center gap-6">
+              <Checkbox
+                isSelected={formData.inventoryTracked}
+                onChange={(v) => setFormData({ ...formData, inventoryTracked: v })}
+                label="Track Inventory"
+              />
+              <Checkbox
+                isSelected={formData.onlineOrderable}
+                onChange={(v) => setFormData({ ...formData, onlineOrderable: v })}
+                label="Online Orderable"
+              />
+              <Checkbox
+                isSelected={formData.pickupOnly}
+                onChange={(v) => setFormData({ ...formData, pickupOnly: v })}
+                label="Pickup Only"
+              />
             </div>
 
             {formData.inventoryTracked && (

@@ -7,6 +7,7 @@ import { generateSlug } from '@/lib/slug';
 import { Button } from '@/app/admin/components/ui/button';
 import { Select } from '@/app/admin/components/ui/select';
 import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 
 interface Flavour {
@@ -288,19 +289,11 @@ export default function NewLaunchPage() {
             />
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="featured"
-              name="featured"
-              checked={formData.featured}
-              onChange={handleChange}
-              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
-              Featured on homepage
-            </label>
-          </div>
+          <Checkbox
+            isSelected={formData.featured}
+            onChange={(v) => setFormData(prev => ({ ...prev, featured: v }))}
+            label="Featured on homepage"
+          />
 
           {/* Flavours Section */}
           <div className="border-t border-gray-200 pt-6">
@@ -319,15 +312,13 @@ export default function NewLaunchPage() {
                 ) : (
                   <div className="space-y-2">
                     {flavours.map((flavour) => (
-                      <label key={flavour.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.featuredFlavourIds.includes(flavour.id)}
+                      <div key={flavour.id} className="p-2 hover:bg-gray-50 rounded">
+                        <Checkbox
+                          isSelected={formData.featuredFlavourIds.includes(flavour.id)}
                           onChange={() => toggleFlavour(flavour.id)}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          label={flavour.name}
                         />
-                        <span className="ml-3 text-sm text-gray-700">{flavour.name}</span>
-                      </label>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -355,20 +346,13 @@ export default function NewLaunchPage() {
                 ) : (
                   <div className="space-y-2">
                     {products.map((product) => (
-                      <label key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.featuredProductIds.includes(product.id)}
+                      <div key={product.id} className="p-2 hover:bg-gray-50 rounded">
+                        <Checkbox
+                          isSelected={formData.featuredProductIds.includes(product.id)}
                           onChange={() => toggleProduct(product.id)}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                          label={`${product.publicName || product.internalName || product.name || 'Unnamed Product'}${product.shopifyProductId ? ' (Shopify)' : ''}`}
                         />
-                        <span className="ml-3 text-sm text-gray-700">
-                          {product.publicName || product.internalName || product.name || 'Unnamed Product'}
-                          {product.shopifyProductId && (
-                            <span className="ml-2 text-xs text-gray-500">(Shopify)</span>
-                          )}
-                        </span>
-                      </label>
+                      </div>
                     ))}
                   </div>
                 )}

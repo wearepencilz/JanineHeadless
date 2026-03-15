@@ -2,6 +2,7 @@
 
 import { parseDate } from '@internationalized/date';
 import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 interface InventoryPanelProps {
   inventoryTracked: boolean;
@@ -32,28 +33,12 @@ export default function InventoryPanel({
       
       <div className="space-y-4">
         {/* Track Inventory Toggle */}
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={inventoryTracked}
-              onChange={(e) => onUpdate({ 
-                inventoryTracked: e.target.checked,
-                inventoryQuantity,
-                batchCode,
-                restockDate,
-                shelfLifeNotes,
-              })}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-sm font-medium text-gray-700">
-              Track inventory for this offering
-            </span>
-          </label>
-          <p className="mt-1 text-xs text-gray-500 ml-6">
-            Enable for packaged products like pints. Disable for made-to-order items like soft serve.
-          </p>
-        </div>
+        <Checkbox
+          isSelected={inventoryTracked}
+          onChange={(v) => onUpdate({ inventoryTracked: v, inventoryQuantity, batchCode, restockDate, shelfLifeNotes })}
+          label="Track inventory for this offering"
+          hint="Enable for packaged products like pints. Disable for made-to-order items like soft serve."
+        />
 
         {inventoryTracked && (
           <>

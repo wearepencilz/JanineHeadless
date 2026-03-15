@@ -11,6 +11,7 @@ import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function CreateFlavourPage() {
   const router = useRouter();
@@ -225,15 +226,11 @@ export default function CreateFlavourPage() {
               </div>
 
               <div className="flex items-end">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.featured}
-                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Featured</span>
-                </label>
+                <Checkbox
+                  isSelected={formData.featured}
+                  onChange={(v) => setFormData({ ...formData, featured: v })}
+                  label="Featured"
+                />
               </div>
             </div>
           </div>

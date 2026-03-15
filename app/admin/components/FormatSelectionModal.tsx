@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Modal } from '@/app/admin/components/ui/modal';
 import { Button } from '@/app/admin/components/ui/button';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 interface Format {
   id: string;
@@ -178,15 +179,14 @@ export default function FormatSelectionModal({
             Eligible Formats ({eligibleFormats.length})
           </h3>
           {eligibleFormats.map(format => (
-            <label
+            <div
               key={format.id}
-              className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <input
-                type="checkbox"
-                checked={selectedFormatIds.includes(format.id)}
+              <Checkbox
+                isSelected={selectedFormatIds.includes(format.id)}
                 onChange={() => toggleFormat(format.id)}
-                className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                className="mt-0.5 shrink-0"
               />
               <div className="ml-3 flex-1">
                 <div className="flex items-center justify-between">
@@ -217,7 +217,7 @@ export default function FormatSelectionModal({
                   )}
                 </div>
               </div>
-            </label>
+            </div>
           ))}
         </div>
       )}

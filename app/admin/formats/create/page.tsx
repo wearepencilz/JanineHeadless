@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import { Select } from '@/app/admin/components/ui/select';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function CreateFormatPage() {
   const router = useRouter();
@@ -162,15 +163,11 @@ export default function CreateFormatPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-4">Flavour Requirements</h3>
             
             <div className="mb-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.requiresFlavours}
-                  onChange={(e) => setFormData({ ...formData, requiresFlavours: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">Requires Flavours</span>
-              </label>
+              <Checkbox
+                isSelected={formData.requiresFlavours}
+                onChange={(v) => setFormData({ ...formData, requiresFlavours: v })}
+                label="Requires Flavours"
+              />
             </div>
 
             {formData.requiresFlavours && (
@@ -212,17 +209,11 @@ export default function CreateFormatPage() {
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Options</h3>
             
-            <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.canIncludeAddOns}
-                  onChange={(e) => setFormData({ ...formData, canIncludeAddOns: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">Can Include Add-ons (toppings, sauces)</span>
-              </label>
-            </div>
+            <Checkbox
+              isSelected={formData.canIncludeAddOns}
+              onChange={(v) => setFormData({ ...formData, canIncludeAddOns: v })}
+              label="Can Include Add-ons (toppings, sauces)"
+            />
           </div>
         </div>
 

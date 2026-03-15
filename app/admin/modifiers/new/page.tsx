@@ -7,6 +7,7 @@ import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 interface Format {
   id: string;
@@ -188,15 +189,12 @@ export default function NewModifierPage() {
             </label>
             <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
               {formats.map((format) => (
-                <label key={format.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.availableForFormatIds.includes(format.id)}
-                    onChange={() => handleFormatToggle(format.id)}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">{format.name}</span>
-                </label>
+                <Checkbox
+                  key={format.id}
+                  isSelected={formData.availableForFormatIds.includes(format.id)}
+                  onChange={() => handleFormatToggle(format.id)}
+                  label={format.name}
+                />
               ))}
             </div>
           </div>

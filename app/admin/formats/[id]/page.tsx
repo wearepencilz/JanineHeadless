@@ -10,6 +10,7 @@ import { useToast } from '@/app/admin/components/ToastContainer';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function EditFormatPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -195,18 +196,12 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
           <h3 className="text-lg font-medium text-gray-900 mb-4">Flavour Requirements</h3>
           <div className="space-y-6">
             <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={format.requiresFlavours}
-                  onChange={(e) => setFormat({ ...format, requiresFlavours: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">Requires Flavours</span>
-              </label>
-              <p className="text-sm text-gray-500 mt-1 ml-6">
-                Check this if products using this format must include flavours
-              </p>
+              <Checkbox
+                isSelected={format.requiresFlavours}
+                onChange={(v) => setFormat({ ...format, requiresFlavours: v })}
+                label="Requires Flavours"
+                hint="Check this if products using this format must include flavours"
+              />
             </div>
 
             {format.requiresFlavours && (
@@ -262,20 +257,12 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
         {/* Additional Options */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Options</h3>
-          <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={format.canIncludeAddOns}
-                onChange={(e) => setFormat({ ...format, canIncludeAddOns: e.target.checked })}
-                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">Can Include Add-ons</span>
-            </label>
-            <p className="text-sm text-gray-500 mt-1 ml-6">
-              Allow toppings, sauces, and other modifiers for this format
-            </p>
-          </div>
+          <Checkbox
+            isSelected={format.canIncludeAddOns}
+            onChange={(v) => setFormat({ ...format, canIncludeAddOns: v })}
+            label="Can Include Add-ons"
+            hint="Allow toppings, sauces, and other modifiers for this format"
+          />
         </div>
       </div>
     </EditPageLayout>
