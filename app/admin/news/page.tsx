@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
+import Link from 'next/link';
+import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
+import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface NewsItem {
@@ -17,103 +19,95 @@ export default function NewsPage() {
   const router = useRouter();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: number; title: string }>({
-    show: false,
-    id: 0,
-    title: '',
-  });
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: 0, title: '' });
 
   useEffect(() => {
-    fetchNews();
+    fetch('/api/news')
+      .then((r) => r.json())
+      .then(setNews)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const fetchNews = async () => {
-    try {
-      const res = await fetch('/api/news');
-      const data = await res.json();
-      setNews(data);
-    } catch (error) {
-      console.error('Failed to fetch news:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteClick = (item: NewsItem) => {
-    setDeleteConfirm({ show: true, id: item.id, title: item.title });
-  };
-
   const handleDelete = async () => {
-    try {
-      await fetch(`/api/news/${deleteConfirm.id}`, { method: 'DELETE' });
-      setNews(news.filter((n) => n.id !== deleteConfirm.id));
-      setDeleteConfirm({ show: false, id: 0, title: '' });
-    } catch (error) {
-      console.error('Failed to delete news:', error);
-      alert('Failed to delete news article');
-    }
+    await fetch(`/api/news/${deleteConfirm.id}`, { method: 'DELETE' });
+    setNews(news.filter((n) => n.id !== deleteConfirm.id));
+    setDeleteConfirm({ show: false, id: 0, title: '' });
   };
-
-  const columns: Column<NewsItem>[] = [
-    {
-      key: 'title',
-      label: 'Article',
-      render: (item) => (
-        <div className="flex items-center">
-          {item.image && (
-            <img
-              src={item.image}
-              alt={item.title}
-              className="h-10 w-10 rounded object-cover mr-3"
-            />
-          )}
-          <div>
-            <div className="text-sm font-medium text-gray-900">{item.title}</div>
-            <div className="text-sm text-gray-500 line-clamp-1">{item.content}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'date',
-      label: 'Date',
-      render: (item) => (
-        <div className="text-sm text-gray-500">
-          {new Date(item.date).toLocaleDateString()}
-        </div>
-      ),
-    },
-  ];
-
-  const actions: Action<NewsItem>[] = [
-    {
-      label: 'Edit',
-      href: (item) => `/admin/news/${item.id}`,
-      stopPropagation: true,
-    },
-    {
-      label: 'Delete',
-      onClick: handleDeleteClick,
-      className: 'text-red-600 hover:text-red-900',
-      stopPropagation: true,
-    },
-  ];
 
   return (
     <>
-      <DataTable
-        title="News"
-        description="Manage news articles and updates"
-        createButton={{ label: 'New Article', href: '/admin/news/new' }}
-        data={news}
-        columns={columns}
-        actions={actions}
-        keyExtractor={(item) => String(item.id)}
-        onRowClick={(item) => router.push(`/admin/news/${item.id}`)}
-        emptyMessage="No news articles yet"
-        emptyAction={{ label: 'Create your first article', href: '/admin/news/new' }}
-        loading={loading}
-      />
+      <TableCard.Root>
+        <TableCard.Header
+          title="News"
+          badge={news.length}
+          description="Manage news articles and updates"
+          contentTrailing={
+            <Link href="/admin/news/new">
+              <Button color="primary" size="sm">New article</Button>
+            </Link>
+          }
+        />
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+          </div>
+        ) : news.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-sm text-tertiary">No news articles yet</p>
+            <Link href="/admin/news/new">
+              <Button color="secondary" size="sm">Create your first article</Button>
+            </Link>
+          </div>
+        ) : (
+          <Table aria-label="News">
+            <Table.Header>
+              <Table.Head isRowHeader label="Article" />
+              <Table.Head label="Date" />
+              <Table.Head label="" />
+            </Table.Header>
+            <Table.Body items={news}>
+              {(item) => (
+                <Table.Row
+                  key={item.id}
+                  id={String(item.id)}
+                  onAction={() => router.push(`/admin/news/${item.id}`)}
+                >
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      {item.image && (
+                        <img src={item.image} alt={item.title} className="h-10 w-10 rounded-lg object-cover" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-primary">{item.title}</p>
+                        <p className="text-xs text-tertiary line-clamp-1">{item.content}</p>
+                      </div>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className="text-sm text-secondary">{new Date(item.date).toLocaleDateString()}</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/admin/news/${item.id}`}>
+                        <Button color="secondary" size="sm">Edit</Button>
+                      </Link>
+                      <Button
+                        color="primary-destructive"
+                        size="sm"
+                        onClick={() => setDeleteConfirm({ show: true, id: item.id, title: item.title })}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
+      </TableCard.Root>
 
       <DeleteModal
         isOpen={deleteConfirm.show}

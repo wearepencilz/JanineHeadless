@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
-import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
+import Link from 'next/link';
+import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
+import { Badge, BadgeWithDot } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Select } from '@/src/app/admin/components/ui/base/select/select';
+import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
 
 interface Ingredient {
@@ -11,8 +14,8 @@ interface Ingredient {
   name: string;
   latinName?: string;
   origin: string;
-  category: string; // Legacy field
-  taxonomyCategory?: string; // New taxonomy field
+  category: string;
+  taxonomyCategory?: string;
   image?: string;
   allergens: string[];
   seasonal: boolean;
@@ -33,11 +36,7 @@ export default function IngredientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
-    show: false,
-    id: '',
-    name: '',
-  });
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', name: '' });
 
   useEffect(() => {
     fetchData();
@@ -49,12 +48,10 @@ export default function IngredientsPage() {
         fetch('/api/ingredients'),
         fetch('/api/settings'),
       ]);
-
       if (ingredientsRes.ok) {
         const data = await ingredientsRes.json();
         setIngredients(data.data || data);
       }
-
       if (settingsRes.ok) {
         const settings = await settingsRes.json();
         setTaxonomyCategories(settings.ingredientCategories || []);
@@ -66,201 +63,160 @@ export default function IngredientsPage() {
     }
   };
 
-  const handleDeleteClick = (ingredient: Ingredient) => {
-    setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name });
-  };
-
   const handleDelete = async () => {
-    try {
-      const response = await fetch(`/api/ingredients/${deleteConfirm.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setIngredients(ingredients.filter((i) => i.id !== deleteConfirm.id));
-        setDeleteConfirm({ show: false, id: '', name: '' });
-      } else {
-        const error = await response.json();
-        if (error.blockers) {
-          alert(`Cannot delete ingredient:\n\n${error.blockers.join('\n')}`);
-        } else {
-          alert(error.error || 'Failed to delete ingredient');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting ingredient:', error);
-      alert('Failed to delete ingredient');
+    const response = await fetch(`/api/ingredients/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (response.ok) {
+      setIngredients(ingredients.filter((i) => i.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: '', name: '' });
+    } else {
+      const error = await response.json();
+      alert(error.blockers ? `Cannot delete:\n\n${error.blockers.join('\n')}` : error.error || 'Failed to delete');
     }
   };
 
   const getCategoryLabel = (ingredient: Ingredient) => {
     const categoryId = ingredient.taxonomyCategory || ingredient.category;
-    const taxonomy = taxonomyCategories.find(t => t.id === categoryId || t.value === categoryId);
+    const taxonomy = taxonomyCategories.find((t) => t.id === categoryId || t.value === categoryId);
     return taxonomy?.label || categoryId || 'Uncategorized';
   };
 
-  const filteredIngredients = ingredients.filter((ingredient) => {
-    const matchesSearch = 
-      ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ingredient.latinName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ingredient.origin?.toLowerCase().includes(searchTerm.toLowerCase());
-    const categoryId = ingredient.taxonomyCategory || ingredient.category;
+  const filtered = ingredients.filter((i) => {
+    const matchesSearch =
+      i.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      i.latinName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      i.origin?.toLowerCase().includes(searchTerm.toLowerCase());
+    const categoryId = i.taxonomyCategory || i.category;
     const matchesCategory = categoryFilter === 'all' || categoryId === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || ingredient.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || i.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  const filters: FilterConfig[] = [
-    {
-      type: 'search',
-      placeholder: 'Search ingredients...',
-      value: searchTerm,
-      onChange: setSearchTerm,
-    },
-    {
-      type: 'select',
-      value: categoryFilter,
-      onChange: setCategoryFilter,
-      options: [
-        { value: 'all', label: 'All Categories' },
-        ...taxonomyCategories
-          .map((cat) => ({
-            value: cat.id,
-            label: cat.label,
-          })),
-      ],
-    },
-    {
-      type: 'select',
-      value: statusFilter,
-      onChange: setStatusFilter,
-      options: [
-        { value: 'all', label: 'All Status' },
-        { value: 'active', label: 'Active' },
-        { value: 'archived', label: 'Archived' },
-      ],
-    },
-  ];
-
-  const columns: Column<Ingredient>[] = [
-    {
-      key: 'name',
-      label: 'Name',
-      render: (ingredient) => (
-        <div className="flex items-center gap-3">
-          {ingredient.image && (
-            <img
-              src={ingredient.image}
-              alt={ingredient.name}
-              className="w-10 h-10 rounded object-cover"
-            />
-          )}
-          <div>
-            <div className="font-medium text-gray-900">{ingredient.name}</div>
-            {ingredient.latinName && (
-              <div className="text-sm text-gray-500 italic">{ingredient.latinName}</div>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'category',
-      label: 'Category',
-      render: (ingredient) => (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          {getCategoryLabel(ingredient)}
-        </span>
-      ),
-    },
-    {
-      key: 'origin',
-      label: 'Origin',
-      render: (ingredient) => (
-        <div className="text-sm text-gray-900">{ingredient.origin || '-'}</div>
-      ),
-    },
-    {
-      key: 'allergens',
-      label: 'Allergens',
-      render: (ingredient) => {
-        if (!ingredient.allergens || ingredient.allergens.length === 0) {
-          return <span className="text-sm text-gray-400">None</span>;
-        }
-        return (
-          <div className="flex flex-wrap gap-1">
-            {ingredient.allergens.slice(0, 3).map((allergen) => (
-              <span
-                key={allergen}
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
-              >
-                {allergen}
-              </span>
-            ))}
-            {ingredient.allergens.length > 3 && (
-              <span className="text-xs text-gray-500">
-                +{ingredient.allergens.length - 3}
-              </span>
-            )}
-          </div>
-        );
-      },
-    },
-    {
-      key: 'properties',
-      label: 'Properties',
-      render: (ingredient) => (
-        <div className="flex flex-wrap gap-1">
-          {ingredient.seasonal && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-              Seasonal
-            </span>
-          )}
-          {ingredient.status === 'archived' && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-              Archived
-            </span>
-          )}
-        </div>
-      ),
-    },
-  ];
-
-  const actions: Action<Ingredient>[] = [
-    {
-      label: 'Edit',
-      href: (ingredient) => `/admin/ingredients/${ingredient.id}`,
-      stopPropagation: true,
-    },
-    {
-      label: 'Delete',
-      onClick: handleDeleteClick,
-      className: 'text-red-600 hover:text-red-900',
-      stopPropagation: true,
-    },
-  ];
-
   return (
     <>
-      <DataTable
-        title="Ingredients"
-        description={`${filteredIngredients.length} ingredient${filteredIngredients.length !== 1 ? 's' : ''}`}
-        createButton={{ label: 'Add Ingredient', href: '/admin/ingredients/create' }}
-        secondaryButton={{ label: 'Seed Data', href: '/admin/ingredients/seed' }}
-        filters={<TableFilters filters={filters} />}
-        data={filteredIngredients}
-        columns={columns}
-        actions={actions}
-        keyExtractor={(ingredient) => ingredient.id}
-        onRowClick={(ingredient) => router.push(`/admin/ingredients/${ingredient.id}`)}
-        emptyMessage={
-          searchTerm || categoryFilter !== 'all' || statusFilter !== 'all'
-            ? 'No ingredients match your filters'
-            : 'No ingredients yet'
-        }
-        emptyAction={{ label: 'Add your first ingredient', href: '/admin/ingredients/create' }}
-        loading={loading}
-      />
+      <TableCard.Root>
+        <TableCard.Header
+          title="Ingredients"
+          badge={filtered.length}
+          description="Manage your ingredient library with provenance details"
+          contentTrailing={
+            <div className="flex items-center gap-3">
+              <Select
+                placeholder="All categories"
+                selectedKey={categoryFilter}
+                onSelectionChange={(key) => setCategoryFilter(key as string)}
+                items={[
+                  { id: 'all', label: 'All categories' },
+                  ...taxonomyCategories.map((c) => ({ id: c.id, label: c.label })),
+                ]}
+              >
+                {(item) => <Select.Item id={item.id} label={item.label} />}
+              </Select>
+              <Select
+                placeholder="All statuses"
+                selectedKey={statusFilter}
+                onSelectionChange={(key) => setStatusFilter(key as string)}
+                items={[
+                  { id: 'all', label: 'All statuses' },
+                  { id: 'active', label: 'Active' },
+                  { id: 'archived', label: 'Archived' },
+                ]}
+              >
+                {(item) => <Select.Item id={item.id} label={item.label} />}
+              </Select>
+              <Link href="/admin/ingredients/create">
+                <Button color="primary" size="sm">Add ingredient</Button>
+              </Link>
+            </div>
+          }
+        />
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-sm text-tertiary">No ingredients found</p>
+            <Link href="/admin/ingredients/create">
+              <Button color="secondary" size="sm">Add your first ingredient</Button>
+            </Link>
+          </div>
+        ) : (
+          <Table aria-label="Ingredients">
+            <Table.Header>
+              <Table.Head isRowHeader label="Name" />
+              <Table.Head label="Category" />
+              <Table.Head label="Origin" />
+              <Table.Head label="Allergens" />
+              <Table.Head label="Properties" />
+              <Table.Head label="" />
+            </Table.Header>
+            <Table.Body items={filtered}>
+              {(ingredient) => (
+                <Table.Row
+                  key={ingredient.id}
+                  id={ingredient.id}
+                  onAction={() => router.push(`/admin/ingredients/${ingredient.id}`)}
+                >
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      {ingredient.image && (
+                        <img src={ingredient.image} alt={ingredient.name} className="h-10 w-10 rounded-lg object-cover" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-primary">{ingredient.name}</p>
+                        {ingredient.latinName && (
+                          <p className="text-xs text-tertiary italic">{ingredient.latinName}</p>
+                        )}
+                      </div>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Badge color="blue">{getCategoryLabel(ingredient)}</Badge>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className="text-sm text-secondary">{ingredient.origin || '—'}</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {!ingredient.allergens?.length ? (
+                      <span className="text-sm text-tertiary">None</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {ingredient.allergens.slice(0, 3).map((a) => (
+                          <Badge key={a} color="error">{a}</Badge>
+                        ))}
+                        {ingredient.allergens.length > 3 && (
+                          <span className="text-xs text-tertiary">+{ingredient.allergens.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex flex-wrap gap-1">
+                      {ingredient.seasonal && <Badge color="success">Seasonal</Badge>}
+                      {ingredient.status === 'archived' && <Badge color="gray">Archived</Badge>}
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/admin/ingredients/${ingredient.id}`}>
+                        <Button color="secondary" size="sm">Edit</Button>
+                      </Link>
+                      <Button
+                        color="primary-destructive"
+                        size="sm"
+                        onClick={() => setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name })}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
+      </TableCard.Root>
 
       <DeleteModal
         isOpen={deleteConfirm.show}

@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
-import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
+import Link from 'next/link';
+import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
+import { Badge, BadgeWithDot } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Select } from '@/src/app/admin/components/ui/base/select/select';
+import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
-import { Badge } from '@/app/admin/components/ui/badge';
 
 interface Launch {
   id: string;
@@ -20,16 +22,22 @@ interface Launch {
   updatedAt: string;
 }
 
+const STATUS_COLOR: Record<string, 'blue' | 'success' | 'gray' | 'error'> = {
+  upcoming: 'blue',
+  active: 'success',
+  ended: 'gray',
+  archived: 'error',
+};
+
+const formatDate = (d?: string) =>
+  d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Not set';
+
 export default function LaunchesPage() {
   const router = useRouter();
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; title: string }>({
-    show: false,
-    id: '',
-    title: '',
-  });
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', title: '' });
 
   useEffect(() => {
     fetchLaunches();
@@ -38,15 +46,9 @@ export default function LaunchesPage() {
   const fetchLaunches = async () => {
     try {
       const params = new URLSearchParams();
-      if (statusFilter !== 'all') {
-        params.append('status', statusFilter);
-      }
-      
+      if (statusFilter !== 'all') params.append('status', statusFilter);
       const response = await fetch(`/api/launches?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setLaunches(data);
-      }
+      if (response.ok) setLaunches(await response.json());
     } catch (error) {
       console.error('Error fetching launches:', error);
     } finally {
@@ -54,150 +56,123 @@ export default function LaunchesPage() {
     }
   };
 
-  const statusVariant = (status: string) => {
-    const map: Record<string, 'info' | 'success' | 'gray' | 'error'> = {
-      upcoming: 'info',
-      active: 'success',
-      ended: 'gray',
-      archived: 'error',
-    };
-    return map[status] ?? 'gray';
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not set';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const handleDeleteClick = (launch: Launch) => {
-    setDeleteConfirm({ show: true, id: launch.id, title: launch.title });
-  };
-
   const handleDelete = async () => {
-    try {
-      const response = await fetch(`/api/launches/${deleteConfirm.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setLaunches(launches.filter((l) => l.id !== deleteConfirm.id));
-        setDeleteConfirm({ show: false, id: '', title: '' });
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to delete launch');
-      }
-    } catch (error) {
-      console.error('Error deleting launch:', error);
-      alert('Failed to delete launch');
+    const response = await fetch(`/api/launches/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (response.ok) {
+      setLaunches(launches.filter((l) => l.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: '', title: '' });
+    } else {
+      const error = await response.json();
+      alert(error.error || 'Failed to delete launch');
     }
   };
 
-  const filters: FilterConfig[] = [
-    {
-      type: 'select',
-      label: 'Filter by status',
-      value: statusFilter,
-      onChange: setStatusFilter,
-      options: [
-        { value: 'all', label: 'All' },
-        { value: 'upcoming', label: 'Upcoming' },
-        { value: 'active', label: 'Active' },
-        { value: 'ended', label: 'Ended' },
-        { value: 'archived', label: 'Archived' },
-      ],
-    },
-  ];
-
-  const columns: Column<Launch>[] = [
-    {
-      key: 'title',
-      label: 'Title',
-      render: (launch) => (
-        <div className="flex items-center">
-          {launch.heroImage && (
-            <img
-              src={launch.heroImage}
-              alt={launch.title}
-              className="h-10 w-10 rounded object-cover mr-3"
-            />
-          )}
-          <div>
-            <div className="text-sm font-medium text-gray-900">{launch.title}</div>
-            <div className="text-sm text-gray-500">{launch.slug}</div>
-          </div>
-        </div>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (launch) => (
-        <Badge variant={statusVariant(launch.status)}>
-          {launch.status}
-        </Badge>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'activePeriod',
-      label: 'Active Period',
-      render: (launch) => (
-        <div className="text-sm text-gray-500">
-          <div>{formatDate(launch.activeStart)}</div>
-          <div className="text-xs text-gray-400">to {formatDate(launch.activeEnd)}</div>
-        </div>
-      ),
-      className: 'whitespace-nowrap',
-    },
-    {
-      key: 'featured',
-      label: 'Featured',
-      render: (launch) => (
-        launch.featured ? (
-          <span className="text-yellow-600">★ Featured</span>
-        ) : (
-          <span className="text-gray-400">—</span>
-        )
-      ),
-      className: 'whitespace-nowrap',
-    },
-  ];
-
-  const actions: Action<Launch>[] = [
-    {
-      label: 'Edit',
-      href: (launch) => `/admin/launches/${launch.id}`,
-      stopPropagation: true,
-    },
-    {
-      label: 'Delete',
-      onClick: handleDeleteClick,
-      className: 'text-red-600 hover:text-red-900',
-      stopPropagation: true,
-    },
-  ];
-
   return (
     <>
-      <DataTable
-        title="Launches"
-        description="Manage seasonal launches and featured product collections"
-        createButton={{ label: 'Create Launch', href: '/admin/launches/new' }}
-        filters={<TableFilters filters={filters} />}
-        data={launches}
-        columns={columns}
-        actions={actions}
-        keyExtractor={(launch) => launch.id}
-        onRowClick={(launch) => router.push(`/admin/launches/${launch.id}`)}
-        emptyMessage="No launches found"
-        emptyAction={{ label: 'Create your first launch', href: '/admin/launches/new' }}
-        loading={loading}
-      />
+      <TableCard.Root>
+        <TableCard.Header
+          title="Launches"
+          badge={launches.length}
+          description="Manage seasonal launches and featured product collections"
+          contentTrailing={
+            <div className="flex items-center gap-3">
+              <Select
+                placeholder="All statuses"
+                selectedKey={statusFilter}
+                onSelectionChange={(key) => setStatusFilter(key as string)}
+                items={[
+                  { id: 'all', label: 'All statuses' },
+                  { id: 'upcoming', label: 'Upcoming' },
+                  { id: 'active', label: 'Active' },
+                  { id: 'ended', label: 'Ended' },
+                  { id: 'archived', label: 'Archived' },
+                ]}
+              >
+                {(item) => <Select.Item id={item.id} label={item.label} />}
+              </Select>
+              <Link href="/admin/launches/new">
+                <Button color="primary" size="sm">Create launch</Button>
+              </Link>
+            </div>
+          }
+        />
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+          </div>
+        ) : launches.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-sm text-tertiary">No launches found</p>
+            <Link href="/admin/launches/new">
+              <Button color="secondary" size="sm">Create your first launch</Button>
+            </Link>
+          </div>
+        ) : (
+          <Table aria-label="Launches">
+            <Table.Header>
+              <Table.Head isRowHeader label="Title" />
+              <Table.Head label="Status" />
+              <Table.Head label="Active period" />
+              <Table.Head label="Featured" />
+              <Table.Head label="" />
+            </Table.Header>
+            <Table.Body items={launches}>
+              {(launch) => (
+                <Table.Row
+                  key={launch.id}
+                  id={launch.id}
+                  onAction={() => router.push(`/admin/launches/${launch.id}`)}
+                >
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      {launch.heroImage && (
+                        <img src={launch.heroImage} alt={launch.title} className="h-10 w-10 rounded-lg object-cover" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-primary">{launch.title}</p>
+                        <p className="text-xs text-tertiary">{launch.slug}</p>
+                      </div>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <BadgeWithDot color={STATUS_COLOR[launch.status] ?? 'gray'}>
+                      {launch.status}
+                    </BadgeWithDot>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div>
+                      <p className="text-sm text-secondary">{formatDate(launch.activeStart)}</p>
+                      <p className="text-xs text-tertiary">to {formatDate(launch.activeEnd)}</p>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {launch.featured ? (
+                      <Badge color="warning">Featured</Badge>
+                    ) : (
+                      <span className="text-sm text-tertiary">—</span>
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/admin/launches/${launch.id}`}>
+                        <Button color="secondary" size="sm">Edit</Button>
+                      </Link>
+                      <Button
+                        color="primary-destructive"
+                        size="sm"
+                        onClick={() => setDeleteConfirm({ show: true, id: launch.id, title: launch.title })}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        )}
+      </TableCard.Root>
 
       <DeleteModal
         isOpen={deleteConfirm.show}
