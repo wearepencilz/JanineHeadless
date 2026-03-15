@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { AlertCircle } from '@untitledui/icons';
+import { Modal } from '@/app/admin/components/ui/modal';
+import { Button } from '@/app/admin/components/ui/button';
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -17,40 +19,32 @@ export default function DeleteModal({
   onConfirm,
   onCancel,
 }: DeleteModalProps) {
-  // Handle ESC key
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 mb-4">{message}</p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      size="md"
+      hideCloseButton
+      footer={
         <div className="flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
+          <Button variant="secondary" size="md" onClick={onCancel}>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
+          </Button>
+          <Button variant="danger" size="md" onClick={onConfirm}>
             Delete
-          </button>
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-error-secondary flex items-center justify-center">
+          <AlertCircle className="w-5 h-5 text-error-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-600 leading-relaxed">{message}</p>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

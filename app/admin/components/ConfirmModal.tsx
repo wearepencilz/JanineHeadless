@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { AlertCircle, CheckCircle, InfoCircle, AlertTriangle, X } from '@untitledui/icons';
+import { AlertCircle, CheckCircle, InfoCircle, AlertTriangle } from '@untitledui/icons';
+import { Modal } from '@/app/admin/components/ui/modal';
+import { Button } from '@/app/admin/components/ui/button';
 
 export type ModalVariant = 'danger' | 'warning' | 'success' | 'info';
 
@@ -19,27 +20,27 @@ interface ConfirmModalProps {
 const variantConfig = {
   danger: {
     icon: AlertCircle,
-    iconColor: 'text-red-600',
-    iconBg: 'bg-red-100',
-    buttonColor: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+    iconColor: 'text-error-primary',
+    iconBg: 'bg-error-secondary',
+    confirmVariant: 'danger' as const,
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: 'text-yellow-600',
-    iconBg: 'bg-yellow-100',
-    buttonColor: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+    iconColor: 'text-warning-primary',
+    iconBg: 'bg-warning-secondary',
+    confirmVariant: 'primary' as const,
   },
   success: {
     icon: CheckCircle,
-    iconColor: 'text-green-600',
-    iconBg: 'bg-green-100',
-    buttonColor: 'bg-green-600 hover:bg-green-700 focus:ring-green-500',
+    iconColor: 'text-success-primary',
+    iconBg: 'bg-success-secondary',
+    confirmVariant: 'primary' as const,
   },
   info: {
     icon: InfoCircle,
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-100',
-    buttonColor: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+    iconColor: 'text-primary',
+    iconBg: 'bg-primary-secondary',
+    confirmVariant: 'primary' as const,
   },
 };
 
@@ -56,80 +57,32 @@ export default function ConfirmModal({
   const config = variantConfig[variant];
   const Icon = config.icon;
 
-  // Handle ESC key
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onCancel]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div 
-      className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={onCancel}
-    >
-      <div 
-        className="bg-white rounded-xl shadow-xl max-w-md w-full"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header with icon */}
-        <div className="p-6 pb-4">
-          <div className="flex items-start gap-4">
-            <div className={`flex-shrink-0 w-10 h-10 rounded-full ${config.iconBg} flex items-center justify-center`}>
-              <Icon className={`w-5 h-5 ${config.iconColor}`} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                {title}
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {message}
-              </p>
-            </div>
-            <button
-              onClick={onCancel}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-          >
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      size="md"
+      hideCloseButton
+      footer={
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" size="md" onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button
-            onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${config.buttonColor}`}
-          >
+          </Button>
+          <Button variant={config.confirmVariant} size="md" onClick={onConfirm}>
             {confirmLabel}
-          </button>
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex items-start gap-4">
+        <div className={`flex-shrink-0 w-10 h-10 rounded-full ${config.iconBg} flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${config.iconColor}`} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-600 leading-relaxed">{message}</p>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

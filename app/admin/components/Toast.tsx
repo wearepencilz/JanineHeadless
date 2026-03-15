@@ -17,27 +17,27 @@ interface ToastProps {
 const variantConfig = {
   success: {
     icon: CheckCircle,
-    iconColor: 'text-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
+    iconColor: 'text-success-primary',
+    bg: 'bg-success-secondary',
+    border: 'border-success-primary/20',
   },
   error: {
     icon: AlertCircle,
-    iconColor: 'text-red-600',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
+    iconColor: 'text-error-primary',
+    bg: 'bg-error-secondary',
+    border: 'border-error-primary/20',
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
+    iconColor: 'text-warning-primary',
+    bg: 'bg-warning-secondary',
+    border: 'border-warning-primary/20',
   },
   info: {
     icon: InfoCircle,
-    iconColor: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    iconColor: 'text-primary',
+    bg: 'bg-primary-secondary',
+    border: 'border-primary/20',
   },
 };
 
