@@ -26,6 +26,74 @@ const config: Config = {
     extend: {
       // Semantic color tokens
       colors: {
+        // Untitled UI semantic shorthand tokens (used by UI components)
+        // These map the shorthand classes like bg-brand-solid, text-secondary etc.
+        'brand-solid': 'var(--color-bg-brand-solid)',
+        'brand-solid_hover': 'var(--color-bg-brand-solid_hover)',
+        'error-solid': 'var(--color-bg-error-solid)',
+        'error-solid_hover': 'var(--color-bg-error-solid_hover)',
+        'disabled': 'var(--color-bg-disabled)',
+        'fg-white': 'var(--color-fg-white)',
+        'fg-primary': 'var(--color-fg-primary)',
+        'fg-secondary': 'var(--color-fg-secondary)',
+        'fg-secondary_hover': 'var(--color-fg-secondary_hover)',
+        'fg-tertiary': 'var(--color-fg-tertiary)',
+        'fg-tertiary_hover': 'var(--color-fg-tertiary_hover)',
+        'fg-quaternary': 'var(--color-fg-quaternary)',
+        'fg-quaternary_hover': 'var(--color-fg-quaternary_hover)',
+        'fg-disabled': 'var(--color-fg-disabled)',
+        'fg-disabled_subtle': 'var(--color-fg-disabled_subtle)',
+        'fg-brand-primary': 'var(--color-fg-brand-primary)',
+        'fg-brand-secondary': 'var(--color-fg-brand-secondary)',
+        'fg-brand-secondary_hover': 'var(--color-fg-brand-secondary_hover)',
+        'fg-error-primary': 'var(--color-fg-error-primary)',
+        'fg-error-secondary': 'var(--color-fg-error-secondary)',
+        'fg-warning-primary': 'var(--color-fg-warning-primary)',
+        'fg-success-primary': 'var(--color-fg-success-primary)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-tertiary': 'var(--color-text-tertiary)',
+        'text-quaternary': 'var(--color-text-quaternary)',
+        'text-disabled': 'var(--color-text-disabled)',
+        'text-placeholder': 'var(--color-text-placeholder)',
+        'text-white': 'var(--color-text-white)',
+        'text-brand-primary': 'var(--color-text-brand-primary)',
+        'text-brand-secondary': 'var(--color-text-brand-secondary)',
+        'text-brand-tertiary': 'var(--color-text-brand-tertiary)',
+        'text-error-primary': 'var(--color-text-error-primary)',
+        'text-warning-primary': 'var(--color-text-warning-primary)',
+        'text-success-primary': 'var(--color-text-success-primary)',
+        'bg-primary': 'var(--color-bg-primary)',
+        'bg-primary_hover': 'var(--color-bg-primary_hover)',
+        'bg-secondary': 'var(--color-bg-secondary)',
+        'bg-secondary_hover': 'var(--color-bg-secondary_hover)',
+        'bg-tertiary': 'var(--color-bg-tertiary)',
+        'bg-active': 'var(--color-bg-active)',
+        'bg-disabled': 'var(--color-bg-disabled)',
+        'border-primary': 'var(--color-border-primary)',
+        'border-secondary': 'var(--color-border-secondary)',
+        'border-tertiary': 'var(--color-border-tertiary)',
+        'border-disabled': 'var(--color-border-disabled)',
+        'border-brand': 'var(--color-border-brand)',
+        'border-error': 'var(--color-border-error)',
+        'focus-ring': 'var(--color-focus-ring)',
+        'button-primary-icon': 'var(--color-button-primary-icon)',
+        'button-primary-icon_hover': 'var(--color-button-primary-icon_hover)',
+        // Untitled UI uses these shorthand names directly in component classes
+        'secondary': 'var(--color-bg-secondary)',
+        'tertiary': 'var(--color-fg-tertiary)',
+        'tertiary_hover': 'var(--color-fg-tertiary_hover)',
+        'secondary_hover': 'var(--color-fg-secondary_hover)',
+        'error-primary': 'var(--color-bg-secondary)',
+        'error-primary_hover': 'var(--color-bg-secondary_hover)',
+        'brand-secondary': 'var(--color-fg-brand-secondary)',
+        'brand-secondary_hover': 'var(--color-fg-brand-secondary_hover)',
+        'outline-brand': 'var(--color-border-brand)',
+        'outline-error': 'var(--color-border-error)',
+        'ring-disabled_subtle': 'var(--color-border-disabled)',
+        'ring-error_subtle': 'var(--color-border-error)',
+        'ring-primary': 'var(--color-border-primary)',
+        // Full brand/error/etc scales
         primary: {
           25: 'var(--color-brand-25)',
           50: 'var(--color-brand-50)',
@@ -115,6 +183,26 @@ const config: Config = {
         'md': '0.5rem',     // 8px
         'lg': '0.75rem',    // 12px
         'xl': '1rem',       // 16px
+      },
+
+      // Box shadow tokens (Untitled UI skeumorphic shadows)
+      boxShadow: {
+        'xs': 'var(--shadow-xs)',
+        'sm': 'var(--shadow-sm)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
+        '2xl': 'var(--shadow-2xl)',
+        '3xl': 'var(--shadow-3xl)',
+        'skeumorphic': 'var(--shadow-skeumorphic)',
+        'xs-skeumorphic': 'var(--shadow-xs-skeumorphic)',
+      },
+
+      // Outline color tokens
+      outlineColor: {
+        'brand': 'var(--color-border-brand)',
+        'error': 'var(--color-border-error)',
+        'focus-ring': 'var(--color-focus-ring)',
       },
 
       // Spacing scale tokens

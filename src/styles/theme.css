@@ -171,9 +171,21 @@
     --color-focus-ring: var(--color-brand-500);
     --color-button-primary-icon: var(--color-brand-300);
     --color-button-primary-icon_hover: var(--color-brand-200);
-    --color-placeholder: var(--color-text-placeholder);
+    --color-button-destructive-primary-icon: var(--color-error-300);
+    --color-button-destructive-primary-icon_hover: var(--color-error-200);
 
-    /* SEMANTIC COLOR ALIASES */
+    /* UNTITLED UI SHORTHAND TOKENS
+     * These are used by components as direct color references (not property-specific).
+     * e.g. ring-brand-solid, bg-brand-solid via --color-* namespace
+     */
+    /* Solid fill tokens (used as bg-brand-solid, bg-error-solid) */
+    --color-brand-solid: var(--color-brand-600);
+    --color-brand-solid_hover: var(--color-brand-700);
+    --color-error-solid: var(--color-error-600);
+    --color-error-solid_hover: var(--color-error-700);
+    /* Alpha color for caret */
+    --color-alpha-black: rgb(0 0 0);
+    --color-placeholder: var(--color-text-placeholder);
     /* primary: maps to brand (blue) scale - primary action color is 600 */
     --color-primary-25: var(--color-brand-25);
     --color-primary-50: var(--color-brand-50);
@@ -207,6 +219,8 @@
     --font-size-xs--line-height: 1.125rem;
     --font-size-sm: 0.875rem;
     --font-size-sm--line-height: 1.25rem;
+    --font-size-md: 0.875rem;
+    --font-size-md--line-height: 1.25rem;
     --font-size-base: 1rem;
     --font-size-base--line-height: 1.5rem;
     --font-size-lg: 1.125rem;
@@ -242,31 +256,95 @@
     --spacing-20: 5rem;
     --spacing-24: 6rem;
 
-    /* PROPERTY-SPECIFIC MAPPINGS FOR TAILWIND */
-    /* These allow Tailwind utilities like text-*, bg-*, border-*, ring-* to work */
-    --text-color-primary: var(--color-text-primary);
-    --text-color-secondary: var(--color-text-secondary);
-    --text-color-tertiary: var(--color-text-tertiary);
-    --text-color-quaternary: var(--color-text-quaternary);
-    --text-color-disabled: var(--color-text-disabled);
-    --text-color-placeholder: var(--color-text-placeholder);
+    /* PROPERTY-SPECIFIC MAPPINGS FOR TAILWIND v4
+     * Tailwind v4 uses namespaced CSS variables to generate property-specific utilities.
+     * --text-color-* generates text-* utilities
+     * --background-color-* generates bg-* utilities
+     * --ring-color-* generates ring-* utilities
+     * --outline-color-* generates outline-* utilities
+     * --border-color-* generates border-* utilities
+     * This allows bg-primary (white) and text-primary (gray-900) to coexist.
+     */
 
+    /* text-* utilities */
+    --text-color-primary: var(--color-fg-primary);
+    --text-color-secondary: var(--color-fg-secondary);
+    --text-color-secondary_hover: var(--color-fg-secondary_hover);
+    --text-color-tertiary: var(--color-fg-tertiary);
+    --text-color-tertiary_hover: var(--color-fg-tertiary_hover);
+    --text-color-quaternary: var(--color-fg-quaternary);
+    --text-color-quaternary_hover: var(--color-fg-quaternary_hover);
+    --text-color-white: var(--color-fg-white);
+    --text-color-disabled: var(--color-fg-disabled);
+    --text-color-disabled_subtle: var(--color-fg-disabled_subtle);
+    --text-color-placeholder: var(--color-text-placeholder);
+    --text-color-brand-primary: var(--color-fg-brand-primary);
+    --text-color-brand-secondary: var(--color-fg-brand-secondary);
+    --text-color-brand-secondary_hover: var(--color-fg-brand-secondary_hover);
+    --text-color-error-primary: var(--color-fg-error-primary);
+    --text-color-error-secondary: var(--color-fg-error-secondary);
+    --text-color-warning-primary: var(--color-fg-warning-primary);
+    --text-color-success-primary: var(--color-fg-success-primary);
+    --text-color-fg-primary: var(--color-fg-primary);
+    --text-color-fg-secondary: var(--color-fg-secondary);
+    --text-color-fg-secondary_hover: var(--color-fg-secondary_hover);
+    --text-color-fg-tertiary: var(--color-fg-tertiary);
+    --text-color-fg-tertiary_hover: var(--color-fg-tertiary_hover);
+    --text-color-fg-quaternary: var(--color-fg-quaternary);
+    --text-color-fg-quaternary_hover: var(--color-fg-quaternary_hover);
+    --text-color-fg-white: var(--color-fg-white);
+    --text-color-fg-disabled: var(--color-fg-disabled);
+    --text-color-fg-disabled_subtle: var(--color-fg-disabled_subtle);
+    --text-color-fg-brand-primary: var(--color-fg-brand-primary);
+    --text-color-fg-brand-secondary: var(--color-fg-brand-secondary);
+    --text-color-fg-brand-secondary_hover: var(--color-fg-brand-secondary_hover);
+    --text-color-fg-error-primary: var(--color-fg-error-primary);
+    --text-color-fg-error-secondary: var(--color-fg-error-secondary);
+    --text-color-fg-warning-primary: var(--color-fg-warning-primary);
+    --text-color-fg-success-primary: var(--color-fg-success-primary);
+    --text-color-md: initial; /* text-md is a font-size utility, not a color */
+
+    /* bg-* utilities */
     --background-color-primary: var(--color-bg-primary);
     --background-color-primary_hover: var(--color-bg-primary_hover);
     --background-color-secondary: var(--color-bg-secondary);
     --background-color-secondary_hover: var(--color-bg-secondary_hover);
     --background-color-tertiary: var(--color-bg-tertiary);
     --background-color-active: var(--color-bg-active);
+    --background-color-disabled: var(--color-bg-disabled);
+    --background-color-disabled_subtle: var(--color-gray-50);
+    --background-color-brand-solid: var(--color-bg-brand-solid);
+    --background-color-brand-solid_hover: var(--color-bg-brand-solid_hover);
+    --background-color-error-solid: var(--color-bg-error-solid);
+    --background-color-error-solid_hover: var(--color-bg-error-solid_hover);
+    --background-color-error-primary: var(--color-error-50);
+    --background-color-error-primary_hover: var(--color-error-100);
+    --background-color-utility-gray-100: var(--color-utility-gray-100);
+    --background-color-utility-gray-200: var(--color-utility-gray-200);
 
+    /* border-* utilities */
     --border-color-primary: var(--color-border-primary);
     --border-color-secondary: var(--color-border-secondary);
     --border-color-tertiary: var(--color-border-tertiary);
     --border-color-brand: var(--color-border-brand);
+    --border-color-error: var(--color-border-error);
+    --border-color-disabled: var(--color-border-disabled);
 
+    /* ring-* utilities */
     --ring-color-primary: var(--color-border-primary);
     --ring-color-secondary: var(--color-border-secondary);
+    --ring-color-secondary_alt: var(--color-gray-200);
     --ring-color-brand: var(--color-border-brand);
+    --ring-color-error: var(--color-border-error);
+    --ring-color-error_subtle: var(--color-error-300);
+    --ring-color-disabled: var(--color-border-disabled);
+    --ring-color-disabled_subtle: var(--color-gray-200);
+    --ring-color-focus-ring: var(--color-focus-ring);
+    --ring-color-border-secondary: var(--color-border-secondary);
 
+    /* outline-* utilities */
     --outline-color-brand: var(--color-border-brand);
+    --outline-color-error: var(--color-border-error);
     --outline-color-focus-ring: var(--color-focus-ring);
+    --outline-color-transparent: transparent;
 }
