@@ -182,7 +182,7 @@ export const MultiSelectBase = ({
                             onPointerEnter={onResize}
                         />
 
-                        <Popover size={"md"} triggerRef={placeholderRef} style={{ width: popoverWidth }} className={props?.popoverClassName}>
+                        <Popover size={"md"} style={{ width: popoverWidth }} className={props?.popoverClassName}>
                             <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
                                 {children}
                             </AriaListBox>
