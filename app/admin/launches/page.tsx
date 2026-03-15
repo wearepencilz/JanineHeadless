@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
 import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
 import DeleteModal from '@/app/admin/components/DeleteModal';
+import { Badge } from '@/app/admin/components/ui/badge';
 
 interface Launch {
   id: string;
@@ -53,14 +54,14 @@ export default function LaunchesPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      upcoming: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      ended: 'bg-gray-100 text-gray-800',
-      archived: 'bg-red-100 text-red-800',
+  const statusVariant = (status: string) => {
+    const map: Record<string, 'info' | 'success' | 'gray' | 'error'> = {
+      upcoming: 'info',
+      active: 'success',
+      ended: 'gray',
+      archived: 'error',
     };
-    return styles[status as keyof typeof styles] || styles.archived;
+    return map[status] ?? 'gray';
   };
 
   const formatDate = (dateString?: string) => {
@@ -136,9 +137,9 @@ export default function LaunchesPage() {
       key: 'status',
       label: 'Status',
       render: (launch) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(launch.status)}`}>
+        <Badge variant={statusVariant(launch.status)}>
           {launch.status}
-        </span>
+        </Badge>
       ),
       className: 'whitespace-nowrap',
     },

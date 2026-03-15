@@ -1,6 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { Input } from '@/app/admin/components/ui/input';
+import { Select } from '@/app/admin/components/ui/select';
 
 export interface FilterConfig {
   type: 'search' | 'select';
@@ -22,31 +24,21 @@ export default function TableFilters({ filters, children }: TableFiltersProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {filters.map((filter, index) => (
           <div key={index}>
-            {filter.label && (
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {filter.label}
-              </label>
-            )}
             {filter.type === 'search' ? (
-              <input
+              <Input
+                label={filter.label}
                 type="text"
                 placeholder={filter.placeholder || 'Search...'}
                 value={filter.value}
-                onChange={(e) => filter.onChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={filter.onChange}
               />
             ) : (
-              <select
+              <Select
+                label={filter.label}
                 value={filter.value}
-                onChange={(e) => filter.onChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {filter.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                onChange={filter.onChange}
+                options={(filter.options || []).map((o) => ({ id: o.value, label: o.label }))}
+              />
             )}
           </div>
         ))}

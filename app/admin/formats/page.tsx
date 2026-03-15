@@ -6,6 +6,7 @@ import type { Format } from '@/types';
 import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
 import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
 import DeleteModal from '@/app/admin/components/DeleteModal';
+import { Badge } from '@/app/admin/components/ui/badge';
 
 export default function FormatsPage() {
   const router = useRouter();
@@ -103,9 +104,7 @@ export default function FormatsPage() {
       key: 'category',
       label: 'Category',
       render: (format) => (
-        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
-          {format.category}
-        </span>
+        <Badge variant="info">{format.category}</Badge>
       ),
       className: 'whitespace-nowrap',
     },
@@ -122,9 +121,7 @@ export default function FormatsPage() {
       key: 'servingStyle',
       label: 'Serving',
       render: (format) => (
-        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
-          {format.servingStyle}
-        </span>
+        <Badge variant="gray">{format.servingStyle}</Badge>
       ),
       className: 'whitespace-nowrap',
     },
@@ -136,11 +133,11 @@ export default function FormatsPage() {
           return <span className="text-sm text-gray-400">N/A</span>;
         }
         return (
-          <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
+          <Badge variant="purple">
             {format.minFlavours === format.maxFlavours
               ? `${format.minFlavours} flavour${format.minFlavours !== 1 ? 's' : ''}`
               : `${format.minFlavours}-${format.maxFlavours} flavours`}
-          </span>
+          </Badge>
         );
       },
       className: 'whitespace-nowrap',

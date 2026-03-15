@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
 import TableFilters, { FilterConfig } from '@/app/admin/components/TableFilters';
 import DeleteModal from '@/app/admin/components/DeleteModal';
+import { Badge } from '@/app/admin/components/ui/badge';
 
 interface Modifier {
   id: string;
@@ -53,16 +54,16 @@ export default function ModifiersPage() {
     }
   };
 
-  const getTypeBadge = (type: string) => {
-    const styles: Record<string, string> = {
-      topping: 'bg-purple-100 text-purple-800',
-      sauce: 'bg-orange-100 text-orange-800',
-      crunch: 'bg-yellow-100 text-yellow-800',
-      drizzle: 'bg-pink-100 text-pink-800',
-      'premium-addon': 'bg-blue-100 text-blue-800',
-      'pack-in': 'bg-green-100 text-green-800',
+  const typeVariant = (type: string): 'purple' | 'info' | 'warning' | 'success' | 'gray' => {
+    const map: Record<string, 'purple' | 'info' | 'warning' | 'success' | 'gray'> = {
+      topping: 'purple',
+      sauce: 'warning',
+      crunch: 'warning',
+      drizzle: 'info',
+      'premium-addon': 'info',
+      'pack-in': 'success',
     };
-    return styles[type] || 'bg-gray-100 text-gray-800';
+    return map[type] ?? 'gray';
   };
 
   const formatPrice = (cents: number) => {
@@ -146,9 +147,7 @@ export default function ModifiersPage() {
       key: 'type',
       label: 'Type',
       render: (modifier) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTypeBadge(modifier.type)}`}>
-          {modifier.type}
-        </span>
+        <Badge variant={typeVariant(modifier.type)}>{modifier.type}</Badge>
       ),
       className: 'whitespace-nowrap',
     },
@@ -164,11 +163,9 @@ export default function ModifiersPage() {
       key: 'status',
       label: 'Status',
       render: (modifier) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          modifier.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
+        <Badge variant={modifier.status === 'active' ? 'success' : 'gray'}>
           {modifier.status}
-        </span>
+        </Badge>
       ),
       className: 'whitespace-nowrap',
     },

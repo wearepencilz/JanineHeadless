@@ -191,8 +191,8 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
   - Verify all modals and toasts are migrated
   - Run `npm run build` to confirm no compilation errors
 
-- [ ] 8. Phase 4 - Table and Badge Components
-  - [ ] 8.1 Add Untitled UI Table component via CLI
+- [x] 8. Phase 4 - Table and Badge Components
+  - [x] 8.1 Add Untitled UI Table component via CLI
     - Run `npx untitledui@latest add table`
     - Verify or create Table wrapper supporting sortable columns, row selection with checkboxes, pagination, empty states, loading states with skeleton loaders, row actions (edit, delete, view)
     - Export from `app/admin/components/ui/table.tsx`
@@ -203,13 +203,13 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify Table supports sorting, pagination, row selection, and empty/loading states
     - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5, 8.6**
 
-  - [ ] 8.3 Migrate DataTable component to use Untitled UI Table
+  - [x] 8.3 Migrate DataTable component to use Untitled UI Table
     - Refactor `app/admin/components/DataTable.tsx` to wrap Untitled UI Table
     - Preserve existing DataTable props API for backward compatibility
     - Migrate `app/admin/components/TableFilters.tsx` to work with new Table
     - _Requirements: 8.8_
 
-  - [ ] 8.4 Apply migrated Table to all list pages
+  - [x] 8.4 Apply migrated Table to all list pages
     - Update Launches list page (`/admin/launches`)
     - Update Products list page (`/admin/products`)
     - Update Ingredients list page (`/admin/ingredients`)
@@ -220,7 +220,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Update Batches, Flavours, Games, Sprites pages
     - _Requirements: 8.9_
 
-  - [ ] 8.5 Add Untitled UI Badge component via CLI
+  - [x] 8.5 Add Untitled UI Badge component via CLI
     - Run `npx untitledui@latest add badge`
     - Verify or create Badge wrapper supporting variants (default, success, warning, error, info), sizes (sm, md, lg), icon prefixes
     - Export from `app/admin/components/ui/badge.tsx`
@@ -231,7 +231,7 @@ Incrementally migrate the Janine CMS admin interface from custom Tailwind compon
     - Verify all status indicators use Badge component with appropriate variants
     - **Validates: Requirements 10.1, 10.2, 10.5, 10.6**
 
-  - [ ] 8.7 Replace all hardcoded badge classes with Badge component
+  - [x] 8.7 Replace all hardcoded badge classes with Badge component
     - Replace `bg-blue-100 text-blue-800` and similar badge patterns across all admin pages
     - Use Badge for taxonomy tags, status indicators, and category labels
     - Update Launches (status badges), Products (sync status), Ingredients (availability), Modifiers (type badges), Formats (status)

@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import { Button } from '@/app/admin/components/ui/button';
 
 export interface Column<T> {
   key: string;
@@ -90,19 +91,13 @@ export default function DataTable<T>({
         {(createButton || secondaryButton) && (
           <div className="flex gap-3">
             {secondaryButton && (
-              <Link
-                href={secondaryButton.href}
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                {secondaryButton.label}
+              <Link href={secondaryButton.href}>
+                <Button variant="secondary" size="md">{secondaryButton.label}</Button>
               </Link>
             )}
             {createButton && (
-              <Link
-                href={createButton.href}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {createButton.label}
+              <Link href={createButton.href}>
+                <Button variant="primary" size="md">{createButton.label}</Button>
               </Link>
             )}
           </div>
