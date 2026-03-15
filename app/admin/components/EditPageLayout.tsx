@@ -113,6 +113,15 @@ export default function EditPageLayout({
       <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
         <Button
           type="button"
+          variant="secondary"
+          size="lg"
+          onClick={onCancel}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
           variant="primary"
           size="lg"
           onClick={onSave}
@@ -121,14 +130,6 @@ export default function EditPageLayout({
           className="flex-1"
         >
           Save Changes
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="lg"
-          onClick={onCancel}
-        >
-          Cancel
         </Button>
       </div>
     </div>
