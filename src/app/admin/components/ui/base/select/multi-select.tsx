@@ -1,7 +1,8 @@
 "use client";
 
 import type { FocusEventHandler, KeyboardEvent, PointerEventHandler, RefAttributes, RefObject } from "react";
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { SearchLg } from "@untitledui/icons";
 import { FocusScope, useFilter, useFocusManager } from "react-aria";
 import type { ComboBoxProps as AriaComboBoxProps, GroupProps as AriaGroupProps, ListBoxProps as AriaListBoxProps, Key } from "react-aria-components";
@@ -12,10 +13,8 @@ import { Avatar } from "@/src/app/admin/components/ui/base/avatar/avatar";
 import type { IconComponentType } from "@/src/app/admin/components/ui/base/badges/badge-types";
 import { HintText } from "@/src/app/admin/components/ui/base/input/hint-text";
 import { Label } from "@/src/app/admin/components/ui/base/input/label";
-import { Popover } from "@/src/app/admin/components/ui/base/select/popover";
 import { type SelectItemType, sizes } from "@/src/app/admin/components/ui/base/select/select";
 import { TagCloseX } from "@/src/app/admin/components/ui/base/tags/base-components/tag-close-x";
-import { useResizeObserver } from "@/src/hooks/use-resize-observer";
 import { cx } from "@/utils/cx";
 import { SelectItem } from "./select-item";
 
@@ -71,13 +70,14 @@ export const MultiSelectBase = ({
     onItemInserted,
     shortcut,
     placeholder = "Search",
-    // Omit these props to avoid conflicts with the `Select` component
     name: _name,
     className: _className,
     ...props
 }: MultiSelectProps) => {
     const { contains } = useFilter({ sensitivity: "base" });
     const selectedKeys = selectedItems.items.map((item) => item.id);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [dropdownStyle, setDropdownStyle] = useState<{ top: number; left: number; width: number } | null>(null);
 
     const filter = useCallback(
         (item: SelectItemType, filterText: string) => {
@@ -94,9 +94,7 @@ export const MultiSelectBase = ({
     const onRemove = useCallback(
         (keys: Set<Key>) => {
             const key = keys.values().next().value;
-
             if (!key) return;
-
             selectedItems.remove(key);
             onItemCleared?.(key);
         },
@@ -104,21 +102,13 @@ export const MultiSelectBase = ({
     );
 
     const onSelectionChange = (id: Key | null) => {
-        if (!id) {
-            return;
-        }
-
+        if (!id) return;
         const item = accessibleList.getItem(id);
-
-        if (!item) {
-            return;
-        }
-
+        if (!item) return;
         if (!selectedKeys.includes(id as string)) {
             selectedItems.append(item);
             onItemInserted?.(id);
         }
-
         accessibleList.setFilterText("");
     };
 
@@ -126,41 +116,30 @@ export const MultiSelectBase = ({
         accessibleList.setFilterText(value);
     };
 
-    const placeholderRef = useRef<HTMLDivElement>(null);
-    const [popoverWidth, setPopoverWidth] = useState("");
-
-    // Resize observer for popover width
-    const onResize = useCallback(() => {
-        if (!placeholderRef.current) return;
-        const divRect = placeholderRef.current?.getBoundingClientRect();
-        setPopoverWidth(divRect.width + "px");
-    }, [placeholderRef, setPopoverWidth]);
-
-    useResizeObserver({
-        ref: placeholderRef,
-        onResize: onResize,
-        box: "border-box",
-    });
+    const updateDropdownPosition = useCallback(() => {
+        if (!triggerRef.current) return;
+        const rect = triggerRef.current.getBoundingClientRect();
+        setDropdownStyle({
+            top: rect.bottom + window.scrollY + 4,
+            left: rect.left + window.scrollX,
+            width: rect.width,
+        });
+    }, []);
 
     return (
-        <ComboboxContext.Provider
-            value={{
-                size,
-                selectedKeys,
-                selectedItems,
-                onInputChange,
-                onRemove,
-            }}
-        >
+        <ComboboxContext.Provider value={{ size, selectedKeys, selectedItems, onInputChange, onRemove }}>
             <AriaComboBox
                 allowsEmptyCollection
                 menuTrigger="focus"
                 items={accessibleList.items}
                 onInputChange={onInputChange}
                 inputValue={accessibleList.filterText}
-                // This keeps the combobox popover open and the input value unchanged when an item is selected.
                 selectedKey={null}
                 onSelectionChange={onSelectionChange}
+                onOpenChange={(open) => {
+                    if (open) updateDropdownPosition();
+                    props.onOpenChange?.(open);
+                }}
                 {...props}
             >
                 {(state) => (
@@ -174,19 +153,33 @@ export const MultiSelectBase = ({
                         <MultiSelectTagsValue
                             size={size}
                             shortcut={shortcut}
-                            ref={placeholderRef}
+                            ref={triggerRef}
                             placeholder={placeholder}
-                            // This is a workaround to correctly calculating the trigger width
-                            // while using ResizeObserver wasn't 100% reliable.
-                            onFocus={onResize}
-                            onPointerEnter={onResize}
+                            onFocus={updateDropdownPosition}
+                            onPointerEnter={updateDropdownPosition}
                         />
 
-                        <Popover size={"md"} triggerRef={placeholderRef} style={{ width: popoverWidth }} className={props?.popoverClassName}>
-                            <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
-                                {children}
-                            </AriaListBox>
-                        </Popover>
+                        {/* Portal-based dropdown: renders into document.body, positioned via getBoundingClientRect */}
+                        {state.isOpen && dropdownStyle && typeof document !== "undefined" && createPortal(
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: dropdownStyle.top,
+                                    left: dropdownStyle.left,
+                                    width: dropdownStyle.width,
+                                    zIndex: 9999,
+                                }}
+                                className={cx(
+                                    "max-h-64 overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/10",
+                                    props.popoverClassName,
+                                )}
+                            >
+                                <AriaListBox selectionMode="multiple" className="size-full outline-hidden">
+                                    {children}
+                                </AriaListBox>
+                            </div>,
+                            document.body,
+                        )}
 
                         {props.hint && <HintText isInvalid={state.isInvalid}>{props.hint}</HintText>}
                     </div>
@@ -203,10 +196,7 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
 
     const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         const isCaretAtStart = event.currentTarget.selectionStart === 0 && event.currentTarget.selectionEnd === 0;
-
-        if (!isCaretAtStart && event.currentTarget.value !== "") {
-            return;
-        }
+        if (!isCaretAtStart && event.currentTarget.value !== "") return;
 
         switch (event.key) {
             case "Backspace":
@@ -219,7 +209,6 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
         }
     };
 
-    // Ensure dropdown opens on click even if input is already focused
     const handleInputMouseDown = (_event: React.MouseEvent<HTMLInputElement>) => {
         if (comboBoxStateContext && !comboBoxStateContext.isOpen) {
             comboBoxStateContext.open();
@@ -227,11 +216,7 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
     };
 
     const handleTagKeyDown = (event: KeyboardEvent<HTMLButtonElement>, value: Key) => {
-        // Do nothing when tab is clicked to move focus from the tag to the input element.
-        if (event.key === "Tab") {
-            return;
-        }
-
+        if (event.key === "Tab") return;
         event.preventDefault();
 
         const isFirstTag = comboBoxContext?.selectedItems?.items?.[0]?.id === value;
@@ -245,10 +230,8 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                 } else {
                     focusManager?.focusPrevious({ wrap: false, tabbable: false });
                 }
-
                 comboBoxContext.onRemove(new Set([value]));
                 break;
-
             case "ArrowLeft":
                 focusManager?.focusPrevious({ wrap: false, tabbable: false });
                 break;
@@ -269,14 +252,11 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                 comboBoxContext?.selectedItems?.items?.map((value) => (
                     <span key={value.id} className="flex items-center rounded-md bg-primary py-0.5 pr-1 pl-1.25 ring-1 ring-primary ring-inset">
                         <Avatar size="xxs" alt={value?.label} src={value?.avatarUrl} />
-
                         <p className="ml-1.25 truncate text-sm font-medium whitespace-nowrap text-secondary select-none">{value?.label}</p>
-
                         <TagCloseX
                             size="md"
                             isDisabled={isDisabled}
                             className="ml-0.75"
-                            // For workaround, onKeyDown is added to the button
                             onKeyDown={(event) => handleTagKeyDown(event, value.id)}
                             onPress={() => comboBoxContext.onRemove(new Set([value.id]))}
                         />
@@ -290,7 +270,6 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                     onMouseDown={handleInputMouseDown}
                     className="w-full flex-[1_0_0] appearance-none bg-transparent text-md text-ellipsis text-primary caret-alpha-black/90 outline-none placeholder:text-placeholder focus:outline-hidden disabled:cursor-not-allowed disabled:text-disabled disabled:placeholder:text-disabled"
                 />
-
                 {shortcut && (
                     <div
                         aria-hidden="true"
@@ -299,12 +278,10 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                             shortcutClassName,
                         )}
                     >
-                        <span
-                            className={cx(
-                                "pointer-events-none rounded px-1 py-px text-xs font-medium text-quaternary ring-1 ring-secondary select-none ring-inset",
-                                isDisabled && "bg-transparent text-disabled",
-                            )}
-                        >
+                        <span className={cx(
+                            "pointer-events-none rounded px-1 py-px text-xs font-medium text-quaternary ring-1 ring-secondary select-none ring-inset",
+                            isDisabled && "bg-transparent text-disabled",
+                        )}>
                             ⌘K
                         </span>
                     </div>
@@ -320,7 +297,6 @@ export const MultiSelectTagsValue = ({
     placeholder,
     shortcutClassName,
     placeholderIcon: Icon = SearchLg,
-    // Omit this prop to avoid invalid HTML attribute warning
     isDisabled: _isDisabled,
     ...otherProps
 }: ComboBoxValueProps) => {
