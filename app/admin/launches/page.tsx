@@ -22,7 +22,9 @@ import { Table, TableCard } from '@/src/app/admin/components/ui/application/tabl
 import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 interface Launch {
   id: string;
@@ -96,9 +98,13 @@ function SortableRow({
           <p className="text-sm text-gray-600">{formatDate(launch.activeStart)}</p>
           <p className="text-xs text-gray-400">to {formatDate(launch.activeEnd)}</p>
         </div>
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-          <Button color="secondary" size="sm" onClick={onEdit}>Edit</Button>
-          <Button color="primary-destructive" size="sm" onClick={onDelete}>Delete</Button>
+        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+          <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit" onClick={onEdit}>
+            <Edit01 className="w-4 h-4" />
+          </button>
+          <button className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded" title="Delete" onClick={onDelete}>
+            <Trash01 className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -107,6 +113,7 @@ function SortableRow({
 
 export default function LaunchesPage() {
   const router = useRouter();
+  const toast = useToast();
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [upcoming, setUpcoming] = useState<Launch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,9 +172,11 @@ export default function LaunchesPage() {
     if (response.ok) {
       setLaunches((prev) => prev.filter((l) => l.id !== deleteConfirm.id));
       setUpcoming((prev) => prev.filter((l) => l.id !== deleteConfirm.id));
+      toast.success('Launch deleted', `"${deleteConfirm.title}" has been removed`);
       setDeleteConfirm({ show: false, id: '', title: '' });
     } else {
-      alert('Failed to delete launch');
+      toast.error('Delete failed', 'Failed to delete launch');
+      setDeleteConfirm({ show: false, id: '', title: '' });
     }
   };
 
@@ -289,17 +298,19 @@ export default function LaunchesPage() {
                     )}
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/launches/${launch.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                          <Edit01 className="w-4 h-4" />
+                        </button>
                       </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
+                      <button
+                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                        title="Delete"
                         onClick={() => setDeleteConfirm({ show: true, id: launch.id, title: launch.title })}
                       >
-                        Delete
-                      </Button>
+                        <Trash01 className="w-4 h-4" />
+                      </button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -309,10 +320,13 @@ export default function LaunchesPage() {
         )}
       </TableCard.Root>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Launch"
         message={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', title: '' })}
       />

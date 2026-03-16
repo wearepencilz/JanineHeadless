@@ -19,8 +19,12 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    await db.write('settings.json', body);
-    return NextResponse.json(body);
+    // Never allow taxonomies to be overwritten via the settings route.
+    // Taxonomies live in taxonomies.json and are managed via /api/settings/taxonomies.
+    const { taxonomies: _dropped, ...safeBody } = body;
+    const existing = await db.read('settings.json') || {};
+    await db.write('settings.json', { ...existing, ...safeBody });
+    return NextResponse.json({ ...existing, ...safeBody });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

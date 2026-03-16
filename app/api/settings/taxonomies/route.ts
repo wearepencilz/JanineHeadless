@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSettings, saveSettings } from '@/lib/db'
+import { getTaxonomies, saveTaxonomies } from '@/lib/db'
 import { auth } from '@/lib/auth'
 
 // GET /api/settings/taxonomies - Get all taxonomies
 export async function GET() {
   try {
-    const settings = await getSettings()
-    return NextResponse.json({ taxonomies: settings.taxonomies || {} })
+    const taxonomies = await getTaxonomies()
+    return NextResponse.json({ taxonomies })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
@@ -21,10 +21,8 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const settings = await getSettings()
-    settings.taxonomies = body
-    await saveSettings(settings)
-    return NextResponse.json(settings.taxonomies)
+    await saveTaxonomies(body)
+    return NextResponse.json(body)
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

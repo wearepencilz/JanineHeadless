@@ -1,304 +1,248 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { findAll } from '@/lib/db-game';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Button } from '@/app/admin/components/ui/button';
+import { Edit01, Trash01 } from '@untitledui/icons';
 import type { Campaign } from '@/types/game';
 
-export const metadata: Metadata = {
-  title: 'Game Campaigns | Admin',
+const STATUS_COLOR: Record<string, 'success' | 'blue' | 'gray' | 'warning'> = {
+  active: 'success',
+  upcoming: 'blue',
+  ended: 'gray',
+  paused: 'warning',
 };
 
-/**
- * Fetch all campaigns
- */
-async function getCampaigns(): Promise<Campaign[]> {
-  try {
-    const campaigns = await findAll<Campaign>('campaigns', {
-      orderBy: 'created_at',
-      order: 'DESC',
-    });
-    return campaigns;
-  } catch (error) {
-    console.error('Error fetching campaigns:', error);
-    return [];
-  }
-}
-
-/**
- * Format date for display
- */
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleString('en-US', {
+function formatDateShort(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
   });
 }
 
-/**
- * Get status badge color
- */
-function getStatusColor(status: string): string {
-  switch (status) {
-    case 'active':
-      return 'bg-green-100 text-green-800';
-    case 'upcoming':
-      return 'bg-blue-100 text-blue-800';
-    case 'ended':
-      return 'bg-gray-100 text-gray-800';
-    case 'paused':
-      return 'bg-yellow-100 text-yellow-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-}
-
-/**
- * Check if campaign is currently active
- */
 function isCampaignActive(campaign: Campaign): boolean {
   const now = new Date();
-  const start = new Date(campaign.start_date);
-  const end = new Date(campaign.end_date);
-  return campaign.status === 'active' && now >= start && now <= end;
+  return campaign.status === 'active' && now >= new Date(campaign.start_date) && now <= new Date(campaign.end_date);
 }
 
-export default async function GamesAdminPage() {
-  const campaigns = await getCampaigns();
+export default function GamesAdminPage() {
+  const router = useRouter();
+  const toast = useToast();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', name: '' });
+
+  useEffect(() => { fetchCampaigns(); }, []);
+
+  const fetchCampaigns = async () => {
+    try {
+      const res = await fetch('/api/game/campaigns');
+      if (res.ok) {
+        const data = await res.json();
+        setCampaigns(data.campaigns || data);
+      }
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const res = await fetch(`/api/game/campaigns/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (res.ok) {
+      setCampaigns(campaigns.filter((c) => c.id !== deleteConfirm.id));
+      toast.success('Campaign deleted', `"${deleteConfirm.name}" has been removed`);
+    } else {
+      const error = await res.json();
+      toast.error('Delete failed', error.error || 'Failed to delete campaign');
+    }
+    setDeleteConfirm({ show: false, id: '', name: '' });
+  };
+
+  const filtered = campaigns.filter((c) => {
+    const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <>
+      {/* Page header */}
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Game Campaigns</h1>
-          <p className="text-gray-600 mt-1">
-            Manage pixel art game campaigns, rewards, and leaderboards
-          </p>
+          <h1 className="text-3xl font-semibold text-gray-900">Game Campaigns</h1>
+          <p className="text-gray-600 mt-1">Manage pixel art game campaigns, rewards, and leaderboards</p>
         </div>
         <div className="flex gap-3">
-          <Link
-            href="/admin/games/scan"
-            className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center gap-2"
-          >
-            <span className="text-xl">🔍</span>
-            Quick Scan
+          <Link href="/admin/games/scan">
+            <Button variant="secondary" size="md">Quick Scan</Button>
           </Link>
-          <Link
-            href="/admin/games/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Campaign
+          <Link href="/admin/games/new">
+            <Button variant="primary" size="md">Create Campaign</Button>
           </Link>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm text-gray-600">Total Campaigns</div>
-          <div className="text-3xl font-bold text-gray-900 mt-2">
-            {campaigns.length}
+      {/* Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        {/* Table header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">All Campaigns</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Pixel art game campaigns with rewards and leaderboards</p>
           </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm text-gray-600">Active Now</div>
-          <div className="text-3xl font-bold text-green-600 mt-2">
-            {campaigns.filter(isCampaignActive).length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm text-gray-600">Total Rewards</div>
-          <div className="text-3xl font-bold text-blue-600 mt-2">
-            {campaigns.reduce((sum, c) => sum + c.reward_total, 0)}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm text-gray-600">Winner Slots</div>
-          <div className="text-3xl font-bold text-yellow-600 mt-2">
-            {campaigns.reduce((sum, c) => sum + ((c as any).winner_count || 100), 0)}
-          </div>
-        </div>
-      </div>
-
-      {/* Campaigns List */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">All Campaigns</h2>
-        </div>
-
-        {campaigns.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-gray-500">No campaigns yet</p>
-            <Link
-              href="/admin/games/new"
-              className="text-blue-600 hover:text-blue-700 mt-2 inline-block"
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search campaigns…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-48"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
-              Create your first campaign
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="paused">Paused</option>
+              <option value="ended">Ended</option>
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-sm text-gray-500">No campaigns found</p>
+            <Link href="/admin/games/new">
+              <Button variant="secondary" size="sm">Create your first campaign</Button>
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Campaign
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duration
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Timer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rewards
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {campaigns.map((campaign) => {
-                  const isActive = isCampaignActive(campaign);
-                  return (
-                    <tr key={campaign.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {campaign.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              ID: {campaign.id.slice(0, 8)}...
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                            campaign.status
-                          )}`}
-                        >
-                          {isActive ? '🟢 Active' : campaign.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div>{formatDate(campaign.start_date)}</div>
-                        <div className="text-gray-500">
-                          to {formatDate(campaign.end_date)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {campaign.timer_duration}s
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex items-center">
-                          <div className="flex-1">
-                            <div className="text-sm font-medium">
-                              {campaign.reward_total} total
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              First {(campaign as any).winner_count || 100} win
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Campaign</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Duration</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Timer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Rewards</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Links</th>
+                <th className="px-6 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((campaign) => {
+                const isActive = isCampaignActive(campaign);
+                const c = campaign as any;
+                return (
+                  <tr
+                    key={campaign.id}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => router.push(`/admin/games/${campaign.id}`)}
+                  >
+                    <td className="px-6 py-3">
+                      <p className="font-medium text-gray-900">{campaign.name}</p>
+                      {c.display_title && c.display_title !== campaign.name && (
+                        <p className="text-xs text-gray-400">{c.display_title}</p>
+                      )}
+                    </td>
+                    <td className="px-6 py-3">
+                      <BadgeWithDot color={isActive ? 'success' : STATUS_COLOR[campaign.status] ?? 'gray'} size="sm">
+                        {isActive ? 'Active' : campaign.status}
+                      </BadgeWithDot>
+                    </td>
+                    <td className="px-6 py-3 text-gray-500">
+                      <div>{formatDateShort(campaign.start_date)}</div>
+                      <div className="text-xs text-gray-400">→ {formatDateShort(campaign.end_date)}</div>
+                    </td>
+                    <td className="px-6 py-3 text-gray-700">
+                      {campaign.timer_duration}s
+                    </td>
+                    <td className="px-6 py-3">
+                      <p className="font-medium text-gray-900">{campaign.reward_total} total</p>
+                      <p className="text-xs text-gray-400">First {c.winner_count || 100} win</p>
+                    </td>
+                    <td className="px-6 py-3" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
                         <Link
                           href={`/game/${campaign.id}`}
                           target="_blank"
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                         >
-                          Play
+                          Play ↗
                         </Link>
                         <Link
                           href={`/leaderboard/${campaign.id}`}
                           target="_blank"
-                          className="text-purple-600 hover:text-purple-900"
-                          title="Public leaderboard for display"
+                          className="text-xs text-purple-600 hover:text-purple-800 font-medium"
                         >
-                          Display
-                        </Link>
-                        <Link
-                          href={`/admin/games/${campaign.id}`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          Edit
+                          Display ↗
                         </Link>
                         <Link
                           href={`/admin/games/${campaign.id}/leaderboard`}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-xs text-green-600 hover:text-green-800 font-medium"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           Leaderboard
                         </Link>
                         <Link
                           href={`/admin/games/${campaign.id}/rewards`}
-                          className="text-yellow-600 hover:text-yellow-900"
+                          className="text-xs text-orange-600 hover:text-orange-800 font-medium"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           Rewards
                         </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1">
+                        <Link href={`/admin/games/${campaign.id}`}>
+                          <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                            <Edit01 className="w-4 h-4" />
+                          </button>
+                        </Link>
+                        <button
+                          className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                          title="Delete"
+                          onClick={() => setDeleteConfirm({ show: true, id: campaign.id, name: campaign.name })}
+                        >
+                          <Trash01 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
 
-      {/* API Endpoints Reference */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          API Endpoints
-        </h2>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <span className="font-mono text-green-600">GET</span>
-              <span className="ml-2 font-mono">/api/game/campaigns</span>
-            </div>
-            <span className="text-gray-600">List all campaigns</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <span className="font-mono text-green-600">GET</span>
-              <span className="ml-2 font-mono">/api/game/campaigns/[id]</span>
-            </div>
-            <span className="text-gray-600">Get campaign by ID</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <span className="font-mono text-blue-600">POST</span>
-              <span className="ml-2 font-mono">/api/game/sessions</span>
-            </div>
-            <span className="text-gray-600">Create game session</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <span className="font-mono text-blue-600">POST</span>
-              <span className="ml-2 font-mono">/api/game/scores</span>
-            </div>
-            <span className="text-gray-600">Submit score</span>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <span className="font-mono text-green-600">GET</span>
-              <span className="ml-2 font-mono">
-                /api/game/leaderboard/[campaignId]
-              </span>
-            </div>
-            <span className="text-gray-600">Get leaderboard</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      <ConfirmModal
+        isOpen={deleteConfirm.show}
+        variant="danger"
+        title="Delete Campaign"
+        message={`Are you sure you want to delete "${deleteConfirm.name}"? This will also delete all associated sessions, scores, and rewards. This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
+      />
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { getSettings, getIngredients, getFlavours, getFormats, getOfferings } from './db.js'
+import { getTaxonomies, getIngredients, getFlavours, getFormats, getSettings } from './db.js'
 
 // Taxonomy Validation Functions
 
@@ -14,18 +14,18 @@ export async function validateEligibleFlavourTypes(eligibleFlavourTypes: string[
     return { valid: true, errors: [] }
   }
   
-  // Get flavourTypes taxonomy from settings
-  const settings = await getSettings()
-  if (!settings.taxonomies || !settings.taxonomies.flavourTypes) {
+  // Get flavourTypes taxonomy
+  const taxonomies = await getTaxonomies()
+  if (!taxonomies.flavourTypes) {
     errors.push({
       field: 'eligibleFlavourTypes',
       constraint: 'taxonomy-missing',
-      message: 'flavourTypes taxonomy not found in settings'
+      message: 'flavourTypes taxonomy not found'
     })
     return { valid: false, errors }
   }
   
-  const validFlavourTypes = settings.taxonomies.flavourTypes.map((item: any) => item.id)
+  const validFlavourTypes = taxonomies.flavourTypes.map((item: any) => item.id)
   
   // Check each provided type exists in taxonomy
   for (const typeId of eligibleFlavourTypes) {
@@ -46,12 +46,12 @@ export async function validateEligibleFlavourTypes(eligibleFlavourTypes: string[
 }
 
 export async function validateTaxonomyUniqueness(category: string, value: string, excludeId?: string): Promise<boolean> {
-  const settings = await getSettings()
-  if (!settings.taxonomies || !settings.taxonomies[category]) {
+  const taxonomies = await getTaxonomies()
+  if (!taxonomies[category]) {
     return true // Category doesn't exist yet, so value is unique
   }
   
-  const existingValues = settings.taxonomies[category]
+  const existingValues = taxonomies[category]
   const duplicate = existingValues.find((item: any) => 
     item.value === value && item.id !== excludeId
   )

@@ -10,6 +10,8 @@ import RelatedItems from '@/app/admin/components/RelatedItems';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { ingredientDescriptorTags } from '@/types';
 
 interface RelatedFlavour {
   id: string;
@@ -18,6 +20,7 @@ interface RelatedFlavour {
 
 export default function EditIngredientPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [usedInFlavours, setUsedInFlavours] = useState<RelatedFlavour[]>([]);
@@ -26,8 +29,11 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
     latinName: '',
     origin: '',
     taxonomyCategory: '',
+    roles: [] as string[],
+    descriptors: [] as string[],
+    description: '',
     story: '',
-    tastingNotes: '',
+    tastingNotes: [] as string[],
     supplier: '',
     farm: '',
     seasonal: false,
@@ -60,8 +66,11 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
           latinName: data.latinName || '',
           origin: data.origin || '',
           taxonomyCategory: data.taxonomyCategory || data.category || '',
+          roles: Array.isArray(data.roles) ? data.roles : [],
+          descriptors: Array.isArray(data.descriptors) ? data.descriptors : [],
+          description: data.description || '',
           story: data.story || '',
-          tastingNotes: Array.isArray(data.tastingNotes) ? data.tastingNotes.join(', ') : data.tastingNotes || '',
+          tastingNotes: Array.isArray(data.tastingNotes) ? data.tastingNotes : (data.tastingNotes ? data.tastingNotes.split(',').map((n: string) => n.trim()).filter(Boolean) : []),
           supplier: data.supplier || '',
           farm: data.farm || '',
           seasonal: data.seasonal || false,
@@ -100,19 +109,16 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
       const response = await fetch(`/api/ingredients/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          tastingNotes: formData.tastingNotes.split(',').map(n => n.trim()).filter(Boolean),
-        }),
+        body: JSON.stringify(formData),
       });
       if (response.ok) {
-        router.push('/admin/ingredients');
+        toast.success('Ingredient saved', `"${formData.name}" has been updated`);
       } else {
-        alert('Failed to update ingredient');
+        toast.error('Save failed', 'Failed to update ingredient');
       }
     } catch (error) {
       console.error('Error updating ingredient:', error);
-      alert('Failed to update ingredient');
+      toast.error('Save failed', 'An unexpected error occurred');
     } finally {
       setSaving(false);
     }
@@ -162,11 +168,44 @@ export default function EditIngredientPage({ params }: { params: { id: string } 
                 <Input label="Origin" type="text" isRequired value={formData.origin} onChange={(v) => setFormData({ ...formData, origin: v })} placeholder="e.g., Sicily" />
                 <TaxonomySelect category="ingredientCategories" value={formData.taxonomyCategory} onChange={(v) => setFormData({ ...formData, taxonomyCategory: v })} label="Category" required />
               </div>
+              <Textarea label="Description" value={formData.description} onChange={(v) => setFormData({ ...formData, description: v })} rows={2} placeholder="Brief description of this ingredient..." />
               <Textarea label="Story & Provenance" value={formData.story} onChange={(v) => setFormData({ ...formData, story: v })} rows={4} placeholder="Tell the story of this ingredient..." />
               <TaxonomyTagSelect
+                category="ingredientRoles"
+                values={formData.roles}
+                onChange={(values) => setFormData({ ...formData, roles: values })}
+                label="Usage Roles"
+                description="Select all applicable usage roles"
+                allowCreate={false}
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Descriptor Tags</p>
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg">
+                  {ingredientDescriptorTags.map((descriptor) => (
+                    <button
+                      key={descriptor}
+                      type="button"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        descriptors: prev.descriptors.includes(descriptor)
+                          ? prev.descriptors.filter(d => d !== descriptor)
+                          : [...prev.descriptors, descriptor],
+                      }))}
+                      className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                        formData.descriptors.includes(descriptor)
+                          ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
+                          : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                      }`}
+                    >
+                      {descriptor}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <TaxonomyTagSelect
                 category="tastingNotes"
-                values={formData.tastingNotes.split(',').map(t => t.trim()).filter(Boolean)}
-                onChange={(values) => setFormData({ ...formData, tastingNotes: values.join(', ') })}
+                values={formData.tastingNotes}
+                onChange={(values) => setFormData({ ...formData, tastingNotes: values })}
                 label="Tasting Notes"
                 description="Select common tasting note descriptors"
                 allowCreate={true}

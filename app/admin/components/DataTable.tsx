@@ -3,6 +3,7 @@
 import { ReactNode, memo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/app/admin/components/ui/button';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 export interface Column<T> {
   key: string;
@@ -13,6 +14,7 @@ export interface Column<T> {
 
 export interface Action<T> {
   label: string;
+  icon?: 'edit' | 'delete';
   onClick?: (item: T) => void;
   href?: (item: T) => string;
   className?: string;
@@ -174,21 +176,40 @@ function DataTable<T>({
                         className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <div className="flex items-center justify-end gap-3">
+                        <div className="flex items-center justify-end gap-1">
                           {actions.map((action, index) => {
+                            const IconComp = action.icon === 'edit' ? Edit01 : action.icon === 'delete' ? Trash01 : undefined;
+                            const isDelete = action.icon === 'delete';
                             if (action.href) {
                               return (
                                 <Link
                                   key={index}
                                   href={action.href(item)}
                                   onClick={(e) => action.stopPropagation && e.stopPropagation()}
-                                  className={action.className || 'text-blue-600 hover:text-blue-900'}
                                 >
-                                  {action.label}
+                                  {IconComp ? (
+                                    <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title={action.label}>
+                                      <IconComp className="w-4 h-4" />
+                                    </button>
+                                  ) : (
+                                    <span className={action.className || 'text-blue-600 hover:text-blue-900'}>{action.label}</span>
+                                  )}
                                 </Link>
                               );
                             }
-                            return (
+                            return IconComp ? (
+                              <button
+                                key={index}
+                                className={`p-1.5 transition-colors rounded ${isDelete ? 'text-gray-400 hover:text-red-500' : 'text-gray-400 hover:text-gray-600'}`}
+                                title={action.label}
+                                onClick={(e) => {
+                                  if (action.stopPropagation) e.stopPropagation();
+                                  action.onClick?.(item);
+                                }}
+                              >
+                                <IconComp className="w-4 h-4" />
+                              </button>
+                            ) : (
                               <button
                                 key={index}
                                 onClick={(e) => {

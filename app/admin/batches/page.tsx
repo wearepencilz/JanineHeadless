@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column, Action } from '@/app/admin/components/DataTable';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface Batch {
   id: string;
@@ -17,6 +18,7 @@ interface Batch {
 
 export default function BatchesPage() {
   const router = useRouter();
+  const toast = useToast();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
@@ -50,9 +52,10 @@ export default function BatchesPage() {
       await fetch(`/api/batches/${deleteConfirm.id}`, { method: 'DELETE' });
       setBatches(batches.filter((b) => b.id !== deleteConfirm.id));
       setDeleteConfirm({ show: false, id: '', name: '' });
+      toast.success('Batch deleted');
     } catch (error) {
       console.error('Error deleting batch:', error);
-      alert('Failed to delete batch');
+      toast.error('Failed to delete batch');
     }
   };
 
@@ -102,13 +105,14 @@ export default function BatchesPage() {
   const actions: Action<Batch>[] = [
     {
       label: 'Edit',
+      icon: 'edit',
       href: (batch) => `/admin/batches/${batch.id}`,
       stopPropagation: true,
     },
     {
       label: 'Delete',
+      icon: 'delete',
       onClick: handleDeleteClick,
-      className: 'text-red-600 hover:text-red-900',
       stopPropagation: true,
     },
   ];
@@ -129,10 +133,13 @@ export default function BatchesPage() {
         loading={loading}
       />
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Batch"
         message={`Are you sure you want to delete batch "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
       />
