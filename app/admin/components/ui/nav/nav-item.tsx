@@ -6,8 +6,8 @@ import { ChevronDown, Share04 } from "@untitledui/icons";
 import { cx, sortCx } from "@/app/admin/components/utils/cx";
 
 const styles = sortCx({
-    root: "group relative flex w-full cursor-pointer items-center rounded-md bg-white outline-none transition duration-100 ease-linear select-none hover:bg-gray-50 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
-    rootSelected: "bg-gray-100 hover:bg-gray-100",
+    root: "group relative flex w-full cursor-pointer items-center rounded-md bg-primary outline-focus-ring transition duration-100 ease-linear select-none hover:bg-primary_hover focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2",
+    rootSelected: "bg-active hover:bg-secondary_hover",
 });
 
 export interface NavItemBaseProps {
@@ -23,17 +23,26 @@ export interface NavItemBaseProps {
     children?: ReactNode;
 }
 
-export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, truncate = true, onClick }: NavItemBaseProps) => {
+export const NavItemBase = ({
+    current,
+    type,
+    badge,
+    href,
+    icon: Icon,
+    children,
+    truncate = true,
+    onClick,
+}: NavItemBaseProps) => {
     const iconElement = Icon && (
-        <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-gray-500 transition-inherit-all group-hover:text-gray-700" />
+        <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-fg-quaternary transition-inherit-all" />
     );
 
     const labelElement = (
         <span
             className={cx(
-                "flex-1 text-sm font-medium text-gray-700 transition-inherit-all group-hover:text-gray-900",
+                "flex-1 text-sm font-semibold text-secondary transition-inherit-all group-hover:text-secondary_hover",
                 truncate && "truncate",
-                current && "text-gray-900",
+                current && "text-secondary_hover",
             )}
         >
             {children}
@@ -41,15 +50,21 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
     );
 
     const isExternal = href && href.startsWith("http");
-    const externalIcon = isExternal && <Share04 className="size-4 stroke-[2.5px] text-gray-500" />;
+    const externalIcon = isExternal && <Share04 className="size-4 stroke-[2.5px] text-fg-quaternary" />;
 
     if (type === "collapsible") {
         return (
-            <summary className={cx("px-3 py-2", styles.root, current && styles.rootSelected)} onClick={onClick}>
+            <summary
+                className={cx("px-3 py-2", styles.root, current && styles.rootSelected)}
+                onClick={onClick}
+            >
                 {iconElement}
                 {labelElement}
                 {badge}
-                <ChevronDown aria-hidden="true" className="ml-3 size-4 shrink-0 stroke-[2.5px] text-gray-400 in-open:-scale-y-100" />
+                <ChevronDown
+                    aria-hidden="true"
+                    className="ml-3 size-4 shrink-0 stroke-[2.5px] text-fg-quaternary in-open:-scale-y-100"
+                />
             </summary>
         );
     }
