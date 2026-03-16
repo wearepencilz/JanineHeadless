@@ -1,13 +1,13 @@
 {
-  "enabled": true,
-  "name": "Run CMS Tests",
-  "description": "Runs all comprehensive CMS test suites to verify forms, inputs, tags, file uploads, and CRUD operations",
+  "enabled": false,
+  "name": "Run CMS Tests (Legacy)",
+  "description": "DISABLED — references legacy src/cms/__tests__ path that no longer exists.",
   "version": "1",
   "when": {
     "type": "userTriggered"
   },
   "then": {
     "type": "runCommand",
-    "command": "npm test src/cms/__tests__"
+    "command": "echo 'Legacy test path — update to current test location'"
   }
 }

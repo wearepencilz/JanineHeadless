@@ -1,13 +1,13 @@
 {
-  "enabled": true,
-  "name": "Start Dev Servers",
-  "description": "Starts both the Express API server (port 3001) and Vite dev server (port 5173) for local development",
+  "enabled": false,
+  "name": "Start Dev Servers (Legacy)",
+  "description": "DISABLED — legacy Express + Vite setup. Use 'npm run dev' directly for Next.js.",
   "version": "1",
   "when": {
     "type": "userTriggered"
   },
   "then": {
-    "type": "askAgent",
-    "prompt": "Start the API server with 'npm run server' and the Vite dev server with 'npm run dev' using controlBashProcess for both. Confirm when both servers are running successfully."
+    "type": "runCommand",
+    "command": "echo 'Use npm run dev instead'"
   }
 }

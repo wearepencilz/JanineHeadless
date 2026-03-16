@@ -1,5 +1,6 @@
 ---
-inclusion: auto
+inclusion: fileMatch
+fileMatchPattern: "app/admin/**"
 description: Untitled UI React design system reference — component patterns, color tokens, and accessibility.
 ---
 
