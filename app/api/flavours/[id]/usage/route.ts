@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOfferings } from '@/lib/db';
-import { getFormats } from '@/lib/db';
+import { getProducts, getFormats } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -8,32 +7,25 @@ export async function GET(
 ) {
   try {
     const flavourId = params.id;
-    
-    // Get all offerings
-    const offerings = await getOfferings();
-    
-    // Get all formats for name lookup
-    const formats = await getFormats();
+
+    const [products, formats] = await Promise.all([getProducts(), getFormats()]);
     const formatMap = new Map(formats.map((f: any) => [f.id, f]));
-    
-    // Find offerings that use this flavour
-    const usageOfferings = offerings
-      .filter((offering: any) => 
-        offering.primaryFlavourIds?.includes(flavourId)
-      )
-      .map((offering: any) => {
-        const format: any = formatMap.get(offering.formatId);
+
+    const usageProducts = products
+      .filter((p: any) => p.primaryFlavourIds?.includes(flavourId))
+      .map((p: any) => {
+        const format: any = formatMap.get(p.formatId);
         return {
-          id: offering.id,
-          name: offering.publicName || offering.internalName,
-          formatName: format?.name || 'Unknown Format',
-          status: offering.status || 'draft',
+          id: p.id,
+          name: p.publicName || p.internalName,
+          formatName: format?.name || 'Unknown format',
+          status: p.status || 'draft',
         };
       });
-    
+
     return NextResponse.json({
-      usageCount: usageOfferings.length,
-      offerings: usageOfferings,
+      usageCount: usageProducts.length,
+      offerings: usageProducts,
     });
   } catch (error) {
     console.error('Error fetching flavour usage:', error);

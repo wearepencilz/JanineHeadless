@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Badge } from '@/app/admin/components/ui/nav/badges';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import type { OfferingStatus } from '@/types';
 
 interface UsageOffering {
@@ -25,7 +26,6 @@ const STATUS_COLOR: Record<string, 'success' | 'blue' | 'gray' | 'orange' | 'err
 
 export default function FlavourUsagePanel({ flavourId }: FlavourUsagePanelProps) {
   const [loading, setLoading] = useState(true);
-  const [usageCount, setUsageCount] = useState(0);
   const [offerings, setOfferings] = useState<UsageOffering[]>([]);
 
   useEffect(() => { fetchUsage(); }, [flavourId]);
@@ -35,7 +35,6 @@ export default function FlavourUsagePanel({ flavourId }: FlavourUsagePanelProps)
       const response = await fetch(`/api/flavours/${flavourId}/usage`);
       if (response.ok) {
         const data = await response.json();
-        setUsageCount(data.usageCount);
         setOfferings(data.offerings);
       }
     } catch (error) {
@@ -45,46 +44,58 @@ export default function FlavourUsagePanel({ flavourId }: FlavourUsagePanelProps)
     }
   };
 
-  if (loading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Usage Tracking</h2>
-        <div className="text-sm text-gray-500">Loading usage data...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Usage Tracking</h2>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900">Used in products</h2>
+          {!loading && (
+            <p className="text-sm text-gray-500 mt-0.5">
+              {offerings.length === 0 ? 'Not used in any products' : `${offerings.length} product${offerings.length !== 1 ? 's' : ''}`}
+            </p>
+          )}
+        </div>
+        {!loading && offerings.length > 0 && (
+          <Badge color="gray" size="sm">{offerings.length}</Badge>
+        )}
+      </div>
 
-      {usageCount === 0 ? (
-        <div className="text-sm text-gray-500">
-          This flavour is not currently used in any offerings.
+      {loading ? (
+        <div className="px-6 py-4">
+          <div className="animate-pulse space-y-2">
+            <div className="h-10 bg-gray-100 rounded" />
+            <div className="h-10 bg-gray-100 rounded" />
+          </div>
+        </div>
+      ) : offerings.length === 0 ? (
+        <div className="px-6 py-4 text-sm text-gray-500">
+          This flavour hasn't been added to any products yet.
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="text-sm text-gray-700">
-            Used in <span className="font-semibold">{usageCount}</span> offering{usageCount !== 1 ? 's' : ''}
-          </div>
-          <div className="space-y-2">
-            {offerings.map((offering) => (
-              <div key={offering.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">{offering.name}</div>
-                  <div className="text-xs text-gray-500">Format: {offering.formatName}</div>
-                </div>
-                <Badge color={STATUS_COLOR[offering.status] ?? 'gray'} size="sm">
-                  {offering.status}
-                </Badge>
+        <div className="divide-y divide-gray-50">
+          {offerings.map((offering) => (
+            <Link
+              key={offering.id}
+              href={`/admin/products/${offering.id}`}
+              className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{offering.name}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{offering.formatName}</p>
               </div>
-            ))}
-          </div>
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="text-xs text-yellow-800">
-              ⚠️ This flavour is in use. Archiving it may affect active offerings.
-            </div>
-          </div>
+              <BadgeWithDot color={STATUS_COLOR[offering.status] ?? 'gray'} size="sm">
+                {offering.status}
+              </BadgeWithDot>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {!loading && offerings.length > 0 && (
+        <div className="px-6 py-3 bg-warning-50 border-t border-warning-200">
+          <p className="text-xs text-warning-700">
+            Archiving this flavour may affect active products.
+          </p>
         </div>
       )}
     </div>
