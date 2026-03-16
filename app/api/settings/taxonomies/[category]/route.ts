@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getTaxonomyValues, addTaxonomyValue, getSettings, saveSettings } from '@/lib/db'
+import { getTaxonomyValues, addTaxonomyValue } from '@/lib/db'
 import { validateTaxonomyUniqueness } from '@/lib/validation'
 import { auth } from '@/lib/auth'
 

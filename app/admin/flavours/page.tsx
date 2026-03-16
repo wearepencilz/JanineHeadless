@@ -8,7 +8,9 @@ import { Table, TableCard } from '@/src/app/admin/components/ui/application/tabl
 import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 const STATUS_COLOR: Record<string, 'success' | 'warning' | 'gray'> = {
   active: 'success',
@@ -19,6 +21,7 @@ const STATUS_COLOR: Record<string, 'success' | 'warning' | 'gray'> = {
 
 export default function FlavoursPage() {
   const router = useRouter();
+  const toast = useToast();
   const [flavours, setFlavours] = useState<Flavour[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,9 +52,11 @@ export default function FlavoursPage() {
     if (response.ok) {
       setFlavours(flavours.filter((f) => f.id !== deleteConfirm.id));
       setDeleteConfirm({ show: false, id: '', name: '' });
+      toast.success('Flavour deleted', `"${deleteConfirm.name}" has been removed`);
     } else {
       const error = await response.json();
-      alert(error.error || 'Failed to delete flavour');
+      toast.error('Delete failed', error.error || 'Failed to delete flavour');
+      setDeleteConfirm({ show: false, id: '', name: '' });
     }
   };
 
@@ -129,17 +134,19 @@ export default function FlavoursPage() {
                     </span>
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/flavours/${flavour.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                          <Edit01 className="w-4 h-4" />
+                        </button>
                       </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
+                      <button
+                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                        title="Delete"
                         onClick={() => setDeleteConfirm({ show: true, id: flavour.id, name: flavour.name })}
                       >
-                        Delete
-                      </Button>
+                        <Trash01 className="w-4 h-4" />
+                      </button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -149,10 +156,13 @@ export default function FlavoursPage() {
         )}
       </TableCard.Root>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Flavour"
         message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
       />

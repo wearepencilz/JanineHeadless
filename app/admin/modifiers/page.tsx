@@ -7,7 +7,9 @@ import { Table, TableCard } from '@/src/app/admin/components/ui/application/tabl
 import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 interface Modifier {
   id: string;
@@ -33,6 +35,7 @@ const TYPE_COLORS: Record<string, 'purple' | 'blue' | 'orange' | 'success' | 'gr
 
 export default function ModifiersPage() {
   const router = useRouter();
+  const toast = useToast();
   const [modifiers, setModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('all');
@@ -62,6 +65,9 @@ export default function ModifiersPage() {
     if (res.ok) {
       setModifiers(modifiers.filter((m) => m.id !== deleteConfirm.id));
       setDeleteConfirm({ show: false, id: '', name: '' });
+      toast.success('Modifier deleted');
+    } else {
+      toast.error('Failed to delete modifier');
     }
   };
 
@@ -171,17 +177,19 @@ export default function ModifiersPage() {
                     <span className="text-sm text-tertiary">{modifier.availableForFormatIds.length} format{modifier.availableForFormatIds.length !== 1 ? 's' : ''}</span>
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/modifiers/${modifier.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                          <Edit01 className="w-4 h-4" />
+                        </button>
                       </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
+                      <button
+                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                        title="Delete"
                         onClick={() => setDeleteConfirm({ show: true, id: modifier.id, name: modifier.name })}
                       >
-                        Delete
-                      </Button>
+                        <Trash01 className="w-4 h-4" />
+                      </button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -191,10 +199,13 @@ export default function ModifiersPage() {
         )}
       </TableCard.Root>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Modifier"
         message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
       />

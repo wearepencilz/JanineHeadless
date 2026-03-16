@@ -8,7 +8,9 @@ import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
 import { BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 interface Product {
   id: string;
@@ -40,6 +42,7 @@ const STATUS_COLOR: Record<string, 'success' | 'gray' | 'blue' | 'warning' | 'er
 
 export default function ProductsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [formats, setFormats] = useState<Format[]>([]);
   const [launches, setLaunches] = useState<Launch[]>([]);
@@ -79,10 +82,12 @@ export default function ProductsPage() {
     const response = await fetch(`/api/products/${deleteConfirm.id}`, { method: 'DELETE' });
     if (response.ok) {
       setProducts(products.filter((p) => p.id !== deleteConfirm.id));
+      toast.success('Product deleted', `"${deleteConfirm.name}" has been removed`);
       setDeleteConfirm({ show: false, id: '', name: '' });
     } else {
       const error = await response.json();
-      alert(error.error || 'Failed to delete product');
+      toast.error('Delete failed', error.error || 'Failed to delete product');
+      setDeleteConfirm({ show: false, id: '', name: '' });
     }
   };
 
@@ -237,17 +242,19 @@ export default function ProductsPage() {
                     )}
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/products/${product.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                          <Edit01 className="w-4 h-4" />
+                        </button>
                       </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
+                      <button
+                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                        title="Delete"
                         onClick={() => setDeleteConfirm({ show: true, id: product.id, name: product.publicName })}
                       >
-                        Delete
-                      </Button>
+                        <Trash01 className="w-4 h-4" />
+                      </button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -257,10 +264,13 @@ export default function ProductsPage() {
         )}
       </TableCard.Root>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Product"
         message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
       />

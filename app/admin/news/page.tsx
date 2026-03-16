@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
 import { Button } from '@/app/admin/components/ui/buttons/button';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 interface NewsItem {
   id: number;
@@ -17,6 +19,7 @@ interface NewsItem {
 
 export default function NewsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: 0, title: '' });
@@ -30,8 +33,13 @@ export default function NewsPage() {
   }, []);
 
   const handleDelete = async () => {
-    await fetch(`/api/news/${deleteConfirm.id}`, { method: 'DELETE' });
-    setNews(news.filter((n) => n.id !== deleteConfirm.id));
+    const response = await fetch(`/api/news/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (response.ok) {
+      setNews(news.filter((n) => n.id !== deleteConfirm.id));
+      toast.success('Article deleted', `"${deleteConfirm.title}" has been removed`);
+    } else {
+      toast.error('Delete failed', 'Failed to delete article');
+    }
     setDeleteConfirm({ show: false, id: 0, title: '' });
   };
 
@@ -89,17 +97,19 @@ export default function NewsPage() {
                     <span className="text-sm text-secondary">{new Date(item.date).toLocaleDateString()}</span>
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/news/${item.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                          <Edit01 className="w-4 h-4" />
+                        </button>
                       </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
+                      <button
+                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                        title="Delete"
                         onClick={() => setDeleteConfirm({ show: true, id: item.id, title: item.title })}
                       >
-                        Delete
-                      </Button>
+                        <Trash01 className="w-4 h-4" />
+                      </button>
                     </div>
                   </Table.Cell>
                 </Table.Row>
@@ -109,10 +119,13 @@ export default function NewsPage() {
         )}
       </TableCard.Root>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete News Article"
         message={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: 0, title: '' })}
       />

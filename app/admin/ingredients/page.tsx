@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
-import DeleteModal from '@/app/admin/components/DeleteModal';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
+import { useToast } from '@/app/admin/components/ToastContainer';
 import { Button } from '@/app/admin/components/ui/button';
+import { Edit01, Trash01 } from '@untitledui/icons';
 
 interface Ingredient {
   id: string;
@@ -53,6 +55,7 @@ const CATEGORY_COLOR: Record<string, 'blue' | 'purple' | 'success' | 'orange' | 
 
 export default function IngredientsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [taxonomyCategories, setTaxonomyCategories] = useState<TaxonomyCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,10 +91,12 @@ export default function IngredientsPage() {
     const response = await fetch(`/api/ingredients/${deleteConfirm.id}`, { method: 'DELETE' });
     if (response.ok) {
       setIngredients(ingredients.filter((i) => i.id !== deleteConfirm.id));
+      toast.success('Ingredient deleted', `"${deleteConfirm.name}" has been removed`);
       setDeleteConfirm({ show: false, id: '', name: '' });
     } else {
       const error = await response.json();
-      alert(error.blockers ? `Cannot delete:\n\n${error.blockers.join('\n')}` : error.error || 'Failed to delete');
+      toast.error('Delete failed', error.blockers ? `Cannot delete: ${error.blockers.join(', ')}` : error.error || 'Failed to delete');
+      setDeleteConfirm({ show: false, id: '', name: '' });
     }
   };
 
@@ -226,17 +231,19 @@ export default function IngredientsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-3">
-                      <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                         <Link href={`/admin/ingredients/${ingredient.id}`}>
-                          <Button variant="secondary" size="sm">Edit</Button>
+                          <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded" title="Edit">
+                            <Edit01 className="w-4 h-4" />
+                          </button>
                         </Link>
-                        <Button
-                          variant="danger"
-                          size="sm"
+                        <button
+                          className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded"
+                          title="Delete"
                           onClick={() => setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name })}
                         >
-                          Delete
-                        </Button>
+                          <Trash01 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -247,10 +254,13 @@ export default function IngredientsPage() {
         )}
       </div>
 
-      <DeleteModal
+      <ConfirmModal
         isOpen={deleteConfirm.show}
+        variant="danger"
         title="Delete Ingredient"
         message={`Are you sure you want to delete "${deleteConfirm.name}"? This will check if the ingredient is used in any flavours.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ show: false, id: '', name: '' })}
       />
