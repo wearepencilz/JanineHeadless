@@ -1,5 +1,50 @@
 {
-  "logo": "/uploads/1773633376646-test-logo.svg",
+  "logo": "/uploads/1773633391366-logo.svg",
+  "email": "help@janinemtl.com",
+  "phone": "",
   "companyName": "Janine",
-  "email": "bonjour@janinemtl.ca"
+  "visit": {
+    "message": "<p>THU / FRI / SAT</p><p>13H – 20H, SOMETIMES LATER</p>",
+    "address": "<p>2455 Notre Dame, <br>Montreal, QC, H3J 1N6</p>",
+    "addressUrl": "https://maps.app.goo.gl/3yU5y5Mnq4Bqf8bAA",
+    "photo": "/uploads/1773633761972-come-see-us.jpg"
+  },
+  "footer": {
+    "address": "<p>2455 rue Notre Dame Ouest</p><p>Montreal, H3J 1N6</p>",
+    "addressUrl": "https://maps.app.goo.gl/3yU5y5Mnq4Bqf8bAA",
+    "hours": "<p>THU / FRI / SAT</p><p>13H – 20H – <em>SOMETIMES LATER</em></p>",
+    "instagram": "https://instagram.com/janinemtl",
+    "contact": "<p>bonjour@janinemtl.ca</p><p>514.970.9266</p>"
+  },
+  "about": {
+    "bg": "#948c22",
+    "text": "<p>Handcraft soft serve mediterranean gelato, made with the heart and honesty.</p><p>Local supplier and a research of insane flavour, so everyone can find a piece of their happy memory in each icy creation.</p>",
+    "image": "/uploads/1773635788718-image-171.jpg"
+  },
+  "home": {
+    "story": {
+      "bg": "#333112",
+      "text": "<p>This is the story of a lost heritage in a southern village, nestled between the azure sea and the singing cicadas. From Marseille to La Spezia.</p><p>A frozen delight for the long summer days.</p><p>A tribute to a grandmother who loves the sea, the warm sand, and the sweetness of a gelato. It is the story of all those little moments of happiness that belong to each of us, told through frozen flavors with simplicity and honesty.</p><p>To Janine,<br>the cicadas will forever sing your name.</p>",
+      "image": "/uploads/1773637015476-image-168.png"
+    },
+    "editorial": [
+      {
+        "text": "<p>For our inspiration our chef kept her habit from the south to go directly to the market to source the best flavours of perfectly ripped season fruits.</p><p>The fruits are the main character in the creation process and we pair the fruit sorbet with a creamy jersey cow milk based gelato infused with spices or native herbs that will marry perfectly and balanced the acidity or the overly sweet power of fruit.</p>",
+        "image": "/uploads/1773636969137-frame-127.png"
+      },
+      {
+        "text": "<p>Our jersey milk comes from MC dairy, a coop from small farmer that provide a great environment for cow, that spend their summer in pasture for incredible product with ethical animal care value.</p><p>An Ontario-based producer, offers \"Naturally Golden Yolks\" eggs from free-run hens fed a diet containing marigold petals, which are rich in lutein for eye health.</p>",
+        "image": "/uploads/1773636975659-frame-128.png"
+      },
+      {
+        "text": "<p>All our supplier are selected for their locality (when season allowed) and that care about the product and the well being of the planet and animal.</p><p>Our main supplier is mediserre, a small Montreal base supplier on the rise created by two chef, Andrew and Olivier that provide the best product from small Canadian producer.</p>",
+        "image": "/uploads/1773636982745-frame-129.png"
+      }
+    ],
+    "photos": {
+      "photo1": "/uploads/1773636989891-frame-120.png",
+      "photo2": "/uploads/1773636993465-frame-119.png"
+    }
+  },
+  "formatEligibilityRules": {}
 }

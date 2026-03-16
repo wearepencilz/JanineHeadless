@@ -4,16 +4,13 @@ export default async function SiteFooter() {
   const settings = await getSettings().catch(() => ({}));
   const logo: string = settings?.logo || '';
   const companyName: string = settings?.companyName || 'Janine';
-  const visit = settings?.visit || {};
+  const footer = settings?.footer || {};
 
-  const days = visit.days || 'THU / FRI / SAT';
-  const hours = visit.hours || '13H – 20H';
-  const hoursNote = visit.hoursNote || 'SOMETIMES LATER';
-  const addressLine1 = visit.addressLine1 || '2455 rue Notre Dame Ouest';
-  const addressLine2 = visit.addressLine2 || 'Montreal, H3J 1N6';
-  const instagram: string = settings?.socialLinks?.instagram || 'https://instagram.com/janinemtl';
-  const email: string = settings?.email || 'bonjour@janinemtl.ca';
-  const phone: string = settings?.phone || '514.970.9266';
+  const address: string = footer.address || '2455 rue Notre Dame Ouest, Montreal, H3J 1N6';
+  const addressUrl: string = footer.addressUrl || 'https://maps.app.goo.gl/3yU5y5Mnq4Bqf8bAA';
+  const hours: string = footer.hours || 'THU / FRI / SAT — 13H – 20H SOMETIMES LATER';
+  const instagram: string = footer.instagram || 'https://instagram.com/janinemtl';
+  const contact: string = footer.contact || '<p>bonjour@janinemtl.ca</p>';
 
   return (
     <footer id="visit" className="relative w-full bg-white overflow-hidden pt-16">
@@ -23,26 +20,25 @@ export default async function SiteFooter() {
         style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
       >
         <address className="not-italic">
-          {addressLine1}<br />
-          {addressLine2}
+          <a
+            href={addressUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-60 transition-opacity"
+            dangerouslySetInnerHTML={{ __html: address }}
+          />
         </address>
 
-        <div className="lowercase">
-          <p>{days}</p>
-          <p>
-            {hours} –{' '}
-            <em style={{ fontStyle: 'italic' }}>{hoursNote}</em>
-          </p>
-        </div>
+        <div
+          className="lowercase"
+          dangerouslySetInnerHTML={{ __html: hours }}
+        />
 
         <a href={instagram} className="hover:opacity-60 transition-opacity">
           instagram
         </a>
 
-        <div>
-          <p>{email}</p>
-          <p>{phone}</p>
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: contact }} />
       </div>
 
       {/* Big logo */}

@@ -5,11 +5,9 @@ export default async function ComeSeeUs() {
   const settings = await getSettings().catch(() => ({}));
   const visit = settings?.visit || {};
 
-  const days = visit.days || 'THU / FRI / SAT';
-  const hours = visit.hours || '13H – 20H';
-  const hoursNote = visit.hoursNote || 'SOMETIMES LATER';
-  const addressLine1 = visit.addressLine1 || '2455 Notre Dame,';
-  const addressLine2 = visit.addressLine2 || 'Montreal, QC, H3J 1N6';
+  const message = visit.message || '<p>THU / FRI / SAT</p><p>13H – 20H <em>SOMETIMES LATER</em></p>';
+  const address = visit.address || '<p>2455 Notre Dame,</p><p>Montreal, QC, H3J 1N6</p>';
+  const addressUrl = visit.addressUrl || 'https://maps.app.goo.gl/3yU5y5Mnq4Bqf8bAA';
   const photo = visit.photo || '';
 
   return (
@@ -19,34 +17,20 @@ export default async function ComeSeeUs() {
       style={{ backgroundColor: '#948c22' }}
     >
       {/* Left: info panel */}
-      <div className="flex-1 flex flex-col justify-center px-16 py-24 relative z-10">
-        <div className="mb-6">
-          <p
-            className="text-white text-[20px] tracking-[0.4px] leading-none uppercase mb-2"
-            style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-          >
-            {days}
-          </p>
-          <div className="flex items-center gap-3 text-white text-[20px] tracking-[0.4px] leading-none">
-            <span style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}>
-              {hours}
-            </span>
-            <span
-              className="italic"
-              style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 500 }}
-            >
-              {hoursNote}
-            </span>
-          </div>
-        </div>
-
-        <address
-          className="not-italic text-white text-[20px] tracking-[0.4px] leading-[1.5] uppercase"
+      <div className="flex-1 flex flex-col justify-center px-16 py-24 relative z-10 gap-6">
+        <div
+          className="text-white text-[20px] tracking-[0.4px] uppercase leading-snug visit-content"
           style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-        >
-          <p>{addressLine1}</p>
-          <p>{addressLine2}</p>
-        </address>
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
+        <a
+          href={addressUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white text-[20px] tracking-[0.4px] uppercase leading-snug hover:opacity-70 transition-opacity visit-content"
+          style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+          dangerouslySetInnerHTML={{ __html: address }}
+        />
       </div>
 
       {/* Right: photo */}
@@ -60,6 +44,11 @@ export default async function ComeSeeUs() {
           />
         </div>
       )}
+
+      <style>{`
+        .visit-content p { margin: 0; }
+        .visit-content p + p { margin-top: 0.15em; }
+      `}</style>
     </section>
   );
 }

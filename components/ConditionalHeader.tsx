@@ -10,8 +10,9 @@ export default function ConditionalHeader() {
   // Homepage and visit page manage their own header
   const isHomepage = pathname === '/';
   const isVisitPage = pathname === '/visit';
+  const isLaunchPage = pathname?.startsWith('/launches');
 
-  if (isAdminRoute || isHomepage || isVisitPage) {
+  if (isAdminRoute || isHomepage || isVisitPage || isLaunchPage) {
     return null;
   }
 

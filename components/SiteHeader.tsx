@@ -1,10 +1,16 @@
 import Link from 'next/link';
 import { getSettings } from '@/lib/db';
 
-export default async function SiteHeader() {
+interface SiteHeaderProps {
+  theme?: 'dark' | 'light';
+}
+
+export default async function SiteHeader({ theme = 'dark' }: SiteHeaderProps) {
   const settings = await getSettings().catch(() => ({}));
   const logo: string = settings?.logo || '';
   const companyName: string = settings?.companyName || 'Janine';
+
+  const textColor = theme === 'light' ? '#ffffff' : '#333112';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between px-8 pt-8 pointer-events-none">
@@ -15,11 +21,12 @@ export default async function SiteHeader() {
             src={logo}
             alt={companyName}
             className="h-[27px] w-auto object-contain"
+            style={theme === 'light' ? { filter: 'brightness(0) invert(1)' } : undefined}
           />
         ) : (
           <span
-            className="text-[#333112] text-sm tracking-widest uppercase"
-            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 500 }}
+            className="text-sm tracking-widest uppercase"
+            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 500, color: textColor }}
           >
             {companyName}
           </span>
@@ -28,8 +35,8 @@ export default async function SiteHeader() {
 
       {/* Right nav */}
       <nav
-        className="pointer-events-auto flex flex-col items-end gap-[10px] text-[#343100] text-[14px] tracking-[0.28px] uppercase leading-none"
-        style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+        className="pointer-events-auto flex flex-col items-end gap-[10px] text-[14px] tracking-[0.28px] uppercase leading-none"
+        style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500, color: textColor }}
       >
         <Link href="/flavours" className="hover:opacity-60 transition-opacity">Flavours</Link>
         <Link href="/stories" className="hover:opacity-60 transition-opacity">Stories</Link>

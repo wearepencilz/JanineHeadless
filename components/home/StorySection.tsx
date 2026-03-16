@@ -1,24 +1,22 @@
-export default function StorySection() {
-  return (
-    <section className="relative w-full h-[804px] bg-[#333112] overflow-hidden">
-      {/* Background image placeholder */}
-      <div className="absolute inset-0 bg-[#1a1a0a]" />
+import { getSettings } from '@/lib/db';
 
-      {/* Story text */}
+export default async function StorySection() {
+  const settings = await getSettings().catch(() => ({}));
+  const story = (settings as any)?.home?.story || {};
+
+  const text: string = story.text || '<p>This is the story of a lost heritage in a southern village, nestled between the azure sea and the singing cicadas. From Marseille to La Spezia.</p><p>A frozen delight for the long summer days.</p><p>A tribute to a grandmother who loves the sea, the warm sand, and the sweetness of a gelato. It is the story of all those little moments of happiness that belong to each of us, told through frozen flavors with simplicity and honesty.</p><p>To Janine,<br>the cicadas will forever sing your name.</p>';
+  const bg: string = story.bg || '#333112';
+  const image: string = story.image || '';
+
+  return (
+    <section className="relative w-full h-[804px] overflow-hidden" style={{ backgroundColor: bg }}>
+      {image && <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+
       <div
-        className="absolute left-[44px] top-[66px] w-[332px] text-white text-[16px] leading-normal"
+        className="absolute left-[44px] top-[66px] w-[332px] text-white text-[16px] leading-normal [&_p]:mb-4 [&_p:last-child]:mb-0"
         style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
-      >
-        <p className="mb-4">
-          This is the story of a lost heritage in a southern village, nestled between the azure sea and the singing cicadas. From Marseille to La Spezia.
-        </p>
-        <p className="mb-4">A frozen delight for the long summer days.</p>
-        <p className="mb-4">
-          A tribute to a grandmother who loves the sea, the warm sand, and the sweetness of a gelato. It is the story of all those little moments of happiness that belong to each of us, told through frozen flavors with simplicity and honesty.
-        </p>
-        <p className="mb-0">To Janine,</p>
-        <p>the cicadas will forever sing your name.</p>
-      </div>
+        dangerouslySetInnerHTML={{ __html: text }}
+      />
     </section>
   );
 }

@@ -45,6 +45,7 @@ const sections: NavSectionType[] = [
     {
         label: 'Content',
         items: [
+            { label: 'Pages', href: '/admin/pages', icon: Announcement01 },
             { label: 'News', href: '/admin/news', icon: Announcement01 },
             { label: 'Games', href: '/admin/games', icon: Dice1 },
         ],
