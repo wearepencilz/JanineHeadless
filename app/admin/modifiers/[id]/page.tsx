@@ -7,6 +7,7 @@ import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 
 interface Modifier {
   id: string;
@@ -27,6 +28,15 @@ interface Format {
   name: string;
 }
 
+const TYPE_COLOR: Record<string, 'blue' | 'purple' | 'orange' | 'pink' | 'indigo' | 'gray'> = {
+  topping: 'blue',
+  sauce: 'orange',
+  crunch: 'indigo',
+  drizzle: 'pink',
+  'premium-addon': 'purple',
+  'pack-in': 'gray',
+};
+
 export default function EditModifierPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -36,29 +46,24 @@ export default function EditModifierPage({ params }: { params: { id: string } })
   const [modifier, setModifier] = useState<Modifier | null>(null);
   const [formats, setFormats] = useState<Format[]>([]);
 
-  useEffect(() => {
-    fetchData();
-  }, [params.id]);
+  useEffect(() => { fetchData(); }, [params.id]);
 
   const fetchData = async () => {
     try {
       const [modifierRes, formatsRes] = await Promise.all([
         fetch(`/api/modifiers/${params.id}`),
-        fetch('/api/formats')
+        fetch('/api/formats'),
       ]);
-
       if (modifierRes.ok) {
-        const modifierData = await modifierRes.json();
-        setModifier(modifierData);
+        setModifier(await modifierRes.json());
       } else {
         setError('Modifier not found');
       }
-
       if (formatsRes.ok) {
-        const formatsData = await formatsRes.json();
-        setFormats(formatsData.data || formatsData);
+        const data = await formatsRes.json();
+        setFormats(data.data || data);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load modifier');
     } finally {
       setLoading(false);
@@ -68,24 +73,21 @@ export default function EditModifierPage({ params }: { params: { id: string } })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!modifier) return;
-
     setSaving(true);
     setError('');
-
     try {
       const response = await fetch(`/api/modifiers/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(modifier),
       });
-
       if (response.ok) {
         router.push('/admin/modifiers');
       } else {
         const data = await response.json();
         setError(data.error || 'Failed to update modifier');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while updating the modifier');
     } finally {
       setSaving(false);
@@ -93,63 +95,47 @@ export default function EditModifierPage({ params }: { params: { id: string } })
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this modifier? This action cannot be undone.')) {
-      return;
-    }
-
+    if (!confirm('Are you sure you want to delete this modifier?')) return;
     setDeleting(true);
-    setError('');
-
     try {
-      const response = await fetch(`/api/modifiers/${params.id}`, {
-        method: 'DELETE',
-      });
-
+      const response = await fetch(`/api/modifiers/${params.id}`, { method: 'DELETE' });
       if (response.ok) {
         router.push('/admin/modifiers');
       } else {
         const data = await response.json();
-        if (data.usedIn) {
-          setError(`Cannot delete: This modifier is used in ${data.usedIn.length} product(s)`);
-        } else {
-          setError(data.error || 'Failed to delete modifier');
-        }
+        setError(data.usedIn
+          ? `Cannot delete: used in ${data.usedIn.length} product(s)`
+          : data.error || 'Failed to delete modifier');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while deleting the modifier');
     } finally {
       setDeleting(false);
     }
   };
 
-  const handleFormatToggle = (formatId: string) => {
+  const toggleFormat = (formatId: string) => {
     if (!modifier) return;
     setModifier({
       ...modifier,
       availableForFormatIds: modifier.availableForFormatIds.includes(formatId)
         ? modifier.availableForFormatIds.filter(id => id !== formatId)
-        : [...modifier.availableForFormatIds, formatId]
+        : [...modifier.availableForFormatIds, formatId],
     });
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   if (!modifier) {
     return (
-      <EditPageLayout
-        title="Edit Modifier"
-        backHref="/admin/modifiers"
-        backLabel="Back to Modifiers"
-        onSave={() => {}}
-        onCancel={() => router.push('/admin/modifiers')}
-        error={error || 'Modifier not found'}
-      >
+      <EditPageLayout title="Edit Modifier" backHref="/admin/modifiers" backLabel="Back to Modifiers"
+        onSave={() => {}} onCancel={() => router.push('/admin/modifiers')} error={error || 'Modifier not found'}>
         <div />
       </EditPageLayout>
     );
@@ -166,111 +152,147 @@ export default function EditModifierPage({ params }: { params: { id: string } })
       saving={saving}
       deleting={deleting}
       error={error}
+      maxWidth="7xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white shadow rounded-lg px-6 py-4 space-y-6">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-3 gap-6">
 
-          <div>
-            <Input
-              label="Name *"
-              type="text"
-              name="name"
-              isRequired
-              value={modifier.name}
-              onChange={(value) => setModifier({ ...modifier, name: value })}
-            />
-          </div>
+          {/* Left column */}
+          <div className="col-span-2 space-y-6">
 
-          <div>
-            <Input
-              label="Slug"
-              type="text"
-              name="slug"
-              value={modifier.slug}
-              onChange={(value) => setModifier({ ...modifier, slug: value })}
-            />
-          </div>
-
-          <div>
-            <Select
-              label="Type *"
-              isRequired
-              value={modifier.type}
-              onChange={(value) => setModifier({ ...modifier, type: value })}
-              options={[
-                { id: 'topping', label: 'Topping' },
-                { id: 'sauce', label: 'Sauce' },
-                { id: 'crunch', label: 'Crunch' },
-                { id: 'drizzle', label: 'Drizzle' },
-                { id: 'premium-addon', label: 'Premium Add-on' },
-                { id: 'pack-in', label: 'Pack-in' },
-              ]}
-            />
-          </div>
-
-          <div>
-            <Textarea
-              label="Description"
-              name="description"
-              rows={3}
-              value={modifier.description || ''}
-              onChange={(value) => setModifier({ ...modifier, description: value })}
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Price (in cents) *"
-              type="number"
-              name="price"
-              isRequired
-              value={String(modifier.price)}
-              onChange={(value) => setModifier({ ...modifier, price: parseFloat(value) || 0 })}
-              helperText={`Current price: $${(modifier.price / 100).toFixed(2)}`}
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Image URL"
-              type="text"
-              name="image"
-              value={modifier.image || ''}
-              onChange={(value) => setModifier({ ...modifier, image: value })}
-            />
-            {modifier.image && (
-              <img src={modifier.image} alt="Modifier preview" className="mt-2 h-32 w-auto rounded" />
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Available for Formats
-            </label>
-            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
-              {formats.map((format) => (
-                <Checkbox
-                  key={format.id}
-                  isSelected={modifier.availableForFormatIds.includes(format.id)}
-                  onChange={() => handleFormatToggle(format.id)}
-                  label={format.name}
+            {/* Modifier details */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Modifier details</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Name, type and description.</p>
+              </div>
+              <div className="px-6 py-6 space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Name"
+                    isRequired
+                    value={modifier.name}
+                    onChange={(v) => setModifier({ ...modifier, name: v })}
+                  />
+                  <Input
+                    label="Slug"
+                    value={modifier.slug}
+                    onChange={(v) => setModifier({ ...modifier, slug: v })}
+                  />
+                </div>
+                <Select
+                  label="Type"
+                  isRequired
+                  value={modifier.type}
+                  onChange={(v) => setModifier({ ...modifier, type: v })}
+                  options={[
+                    { id: 'topping', label: 'Topping' },
+                    { id: 'sauce', label: 'Sauce' },
+                    { id: 'crunch', label: 'Crunch' },
+                    { id: 'drizzle', label: 'Drizzle' },
+                    { id: 'premium-addon', label: 'Premium Add-on' },
+                    { id: 'pack-in', label: 'Pack-in' },
+                  ]}
                 />
-              ))}
+                <Textarea
+                  label="Description"
+                  rows={3}
+                  value={modifier.description || ''}
+                  onChange={(v) => setModifier({ ...modifier, description: v })}
+                />
+              </div>
             </div>
+
+            {/* Available formats */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Available for formats</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {modifier.availableForFormatIds.length === 0
+                    ? 'Not available for any formats'
+                    : `${modifier.availableForFormatIds.length} format${modifier.availableForFormatIds.length !== 1 ? 's' : ''} selected`}
+                </p>
+              </div>
+              <div className="px-6 py-4 grid grid-cols-2 gap-2">
+                {formats.map((format) => (
+                  <Checkbox
+                    key={format.id}
+                    isSelected={modifier.availableForFormatIds.includes(format.id)}
+                    onChange={() => toggleFormat(format.id)}
+                    label={format.name}
+                  />
+                ))}
+              </div>
+            </div>
+
           </div>
 
-          <div>
-            <Select
-              label="Status"
-              value={modifier.status}
-              onChange={(value) => setModifier({ ...modifier, status: value })}
-              options={[
-                { id: 'active', label: 'Active' },
-                { id: 'archived', label: 'Archived' },
-              ]}
-            />
-          </div>
+          {/* Right column */}
+          <div className="col-span-1 space-y-6">
 
+            {/* Status */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Status</h2>
+                <BadgeWithDot color={modifier.status === 'active' ? 'success' : 'gray'}>
+                  {modifier.status}
+                </BadgeWithDot>
+              </div>
+              <div className="px-6 py-5 space-y-4">
+                <Select
+                  label="Status"
+                  value={modifier.status}
+                  onChange={(v) => setModifier({ ...modifier, status: v })}
+                  options={[
+                    { id: 'active', label: 'Active' },
+                    { id: 'archived', label: 'Archived' },
+                  ]}
+                />
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Type</span>
+                  <Badge color={TYPE_COLOR[modifier.type] ?? 'gray'} size="sm">{modifier.type}</Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Pricing</h2>
+              </div>
+              <div className="px-6 py-5 space-y-2">
+                <Input
+                  label="Price (cents)"
+                  type="number"
+                  isRequired
+                  value={String(modifier.price)}
+                  onChange={(v) => setModifier({ ...modifier, price: parseFloat(v) || 0 })}
+                />
+                <p className="text-xs text-gray-500">
+                  Display price: ${(modifier.price / 100).toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            {/* Image */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Image</h2>
+              </div>
+              <div className="px-6 py-5 space-y-3">
+                <Input
+                  label="Image URL"
+                  type="text"
+                  value={modifier.image || ''}
+                  onChange={(v) => setModifier({ ...modifier, image: v })}
+                />
+                {modifier.image && (
+                  <img src={modifier.image} alt="Preview" className="h-24 w-auto rounded-lg object-cover" />
+                )}
+              </div>
+            </div>
+
+          </div>
         </div>
       </form>
     </EditPageLayout>
