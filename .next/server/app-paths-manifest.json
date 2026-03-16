@@ -1,7 +1,0 @@
-{
-  "/api/flavours/route": "app/api/flavours/route.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/ingredients/page": "app/admin/ingredients/page.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/flavours/page": "app/admin/flavours/page.js"
-}
