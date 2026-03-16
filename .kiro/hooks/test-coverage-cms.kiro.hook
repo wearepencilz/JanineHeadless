@@ -1,13 +1,13 @@
 {
-  "enabled": true,
-  "name": "CMS Test Coverage",
-  "description": "Runs CMS tests with coverage report to see which code paths are tested",
+  "enabled": false,
+  "name": "CMS Test Coverage (Legacy)",
+  "description": "DISABLED — references legacy src/cms/__tests__ path that no longer exists.",
   "version": "1",
   "when": {
     "type": "userTriggered"
   },
   "then": {
     "type": "runCommand",
-    "command": "npm test src/cms/__tests__ -- --coverage --run"
+    "command": "echo 'Legacy test path — update to current test location'"
   }
 }
