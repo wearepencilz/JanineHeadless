@@ -23,15 +23,15 @@ export default async function EditorialColumns() {
     : defaultColumns;
 
   return (
-    <section className="flex flex-col gap-4 px-[252px] py-16">
+    <section className="flex flex-col gap-4 px-4 md:px-[252px] py-12 md:py-16">
       {columns.map((col, i) => (
-        <div key={i} className="flex gap-16">
-          <div className="flex-none w-[578px] h-[702px] overflow-hidden bg-[#dad5bb]">
+        <div key={i} className="flex flex-col md:flex-row gap-8 md:gap-16">
+          <div className="w-full md:flex-none md:w-[578px] h-[280px] md:h-[702px] overflow-hidden bg-[#dad5bb]">
             {col.image && <img src={col.image} alt="" className="w-full h-full object-cover" />}
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start md:items-center">
             <div
-              className="text-[#333112] text-[14px] leading-[22px] w-[399px] [&_p]:mb-4 [&_p:last-child]:mb-0"
+              className="text-[#333112] text-[14px] leading-[22px] md:w-[399px] [&_p]:mb-4 [&_p:last-child]:mb-0"
               style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
               dangerouslySetInnerHTML={{ __html: col.text }}
             />

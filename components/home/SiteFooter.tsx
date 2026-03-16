@@ -13,10 +13,10 @@ export default async function SiteFooter() {
   const contact: string = footer.contact || '<p>bonjour@janinemtl.ca</p>';
 
   return (
-    <footer id="visit" className="relative w-full bg-white overflow-hidden pt-16">
+    <footer id="visit" className="relative w-full bg-white overflow-hidden pt-12 md:pt-16">
       {/* Footer info row */}
       <div
-        className="flex justify-between px-8 pb-16 text-[#333112] text-[16px] leading-[22px] tracking-[0.48px]"
+        className="grid grid-cols-2 md:flex md:justify-between gap-6 md:gap-0 px-4 md:px-8 pb-12 md:pb-16 text-[#333112] text-[13px] md:text-[16px] leading-[22px] tracking-[0.48px]"
         style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
       >
         <address className="not-italic">
@@ -29,10 +29,7 @@ export default async function SiteFooter() {
           />
         </address>
 
-        <div
-          className="lowercase"
-          dangerouslySetInnerHTML={{ __html: hours }}
-        />
+        <div className="lowercase" dangerouslySetInnerHTML={{ __html: hours }} />
 
         <a href={instagram} className="hover:opacity-60 transition-opacity">
           instagram
@@ -51,7 +48,7 @@ export default async function SiteFooter() {
           />
         ) : (
           <p
-            className="text-[#333112] text-[clamp(60px,12vw,180px)] leading-none tracking-tight select-none pb-0"
+            className="text-[#333112] text-[clamp(40px,12vw,180px)] leading-none tracking-tight select-none pb-0"
             style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
             aria-hidden="true"
           >

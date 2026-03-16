@@ -9,11 +9,11 @@ export default async function StorySection() {
   const image: string = story.image || '';
 
   return (
-    <section className="relative w-full h-[804px] overflow-hidden" style={{ backgroundColor: bg }}>
+    <section className="relative w-full min-h-[500px] md:h-[804px] overflow-hidden" style={{ backgroundColor: bg }}>
       {image && <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />}
 
       <div
-        className="absolute left-[44px] top-[66px] w-[332px] text-white text-[16px] leading-normal [&_p]:mb-4 [&_p:last-child]:mb-0"
+        className="relative z-10 px-6 md:px-[44px] pt-12 md:pt-[66px] pb-12 md:pb-16 max-w-[400px] text-white text-[15px] md:text-[16px] leading-normal [&_p]:mb-4 [&_p:last-child]:mb-0"
         style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
         dangerouslySetInnerHTML={{ __html: text }}
       />

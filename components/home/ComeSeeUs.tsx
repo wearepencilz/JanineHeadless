@@ -13,13 +13,13 @@ export default async function ComeSeeUs() {
   return (
     <section
       id="visit"
-      className="relative w-full min-h-screen flex"
+      className="relative w-full min-h-screen flex flex-col md:flex-row"
       style={{ backgroundColor: '#948c22' }}
     >
       {/* Left: info panel */}
-      <div className="flex-1 flex flex-col justify-center px-16 py-24 relative z-10 gap-6">
+      <div className="flex flex-col justify-center px-6 md:px-16 pt-28 md:pt-24 pb-12 md:pb-24 relative z-10 gap-6 w-full md:flex-1">
         <div
-          className="text-white text-[20px] tracking-[0.4px] uppercase leading-snug visit-content"
+          className="text-white text-[16px] md:text-[20px] tracking-[0.4px] uppercase leading-snug visit-content"
           style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
           dangerouslySetInnerHTML={{ __html: message }}
         />
@@ -27,7 +27,7 @@ export default async function ComeSeeUs() {
           href={addressUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-white text-[20px] tracking-[0.4px] uppercase leading-snug hover:opacity-70 transition-opacity visit-content"
+          className="text-white text-[16px] md:text-[20px] tracking-[0.4px] uppercase leading-snug hover:opacity-70 transition-opacity visit-content"
           style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
           dangerouslySetInnerHTML={{ __html: address }}
         />
@@ -35,7 +35,7 @@ export default async function ComeSeeUs() {
 
       {/* Right: photo */}
       {photo && (
-        <div className="w-1/2 relative overflow-hidden">
+        <div className="w-full h-[50vw] md:h-auto md:w-1/2 relative overflow-hidden">
           <Image
             src={photo}
             alt="Janine storefront"

@@ -13,10 +13,10 @@ export default function HomePage() {
       <SiteHeader />
 
       {/* Hero + flavour strip */}
-      <section className="relative w-full bg-white pt-[120px]">
+      <section className="relative w-full bg-white pt-[80px] md:pt-[120px]">
         {/* Tagline */}
         <p
-          className="absolute top-[33px] left-1/2 -translate-x-1/2 text-[#333112] text-[14px] leading-[18px] tracking-[0.42px] whitespace-pre-line text-left"
+          className="absolute top-[24px] md:top-[33px] left-1/2 -translate-x-1/2 text-[#333112] text-[12px] md:text-[14px] leading-[18px] tracking-[0.42px] whitespace-pre-line text-left"
           style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
         >
           {'Handcraft soft serve \nmediterranean gelato,'}
