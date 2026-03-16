@@ -1,27 +1,34 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
-  
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    // Allow access to login page
-    if (request.nextUrl.pathname === '/admin/login') {
-      // If already logged in, redirect to dashboard
-      if (session) {
-        return NextResponse.redirect(new URL('/admin', request.url));
-      }
-      return NextResponse.next();
-    }
-    
-    // Require authentication for all other admin routes
-    if (!session) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
+  const { pathname } = request.nextUrl;
+
+  if (!pathname.startsWith('/admin')) {
+    return NextResponse.next();
   }
-  
+
+  // Use getToken — works on Edge, reads the JWT cookie directly without hitting the DB
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
+
+  if (pathname === '/admin/login') {
+    if (token) {
+      const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/admin';
+      return NextResponse.redirect(new URL(callbackUrl, request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (!token) {
+    const loginUrl = new URL('/admin/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
   return NextResponse.next();
 }
 
