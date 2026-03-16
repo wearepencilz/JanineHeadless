@@ -1,8 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { NavSections } from './ui/nav/nav-sections';
+import { NavUserBlock } from './ui/nav/nav-user-block';
 import type { NavSectionType } from './ui/nav/nav-sections';
 import {
     HomeLine,
@@ -17,6 +18,7 @@ import {
     Dice1,
     Settings01,
     Tag01,
+    Users01,
 } from '@untitledui/icons';
 
 const sections: NavSectionType[] = [
@@ -55,6 +57,7 @@ const sections: NavSectionType[] = [
         items: [
             { label: 'Formats', href: '/admin/formats', icon: LayersThree01 },
             { label: 'Taxonomies', href: '/admin/taxonomies', icon: Tag01 },
+            { label: 'Users', href: '/admin/settings/users', icon: Users01 },
             { label: 'Settings', href: '/admin/settings', icon: Settings01 },
         ],
     },
@@ -62,6 +65,9 @@ const sections: NavSectionType[] = [
 
 export default function AdminSidebar() {
     const pathname = usePathname();
+    const { data: session } = useSession();
+    const user = session?.user;
+    const role = ((user as any)?.role ?? 'super_admin') as string;
 
     const activeUrl = pathname === '/admin'
         ? '/admin'
@@ -81,13 +87,14 @@ export default function AdminSidebar() {
                 <NavSections items={sections} activeUrl={activeUrl} />
             </div>
 
-            <div className="border-t border-gray-200 p-4">
-                <button
-                    onClick={() => signOut({ callbackUrl: '/admin/login' })}
-                    className="w-full rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors text-left"
-                >
-                    Sign out
-                </button>
+            <div className="border-t border-gray-200 p-3">
+                {user && (
+                    <NavUserBlock
+                        name={user.name ?? 'Admin'}
+                        username={(user as any).username ?? 'admin'}
+                        role={role}
+                    />
+                )}
             </div>
         </aside>
     );

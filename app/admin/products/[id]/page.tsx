@@ -13,6 +13,8 @@ import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import ConfirmModal from '@/app/admin/components/ConfirmModal';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -24,6 +26,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [creatingShopifyProduct, setCreatingShopifyProduct] = useState(false);
+  const [shopifyConfirmOpen, setShopifyConfirmOpen] = useState(false);
+  const [unlinkConfirmOpen, setUnlinkConfirmOpen] = useState(false);
+  const toast = useToast();
 
   const [formData, setFormData] = useState({
     internalName: '',
@@ -114,14 +119,16 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       });
       if (response.ok) {
         setOffering(await response.json());
-        alert('Product updated successfully');
+        toast.success('Product saved', 'Your changes have been saved successfully');
       } else {
         const error = await response.json();
         setErrors([error.error || 'Failed to update product']);
+        toast.error('Save failed', error.error || 'Failed to update product');
       }
     } catch (error) {
       console.error('Error updating product:', error);
       setErrors(['Failed to update product']);
+      toast.error('Save failed', 'An unexpected error occurred');
     } finally {
       setSaving(false);
     }
@@ -149,8 +156,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     if (!offering?.formatId) validationErrors.push('Offering must have a format');
     if (!offering?.primaryFlavourIds || offering.primaryFlavourIds.length === 0) validationErrors.push('Offering must have at least one flavour');
     if (validationErrors.length > 0) { setErrors(validationErrors); return; }
-    if (!confirm('Create a new Shopify product for this offering?')) return;
+    setShopifyConfirmOpen(true);
+  }
 
+  async function doCreateShopifyProduct() {
+    setShopifyConfirmOpen(false);
     setCreatingShopifyProduct(true);
     setErrors([]);
     try {
@@ -167,10 +177,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         setOffering({ ...offering, shopifyProductId: data.shopifyProduct.id, shopifyProductHandle: data.shopifyProduct.handle, syncStatus: 'synced', lastSyncedAt: data.offering.lastSyncedAt });
       }
       await fetchData();
-      alert(`Shopify product created!\n\nTitle: ${data.shopifyProduct.title}\nHandle: ${data.shopifyProduct.handle}`);
+      toast.success('Shopify product created', `"${data.shopifyProduct.title}" is now live on Shopify`);
     } catch (error) {
       console.error('Error creating Shopify product:', error);
-      setErrors([error instanceof Error ? error.message : 'Failed to create Shopify product']);
+      const msg = error instanceof Error ? error.message : 'Failed to create Shopify product';
+      setErrors([msg]);
+      toast.error('Shopify error', msg);
     } finally {
       setCreatingShopifyProduct(false);
     }
@@ -319,11 +331,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => {
-                        if (confirm('Unlink this Shopify product? This will not delete it from Shopify.')) {
-                          setFormData({ ...formData, shopifyProductId: '', shopifyProductHandle: '' });
-                        }
-                      }}
+                      onClick={() => setUnlinkConfirmOpen(true)}
                     >
                       Unlink
                     </Button>
@@ -468,6 +476,27 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
         </div> {/* end right column */}
       </div> {/* end grid */}
+
+      <ConfirmModal
+        isOpen={shopifyConfirmOpen}
+        variant="info"
+        title="Create Shopify product"
+        message="This will generate a new product in your Shopify store from this offering's details. Continue?"
+        confirmLabel="Create"
+        cancelLabel="Cancel"
+        onConfirm={doCreateShopifyProduct}
+        onCancel={() => setShopifyConfirmOpen(false)}
+      />
+      <ConfirmModal
+        isOpen={unlinkConfirmOpen}
+        variant="warning"
+        title="Unlink Shopify product"
+        message="This will remove the Shopify connection from this product. The product will not be deleted from Shopify."
+        confirmLabel="Unlink"
+        cancelLabel="Cancel"
+        onConfirm={() => { setFormData({ ...formData, shopifyProductId: '', shopifyProductHandle: '' }); setUnlinkConfirmOpen(false); }}
+        onCancel={() => setUnlinkConfirmOpen(false)}
+      />
     </EditPageLayout>
   );
 }

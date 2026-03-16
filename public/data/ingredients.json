@@ -17,13 +17,19 @@
     "seasonal": false,
     "description": "Primary dairy base ingredient for gelato.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T19:37:18.454Z",
+    "updatedAt": "2026-03-16T13:43:56.237Z",
     "tastingNotes": [],
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": true,
     "vegetarian": false,
-    "taxonomyCategory": "dairy-bases"
+    "taxonomyCategory": "dairy-bases",
+    "latinName": "",
+    "story": "",
+    "supplier": "",
+    "farm": "",
+    "isOrganic": false,
+    "image": ""
   },
   {
     "id": "cream",

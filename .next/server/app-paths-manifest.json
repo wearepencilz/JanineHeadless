@@ -1,7 +1,8 @@
 {
   "/visit/page": "app/visit/page.js",
+  "/stories/page": "app/stories/page.js",
+  "/page": "app/page.js",
   "/api/settings/route": "app/api/settings/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/upload/route": "app/api/upload/route.js",
-  "/admin/settings/page": "app/admin/settings/page.js"
+  "/archive/page": "app/archive/page.js",
+  "/flavours/page": "app/flavours/page.js"
 }

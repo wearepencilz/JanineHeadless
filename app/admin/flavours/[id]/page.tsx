@@ -13,6 +13,7 @@ import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
 import { BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 const STATUS_COLOR: Record<string, 'success' | 'blue' | 'gray' | 'error'> = {
   active: 'success',
@@ -28,6 +29,7 @@ export default function EditFlavourPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Flavour | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (id) fetchFlavour();
@@ -59,13 +61,14 @@ export default function EditFlavourPage() {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
-        router.push('/admin/flavours');
+        toast.success('Flavour saved', `"${formData.name}" has been updated`);
       } else {
         const error = await response.json();
-        alert(error.error || 'Error updating flavour');
+        toast.error('Save failed', error.error || 'Error updating flavour');
       }
     } catch (error) {
       console.error('Error updating flavour:', error);
+      toast.error('Save failed', 'An unexpected error occurred');
     } finally {
       setSaving(false);
     }

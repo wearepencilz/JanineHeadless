@@ -9,7 +9,7 @@ export const metadata = {
 export default function VisitPage() {
   return (
     <main className="min-h-screen">
-      <SiteHeader theme="light" />
+      <SiteHeader theme="dark" />
       <ComeSeeUs />
     </main>
   );

@@ -12,7 +12,7 @@ export default async function AboutSection() {
     <section className="relative w-full overflow-hidden" style={{ backgroundColor: bg }}>
       <div className="flex flex-col md:flex-row min-h-[500px] md:min-h-[854px]">
         {/* Text content */}
-        <div className="relative z-10 flex flex-col justify-start md:justify-start px-6 md:px-[46px] pt-12 md:pt-[57px] pb-12 md:pb-16 w-full md:w-[480px] shrink-0">
+        <div className="relative z-10 flex flex-col justify-start md:justify-start px-6 md:px-[46px] pt-12 md:pt-[57px] pb-12 md:pb-16 w-full md:w-1/2 shrink-0">
           <div
             className="text-white text-[16px] md:text-[18px] leading-[22px] mb-8 [&_p]:mb-4 [&_p:last-child]:mb-0"
             style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
@@ -27,7 +27,7 @@ export default async function AboutSection() {
         </div>
 
         {/* Right image */}
-        <div className="w-full md:flex-1 h-[300px] md:h-auto overflow-hidden">
+        <div className="w-full md:w-1/2 h-[300px] md:h-auto overflow-hidden">
           {image ? (
             <img src={image} alt="" className="w-full h-full object-cover" />
           ) : (

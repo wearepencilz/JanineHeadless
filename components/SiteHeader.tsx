@@ -41,7 +41,7 @@ export default async function SiteHeader({ theme = 'dark' }: SiteHeaderProps) {
         <Link href="/flavours" className="hover:opacity-60 transition-opacity">Flavours</Link>
         <Link href="/stories" className="hover:opacity-60 transition-opacity hidden md:block">Stories</Link>
         <Link href="/visit" className="hover:opacity-60 transition-opacity">Come See Us</Link>
-        <Link href="#archive" className="hover:opacity-60 transition-opacity hidden md:block">Archive</Link>
+        <Link href="/archive" className="hover:opacity-60 transition-opacity hidden md:block">Archive</Link>
       </nav>
     </header>
   );
