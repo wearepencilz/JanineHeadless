@@ -1,10 +1,19 @@
-import Image from 'next/image';
 import { getSettings } from '@/lib/db';
 
 export default async function SiteFooter() {
   const settings = await getSettings().catch(() => ({}));
   const logo: string = settings?.logo || '';
   const companyName: string = settings?.companyName || 'Janine';
+  const visit = settings?.visit || {};
+
+  const days = visit.days || 'THU / FRI / SAT';
+  const hours = visit.hours || '13H – 20H';
+  const hoursNote = visit.hoursNote || 'SOMETIMES LATER';
+  const addressLine1 = visit.addressLine1 || '2455 rue Notre Dame Ouest';
+  const addressLine2 = visit.addressLine2 || 'Montreal, H3J 1N6';
+  const instagram: string = settings?.socialLinks?.instagram || 'https://instagram.com/janinemtl';
+  const email: string = settings?.email || 'bonjour@janinemtl.ca';
+  const phone: string = settings?.phone || '514.970.9266';
 
   return (
     <footer id="visit" className="relative w-full bg-white overflow-hidden pt-16">
@@ -14,36 +23,34 @@ export default async function SiteFooter() {
         style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
       >
         <address className="not-italic">
-          2455 rue Notre Dame Ouest<br />
-          Montreal, H3J 1N6
+          {addressLine1}<br />
+          {addressLine2}
         </address>
 
         <div className="lowercase">
-          <p>THU / FRI / SAT</p>
+          <p>{days}</p>
           <p>
-            13H – 20H –{' '}
-            <em style={{ fontStyle: 'italic' }}>SOMETIMES LATER</em>
+            {hours} –{' '}
+            <em style={{ fontStyle: 'italic' }}>{hoursNote}</em>
           </p>
         </div>
 
-        <a href="https://instagram.com/janinemtl" className="hover:opacity-60 transition-opacity">
+        <a href={instagram} className="hover:opacity-60 transition-opacity">
           instagram
         </a>
 
         <div>
-          <p>bonjour@janinemtl.ca</p>
-          <p>514.970.9266</p>
+          <p>{email}</p>
+          <p>{phone}</p>
         </div>
       </div>
 
       {/* Big logo */}
       <div className="w-full flex items-end justify-center overflow-hidden">
         {logo ? (
-          <Image
+          <img
             src={logo}
             alt={companyName}
-            width={1440}
-            height={306}
             className="w-full object-contain object-bottom"
           />
         ) : (

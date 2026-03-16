@@ -5,6 +5,7 @@ import AboutSection from '@/components/home/AboutSection';
 import EditorialColumns from '@/components/home/EditorialColumns';
 import ArchiveSection from '@/components/home/ArchiveSection';
 import PhotoPanels from '@/components/home/PhotoPanels';
+import ComeSeeUs from '@/components/home/ComeSeeUs';
 import SiteFooter from '@/components/home/SiteFooter';
 
 export default function HomePage() {
@@ -30,6 +31,7 @@ export default function HomePage() {
       <EditorialColumns />
       <ArchiveSection />
       <PhotoPanels />
+      <ComeSeeUs />
       <SiteFooter />
     </main>
   );

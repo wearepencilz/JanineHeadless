@@ -7,10 +7,11 @@ import CartModal from '@/components/CartModal';
 export default function ConditionalHeader() {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin') || false;
-  // Homepage manages its own header
+  // Homepage and visit page manage their own header
   const isHomepage = pathname === '/';
+  const isVisitPage = pathname === '/visit';
 
-  if (isAdminRoute || isHomepage) {
+  if (isAdminRoute || isHomepage || isVisitPage) {
     return null;
   }
 

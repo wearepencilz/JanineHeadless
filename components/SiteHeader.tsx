@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getSettings } from '@/lib/db';
 
 export default async function SiteHeader() {
@@ -12,11 +11,9 @@ export default async function SiteHeader() {
       {/* Logo */}
       <Link href="/" className="pointer-events-auto" aria-label={`${companyName} home`}>
         {logo ? (
-          <Image
+          <img
             src={logo}
             alt={companyName}
-            width={124}
-            height={27}
             className="h-[27px] w-auto object-contain"
           />
         ) : (
@@ -36,7 +33,7 @@ export default async function SiteHeader() {
       >
         <Link href="/flavours" className="hover:opacity-60 transition-opacity">Flavours</Link>
         <Link href="/stories" className="hover:opacity-60 transition-opacity">Stories</Link>
-        <Link href="#visit" className="hover:opacity-60 transition-opacity">Come See Us</Link>
+        <Link href="/visit" className="hover:opacity-60 transition-opacity">Come See Us</Link>
         <Link href="#archive" className="hover:opacity-60 transition-opacity">Archive</Link>
       </nav>
     </header>

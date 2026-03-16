@@ -23,11 +23,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validate file type - strict list per requirements
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: `Invalid file type. Only JPG, PNG, WebP, and AVIF are allowed.` },
+        { error: `Invalid file type. Allowed: JPG, PNG, WebP, AVIF, GIF, SVG.` },
         { status: 400 }
       );
     }
