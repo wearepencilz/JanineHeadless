@@ -1,7 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/local-ip/route": "app/api/local-ip/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/flavours/route": "app/api/flavours/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/ingredients/page": "app/admin/ingredients/page.js",
   "/admin/login/page": "app/admin/login/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/admin/flavours/page": "app/admin/flavours/page.js"
 }
