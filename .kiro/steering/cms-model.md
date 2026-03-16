@@ -1,5 +1,6 @@
 ---
 inclusion: auto
+description: CMS content types, entity relationships, lifecycle rules, and API routes.
 ---
 
 # CMS Content Model

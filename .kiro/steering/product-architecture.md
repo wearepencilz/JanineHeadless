@@ -1,5 +1,6 @@
 ---
 inclusion: auto
+description: System ownership, architecture boundaries, tech stack, and project structure for Janine.
 ---
 
 # Product Architecture

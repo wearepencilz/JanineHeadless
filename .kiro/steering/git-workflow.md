@@ -1,3 +1,8 @@
+---
+inclusion: auto
+description: Git branching strategy, commit conventions, and workflow rules for this project.
+---
+
 # Git Workflow & Version Control
 
 ## Critical Rule: Always Commit Your Work
