@@ -12,22 +12,12 @@ import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
-import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+import { BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 
 const STATUS_COLOR: Record<string, 'success' | 'blue' | 'gray' | 'error'> = {
   active: 'success',
   upcoming: 'blue',
   archived: 'error',
-};
-
-const TYPE_COLOR: Record<string, 'blue' | 'purple' | 'success' | 'orange' | 'pink' | 'indigo' | 'gray'> = {
-  sorbet: 'blue',
-  gelato: 'purple',
-  'ice-cream': 'success',
-  sherbet: 'orange',
-  soft: 'pink',
-  granita: 'indigo',
-  special: 'gray',
 };
 
 export default function EditFlavourPage() {
@@ -157,12 +147,31 @@ export default function EditFlavourPage() {
                   onChange={(v) => setFormData({ ...formData, description: v })}
                   placeholder="Longer editorial description..."
                 />
+
+              </div>
+            </div>
+
+            {/* Tasting notes */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Tasting notes</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Flavour tags and optional prose notes.</p>
+              </div>
+              <div className="px-6 py-6 space-y-5">
+                <TaxonomyTagSelect
+                  category="keyNotes"
+                  values={formData.keyNotes || []}
+                  onChange={(values) => setFormData({ ...formData, keyNotes: values })}
+                  label="Tags"
+                  description="e.g. smoky, sweet, floral, summer"
+                  allowCreate={true}
+                />
                 <Textarea
-                  label="Tasting notes"
+                  label="Notes"
                   rows={3}
                   value={formData.tastingNotes || ''}
                   onChange={(v) => setFormData({ ...formData, tastingNotes: v })}
-                  placeholder="Sweet, creamy, hints of vanilla..."
+                  placeholder="Optional prose — e.g. Sweet and creamy with a long caramel finish..."
                 />
               </div>
             </div>
@@ -218,24 +227,6 @@ export default function EditFlavourPage() {
                   type="number"
                   value={String(formData.sortOrder ?? 0)}
                   onChange={(v) => setFormData({ ...formData, sortOrder: parseInt(v) || 0 })}
-                />
-              </div>
-            </div>
-
-            {/* Flavour tags */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-sm font-semibold text-gray-900">Flavour tags</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Key notes and descriptors.</p>
-              </div>
-              <div className="px-6 py-5">
-                <TaxonomyTagSelect
-                  category="keyNotes"
-                  values={formData.keyNotes || []}
-                  onChange={(values) => setFormData({ ...formData, keyNotes: values })}
-                  label="Key notes"
-                  description="e.g. smoky, sweet, summer"
-                  allowCreate={true}
                 />
               </div>
             </div>
