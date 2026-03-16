@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/app/admin/components/ui/button';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { useState, useEffect, useRef } from 'react';
+import { Badge } from '@/app/admin/components/ui/nav/badges';
+import { XClose, Plus } from '@untitledui/icons';
 import type { Ingredient, FlavourIngredient, Allergen, DietaryClaim, IngredientCategory } from '@/types';
 
 interface Props {
@@ -10,447 +10,199 @@ interface Props {
   onChange: (ingredients: FlavourIngredient[]) => void;
 }
 
+const ALLERGEN_COLOR: Record<string, 'error' | 'warning' | 'orange'> = {
+  dairy: 'error',
+  egg: 'warning',
+  gluten: 'warning',
+  'tree-nuts': 'orange',
+  peanuts: 'orange',
+  sesame: 'warning',
+  soy: 'warning',
+};
+
+const DIETARY_COLOR: Record<string, 'success' | 'blue' | 'indigo'> = {
+  vegan: 'success',
+  vegetarian: 'success',
+  'gluten-free': 'blue',
+  'dairy-free': 'blue',
+  'nut-free': 'indigo',
+};
+
 export default function FlavourIngredientSelector({ selectedIngredients, onChange }: Props) {
   const [allIngredients, setAllIngredients] = useState<Ingredient[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [search, setSearch] = useState('');
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [calculatedAllergens, setCalculatedAllergens] = useState<Allergen[]>([]);
-  const [calculatedDietaryFlags, setCalculatedDietaryFlags] = useState<DietaryClaim[]>([]);
-  const [newIngredient, setNewIngredient] = useState({
-    name: '',
-    category: 'flavor' as IngredientCategory,
-    origin: '',
-    allergens: [] as Allergen[],
-    dietaryFlags: [] as DietaryClaim[],
-    seasonal: false,
-    description: ''
-  });
+  const [allergens, setAllergens] = useState<Allergen[]>([]);
+  const [dietary, setDietary] = useState<DietaryClaim[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { fetchIngredients(); }, []);
+  useEffect(() => { calculateMetadata(); }, [selectedIngredients, allIngredients]);
 
   useEffect(() => {
-    fetchIngredients();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, []);
-
-  useEffect(() => {
-    calculateMetadata();
-  }, [selectedIngredients, allIngredients]);
-
-  // Handle ESC key to close modal
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setShowModal(false);
-        setShowCreateForm(false);
-      }
-    };
-    
-    if (showModal) {
-      document.addEventListener('keydown', handleEsc);
-      return () => document.removeEventListener('keydown', handleEsc);
-    }
-  }, [showModal]);
 
   const fetchIngredients = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/ingredients?pageSize=100');
-      const data = await response.json();
+      const res = await fetch('/api/ingredients?pageSize=200');
+      const data = await res.json();
       setAllIngredients(data.data || data);
-    } catch (error) {
-      console.error('Error fetching ingredients:', error);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
   const calculateMetadata = () => {
-    const ingredientIds = selectedIngredients.map(si => si.ingredientId);
-    const ingredients = allIngredients.filter(ing => ingredientIds.includes(ing.id));
-    
-    // Calculate allergens
+    const ids = selectedIngredients.map(si => si.ingredientId);
+    const selected = allIngredients.filter(ing => ids.includes(ing.id));
+
     const allergenSet = new Set<Allergen>();
-    ingredients.forEach(ing => {
-      ing.allergens.forEach(allergen => allergenSet.add(allergen));
-    });
-    setCalculatedAllergens(Array.from(allergenSet));
-    
-    // Calculate dietary claims
+    selected.forEach(ing => ing.allergens.forEach(a => allergenSet.add(a)));
+    setAllergens(Array.from(allergenSet));
+
     const claims: DietaryClaim[] = [];
-    const hasAnimalProducts = ingredients.some(ing => 
-      ing.allergens.includes('dairy') || ing.allergens.includes('egg')
-    );
-    if (!hasAnimalProducts && ingredients.length > 0) {
-      claims.push('vegan', 'vegetarian');
-    } else if (ingredients.length > 0) {
-      claims.push('vegetarian');
+    if (selected.length > 0) {
+      const hasAnimal = selected.some(ing => ing.allergens.includes('dairy') || ing.allergens.includes('egg'));
+      if (!hasAnimal) claims.push('vegan', 'vegetarian');
+      else claims.push('vegetarian');
+      if (!selected.some(ing => ing.allergens.includes('gluten'))) claims.push('gluten-free');
+      if (!selected.some(ing => ing.allergens.includes('dairy'))) claims.push('dairy-free');
+      if (!selected.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'))) claims.push('nut-free');
     }
-    
-    if (!ingredients.some(ing => ing.allergens.includes('gluten'))) claims.push('gluten-free');
-    if (!ingredients.some(ing => ing.allergens.includes('dairy'))) claims.push('dairy-free');
-    if (!ingredients.some(ing => ing.allergens.includes('tree-nuts') || ing.allergens.includes('peanuts'))) claims.push('nut-free');
-    
-    setCalculatedDietaryFlags(claims);
+    setDietary(claims);
   };
 
-  const addIngredient = (ingredient: Ingredient) => {
-    const maxOrder = selectedIngredients.length > 0 
+  const add = (ingredient: Ingredient) => {
+    const maxOrder = selectedIngredients.length > 0
       ? Math.max(...selectedIngredients.map(si => si.displayOrder))
       : -1;
-    
-    const newIngredient: FlavourIngredient = {
-      ingredientId: ingredient.id,
-      displayOrder: maxOrder + 1,
-      quantity: '',
-      notes: ''
-    };
-    
-    onChange([...selectedIngredients, newIngredient]);
-    setShowModal(false);
-    setSearchTerm('');
+    onChange([...selectedIngredients, { ingredientId: ingredient.id, displayOrder: maxOrder + 1, quantity: '', notes: '' }]);
+    setSearch('');
+    setOpen(false);
+    inputRef.current?.focus();
   };
 
-  const createIngredient = async () => {
-    if (!newIngredient.name.trim() || !newIngredient.origin.trim()) {
-      alert('Name and origin are required');
-      return;
-    }
-
-    setCreating(true);
-    try {
-      const response = await fetch('/api/ingredients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newIngredient)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create ingredient');
-      }
-
-      const created = await response.json();
-      
-      // Add to local list
-      setAllIngredients([...allIngredients, created]);
-      
-      // Add to selected ingredients
-      addIngredient(created);
-      
-      // Reset form
-      setNewIngredient({
-        name: '',
-        category: 'Fruit',
-        origin: '',
-        allergens: [],
-        dietaryFlags: [],
-        seasonal: false,
-        description: ''
-      });
-      setShowCreateForm(false);
-    } catch (error) {
-      console.error('Error creating ingredient:', error);
-      alert('Failed to create ingredient');
-    } finally {
-      setCreating(false);
-    }
+  const remove = (id: string) => {
+    onChange(selectedIngredients.filter(si => si.ingredientId !== id).map((si, i) => ({ ...si, displayOrder: i })));
   };
 
-  const removeIngredient = (ingredientId: string) => {
-    const filtered = selectedIngredients.filter(si => si.ingredientId !== ingredientId);
-    // Reorder
-    const reordered = filtered.map((si, index) => ({ ...si, displayOrder: index }));
-    onChange(reordered);
-  };
+  const sorted = [...selectedIngredients].sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const updateIngredient = (ingredientId: string, updates: Partial<FlavourIngredient>) => {
-    const updated = selectedIngredients.map(si =>
-      si.ingredientId === ingredientId ? { ...si, ...updates } : si
-    );
-    onChange(updated);
-  };
-
-  const moveIngredient = (ingredientId: string, direction: 'up' | 'down') => {
-    const index = selectedIngredients.findIndex(si => si.ingredientId === ingredientId);
-    if (index === -1) return;
-    
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= selectedIngredients.length) return;
-    
-    const reordered = [...selectedIngredients];
-    [reordered[index], reordered[newIndex]] = [reordered[newIndex], reordered[index]];
-    
-    // Update display orders
-    const withOrders = reordered.map((si, idx) => ({ ...si, displayOrder: idx }));
-    onChange(withOrders);
-  };
-
-  const filteredIngredients = allIngredients.filter(ing => {
-    const alreadySelected = selectedIngredients.some(si => si.ingredientId === ing.id);
-    const matchesSearch = ing.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return !alreadySelected && matchesSearch;
-  });
-
-  const sortedSelected = [...selectedIngredients].sort((a, b) => a.displayOrder - b.displayOrder);
+  const filtered = allIngredients.filter(ing =>
+    !selectedIngredients.some(si => si.ingredientId === ing.id) &&
+    ing.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
-          Ingredients
-        </label>
-        <button
-          type="button"
-          onClick={() => setShowModal(true)}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        >
-          + Add Ingredient
-        </button>
-      </div>
 
-      {/* Selected Ingredients List */}
-      {sortedSelected.length === 0 ? (
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <p className="text-gray-500 text-sm">No ingredients added yet</p>
-          <button
-            type="button"
-            onClick={() => setShowModal(true)}
-            className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-          >
-            Add your first ingredient
-          </button>
-        </div>
-      ) : (
-        <div className="border border-gray-300 rounded-lg divide-y divide-gray-200">
-          {sortedSelected.map((si, index) => {
-            const ingredient = allIngredients.find(ing => ing.id === si.ingredientId);
-            if (!ingredient) return null;
-            
+      {/* Selected pills */}
+      {sorted.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {sorted.map(si => {
+            const ing = allIngredients.find(i => i.id === si.ingredientId);
+            if (!ing) return null;
             return (
-              <div key={si.ingredientId} className="p-4 hover:bg-gray-50">
-                <div className="flex items-start gap-3">
-                  <div className="flex flex-col gap-1 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => moveIngredient(si.ingredientId, 'up')}
-                      disabled={index === 0}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveIngredient(si.ingredientId, 'down')}
-                      disabled={index === sortedSelected.length - 1}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    >
-                      ↓
-                    </button>
-                  </div>
-                  
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-900">{ingredient.name}</h4>
-                        <p className="text-sm text-gray-500">{ingredient.category} • {ingredient.origin}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeIngredient(si.ingredientId)}
-                        className="text-red-600 hover:text-red-700 text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        placeholder="Quantity (e.g., 30%, 2 cups)"
-                        value={si.quantity || ''}
-                        onChange={(e) => updateIngredient(si.ingredientId, { quantity: e.target.value })}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Notes (optional)"
-                        value={si.notes || ''}
-                        onChange={(e) => updateIngredient(si.ingredientId, { notes: e.target.value })}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <span
+                key={si.ingredientId}
+                className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-800 ring-1 ring-gray-200"
+              >
+                {ing.name}
+                <button
+                  type="button"
+                  onClick={() => remove(si.ingredientId)}
+                  className="rounded-full p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors"
+                  aria-label={`Remove ${ing.name}`}
+                >
+                  <XClose size={12} />
+                </button>
+              </span>
             );
           })}
         </div>
       )}
 
-      {/* Calculated Metadata */}
-      {sortedSelected.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-          <h4 className="text-sm font-medium text-blue-900">Auto-calculated Metadata</h4>
-          
-          {calculatedAllergens.length > 0 && (
-            <div>
-              <p className="text-xs text-blue-700 mb-1">Allergens:</p>
-              <div className="flex flex-wrap gap-1">
-                {calculatedAllergens.map(allergen => (
-                  <Badge key={allergen} color="error" size="sm">{allergen}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {calculatedDietaryFlags.length > 0 && (
-            <div>
-              <p className="text-xs text-blue-700 mb-1">Dietary Flags:</p>
-              <div className="flex flex-wrap gap-1">
-                {calculatedDietaryFlags.map(flag => (
-                  <Badge key={flag} color="success" size="sm">{flag}</Badge>
-                ))}
-              </div>
-            </div>
+      {/* Search / add input */}
+      <div className="relative">
+        <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+          <Plus size={16} className="text-gray-400 shrink-0" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={loading ? 'Loading ingredients…' : 'Search and add ingredients…'}
+            value={search}
+            onChange={e => { setSearch(e.target.value); setOpen(true); }}
+            onFocus={() => setOpen(true)}
+            className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400"
+          />
+          {search && (
+            <button type="button" onClick={() => { setSearch(''); setOpen(false); }} className="text-gray-400 hover:text-gray-600">
+              <XClose size={14} />
+            </button>
           )}
         </div>
-      )}
 
-      {/* Add Ingredient Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-gray-900">Add Ingredient</h3>
+        {open && search.length > 0 && (
+          <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+            {filtered.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-gray-500">No ingredients found for "{search}"</p>
+            ) : (
+              filtered.slice(0, 20).map(ing => (
                 <button
+                  key={ing.id}
                   type="button"
-                  onClick={() => setShowCreateForm(!showCreateForm)}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  onClick={() => add(ing)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-gray-50 transition-colors"
                 >
-                  {showCreateForm ? '← Back to Search' : '+ Create New'}
-                </button>
-              </div>
-              
-              {!showCreateForm ? (
-                <input
-                  type="text"
-                  placeholder="Search ingredients..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                />
-              ) : (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="Name *"
-                      value={newIngredient.name}
-                      onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <select
-                      value={newIngredient.category}
-                      onChange={(e) => setNewIngredient({ ...newIngredient, category: e.target.value as IngredientCategory })}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="base">Base</option>
-                      <option value="flavor">Flavor</option>
-                      <option value="mix-in">Mix-in</option>
-                      <option value="topping">Topping</option>
-                      <option value="spice">Spice</option>
-                    </select>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">{ing.name}</span>
+                    {ing.origin && <span className="text-xs text-gray-500 ml-2">{ing.origin}</span>}
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Origin *"
-                    value={newIngredient.origin}
-                    onChange={(e) => setNewIngredient({ ...newIngredient, origin: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    onClick={createIngredient}
-                    isDisabled={creating}
-                    className="w-full"
-                  >
-                    {creating ? 'Creating...' : 'Create & Add Ingredient'}
-                  </Button>
-                </div>
-              )}
-            </div>
-            
-            {!showCreateForm && (
-              <div className="flex-1 overflow-y-auto p-6">
-                {loading ? (
-                  <p className="text-center text-gray-500">Loading ingredients...</p>
-                ) : filteredIngredients.length === 0 ? (
-                  <div className="text-center text-gray-500 py-8">
-                    <p>No ingredients found</p>
-                    <button
-                      type="button"
-                      onClick={() => setShowCreateForm(true)}
-                      className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      Create a new ingredient
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-3">
-                    {filteredIngredients.map(ingredient => (
-                      <button
-                        key={ingredient.id}
-                        type="button"
-                        onClick={() => addIngredient(ingredient)}
-                        className="text-left p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{ingredient.name}</h4>
-                            {ingredient.latinName && (
-                              <p className="text-sm text-gray-500 italic">{ingredient.latinName}</p>
-                            )}
-                            <p className="text-sm text-gray-600 mt-1">
-                              {ingredient.category} • {ingredient.origin}
-                            </p>
-                          </div>
-                          <Badge color="gray" size="sm">{ingredient.category}</Badge>
-                        </div>
-                        
-                        {ingredient.allergens.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {ingredient.allergens.map(allergen => (
-                              <span key={allergen} className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
-                                {allergen}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </button>
+                  <div className="flex items-center gap-1 ml-3 shrink-0">
+                    <Badge color="gray" size="sm">{ing.category}</Badge>
+                    {ing.allergens.slice(0, 2).map(a => (
+                      <Badge key={a} color={ALLERGEN_COLOR[a] ?? 'error'} size="sm">{a}</Badge>
                     ))}
                   </div>
-                )}
-              </div>
+                </button>
+              ))
             )}
-            
-            <div className="p-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowModal(false);
-                  setShowCreateForm(false);
-                  setSearchTerm('');
-                }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Close
-              </button>
-            </div>
           </div>
+        )}
+      </div>
+
+      {/* Auto-calculated metadata */}
+      {sorted.length > 0 && (
+        <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 space-y-2.5">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Auto-calculated</p>
+          {allergens.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-gray-500 w-16 shrink-0">Allergens</span>
+              {allergens.map(a => (
+                <Badge key={a} color={ALLERGEN_COLOR[a] ?? 'error'} size="sm">{a}</Badge>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 w-16 shrink-0">Allergens</span>
+              <Badge color="success" size="sm">None detected</Badge>
+            </div>
+          )}
+          {dietary.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-gray-500 w-16 shrink-0">Dietary</span>
+              {dietary.map(d => (
+                <Badge key={d} color={DIETARY_COLOR[d] ?? 'gray'} size="sm">{d}</Badge>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
