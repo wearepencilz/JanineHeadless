@@ -37,9 +37,9 @@ const sections: NavSectionType[] = [
         label: 'Archive',
         items: [
             { label: 'Flavours', href: '/admin/flavours', icon: Star01 },
-            { label: 'Ingredients', href: '/admin/ingredients', icon: Atom01 },
             { label: 'Batches', href: '/admin/batches', icon: Beaker01 },
             { label: 'Modifiers', href: '/admin/modifiers', icon: Sliders01 },
+            { label: 'Ingredients', href: '/admin/ingredients', icon: Atom01 },
         ],
     },
     {
