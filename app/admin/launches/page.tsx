@@ -3,6 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
 import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
@@ -18,6 +33,7 @@ interface Launch {
   activeStart?: string;
   activeEnd?: string;
   heroImage?: string;
+  sortOrder?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,23 +48,88 @@ const STATUS_COLOR: Record<string, 'blue' | 'success' | 'gray' | 'error'> = {
 const formatDate = (d?: string) =>
   d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Not set';
 
+// Sortable row for upcoming launches
+function SortableRow({
+  launch,
+  onEdit,
+  onDelete,
+}: {
+  launch: Launch;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: launch.id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-center gap-4 px-4 py-3 bg-white border-b border-gray-100 ${isDragging ? 'opacity-50 shadow-lg z-50' : ''}`}
+    >
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 touch-none"
+        aria-label="Drag to reorder"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <circle cx="5" cy="4" r="1.5" />
+          <circle cx="11" cy="4" r="1.5" />
+          <circle cx="5" cy="8" r="1.5" />
+          <circle cx="11" cy="8" r="1.5" />
+          <circle cx="5" cy="12" r="1.5" />
+          <circle cx="11" cy="12" r="1.5" />
+        </svg>
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 truncate">{launch.title}</p>
+        <p className="text-xs text-gray-400">{launch.slug}</p>
+      </div>
+
+      <div className="flex items-center gap-3 shrink-0">
+        <BadgeWithDot color="blue">upcoming</BadgeWithDot>
+        <div className="text-right">
+          <p className="text-sm text-gray-600">{formatDate(launch.activeStart)}</p>
+          <p className="text-xs text-gray-400">to {formatDate(launch.activeEnd)}</p>
+        </div>
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <Button color="secondary" size="sm" onClick={onEdit}>Edit</Button>
+          <Button color="primary-destructive" size="sm" onClick={onDelete}>Delete</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LaunchesPage() {
   const router = useRouter();
   const [launches, setLaunches] = useState<Launch[]>([]);
+  const [upcoming, setUpcoming] = useState<Launch[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', title: '' });
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchLaunches();
-  }, [statusFilter]);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  useEffect(() => { fetchLaunches(); }, [statusFilter]);
 
   const fetchLaunches = async () => {
+    setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (statusFilter !== 'all') params.append('status', statusFilter);
-      const response = await fetch(`/api/launches?${params}`);
-      if (response.ok) setLaunches(await response.json());
+      const [allRes, upcomingRes] = await Promise.all([
+        fetch(`/api/launches${statusFilter !== 'all' ? `?status=${statusFilter}` : ''}`),
+        fetch('/api/launches?status=upcoming'),
+      ]);
+      if (allRes.ok) setLaunches(await allRes.json());
+      if (upcomingRes.ok) {
+        const data = await upcomingRes.json();
+        setUpcoming(data.sort((a: Launch, b: Launch) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
+      }
     } catch (error) {
       console.error('Error fetching launches:', error);
     } finally {
@@ -56,22 +137,76 @@ export default function LaunchesPage() {
     }
   };
 
-  const handleDelete = async () => {
-    const response = await fetch(`/api/launches/${deleteConfirm.id}`, { method: 'DELETE' });
-    if (response.ok) {
-      setLaunches(launches.filter((l) => l.id !== deleteConfirm.id));
-      setDeleteConfirm({ show: false, id: '', title: '' });
-    } else {
-      const error = await response.json();
-      alert(error.error || 'Failed to delete launch');
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setUpcoming((prev) => {
+      const oldIdx = prev.findIndex((l) => l.id === active.id);
+      const newIdx = prev.findIndex((l) => l.id === over.id);
+      return arrayMove(prev, oldIdx, newIdx);
+    });
+  };
+
+  const saveOrder = async () => {
+    setSaving(true);
+    try {
+      await fetch('/api/launches/reorder', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: upcoming.map((l) => l.id) }),
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
+  const handleDelete = async () => {
+    const response = await fetch(`/api/launches/${deleteConfirm.id}`, { method: 'DELETE' });
+    if (response.ok) {
+      setLaunches((prev) => prev.filter((l) => l.id !== deleteConfirm.id));
+      setUpcoming((prev) => prev.filter((l) => l.id !== deleteConfirm.id));
+      setDeleteConfirm({ show: false, id: '', title: '' });
+    } else {
+      alert('Failed to delete launch');
+    }
+  };
+
+  // Upcoming drag-and-drop section
+  const upcomingSection = upcoming.length > 0 && (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">Upcoming order</h2>
+          <p className="text-sm text-gray-500">Drag to set the display order for upcoming launches</p>
+        </div>
+        <Button color="primary" size="sm" isLoading={saving} onClick={saveOrder}>
+          Save order
+        </Button>
+      </div>
+      <div className="rounded-lg border border-gray-200 overflow-hidden">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={upcoming.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+            {upcoming.map((launch) => (
+              <SortableRow
+                key={launch.id}
+                launch={launch}
+                onEdit={() => router.push(`/admin/launches/${launch.id}`)}
+                onDelete={() => setDeleteConfirm({ show: true, id: launch.id, title: launch.title })}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      </div>
+    </div>
+  );
+
   return (
     <>
+      {!loading && upcomingSection}
+
       <TableCard.Root>
         <TableCard.Header
-          title="Launches"
+          title="All Launches"
           badge={launches.length}
           description="Manage seasonal launches and featured product collections"
           contentTrailing={
