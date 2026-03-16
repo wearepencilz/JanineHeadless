@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
 import { computeProductAllergens, formatAllergen, formatDietaryClaim } from '@/lib/product-allergens';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Badge } from '@/app/admin/components/ui/nav/badges';
+import Link from 'next/link';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
@@ -190,6 +191,23 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       </EditPageLayout>
     );
   }
+
+  const FLAVOUR_TYPE_COLOR: Record<string, 'blue' | 'purple' | 'success' | 'orange' | 'pink' | 'indigo' | 'gray'> = {
+    sorbet: 'blue',
+    gelato: 'purple',
+    'ice-cream': 'success',
+    sherbet: 'orange',
+    soft: 'pink',
+    granita: 'indigo',
+  };
+  const BASE_STYLE_COLOR: Record<string, 'gray-blue' | 'orange' | 'pink' | 'indigo' | 'gray'> = {
+    fruit: 'orange',
+    dairy: 'gray-blue',
+    nut: 'indigo',
+    chocolate: 'pink',
+    floral: 'pink',
+    herb: 'indigo',
+  };
 
   const primaryFlavours = flavours.filter(f => offering.primaryFlavourIds.includes(f.id));
   const flavourIngredientIds = primaryFlavours.flatMap(f => f.ingredients?.map(fi => fi.ingredientId) || []);
@@ -385,7 +403,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{format.name}</p>
+                    <Link href={`/admin/formats/${format.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                      {format.name}
+                    </Link>
                     {format.description && <p className="text-xs text-gray-500 mt-0.5">{format.description}</p>}
                   </div>
                 </div>
@@ -402,11 +422,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{flavour.name}</p>
+                        <Link href={`/admin/flavours/${flavour.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                          {flavour.name}
+                        </Link>
                         {flavour.shortDescription && <p className="text-xs text-gray-500 mt-0.5">{flavour.shortDescription}</p>}
                         <div className="flex flex-wrap gap-1 mt-1.5">
-                          <Badge color="blue" size="sm">{flavour.type}</Badge>
-                          <Badge color="purple" size="sm">{flavour.baseStyle}</Badge>
+                          <Badge color={FLAVOUR_TYPE_COLOR[flavour.type] ?? 'gray'} size="sm">{flavour.type}</Badge>
+                          {flavour.baseStyle && <Badge color={BASE_STYLE_COLOR[flavour.baseStyle] ?? 'gray'} size="sm">{flavour.baseStyle}</Badge>}
                         </div>
                       </div>
                     </div>

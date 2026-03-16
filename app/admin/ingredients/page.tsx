@@ -3,11 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
-import { Badge, BadgeWithDot } from '@/src/app/admin/components/ui/base/badges/badges';
-import { Select } from '@/src/app/admin/components/ui/base/select/select';
-import { Button } from '@/app/admin/components/ui/buttons/button';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import DeleteModal from '@/app/admin/components/DeleteModal';
+import { Button } from '@/app/admin/components/ui/button';
 
 interface Ingredient {
   id: string;
@@ -28,6 +26,31 @@ interface TaxonomyCategory {
   value: string;
 }
 
+const ALLERGEN_COLOR: Record<string, 'error' | 'warning' | 'orange'> = {
+  dairy: 'error',
+  egg: 'warning',
+  gluten: 'warning',
+  'tree-nuts': 'orange',
+  peanuts: 'orange',
+  sesame: 'warning',
+  soy: 'warning',
+};
+
+const CATEGORY_COLOR: Record<string, 'blue' | 'purple' | 'success' | 'orange' | 'pink' | 'indigo' | 'gray'> = {
+  Dairy: 'blue',
+  Fruit: 'success',
+  Herb: 'indigo',
+  Spice: 'orange',
+  Nut: 'orange',
+  Seed: 'orange',
+  Chocolate: 'purple',
+  Floral: 'pink',
+  Vegetable: 'success',
+  Grain: 'gray',
+  Sweetener: 'yellow' as any,
+  Fat: 'gray',
+};
+
 export default function IngredientsPage() {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -38,9 +61,7 @@ export default function IngredientsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', name: '' });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
@@ -87,136 +108,144 @@ export default function IngredientsPage() {
       i.origin?.toLowerCase().includes(searchTerm.toLowerCase());
     const categoryId = i.taxonomyCategory || i.category;
     const matchesCategory = categoryFilter === 'all' || categoryId === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || i.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || (i.status || 'active') === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   return (
     <>
-      <TableCard.Root>
-        <TableCard.Header
-          title="Ingredients"
-          badge={filtered.length}
-          description="Manage your ingredient library with provenance details"
-          contentTrailing={
-            <div className="flex items-center gap-3">
-              <Select
-                placeholder="All categories"
-                selectedKey={categoryFilter}
-                onSelectionChange={(key) => setCategoryFilter(key as string)}
-                items={[
-                  { id: 'all', label: 'All categories' },
-                  ...taxonomyCategories.map((c) => ({ id: c.id, label: c.label })),
-                ]}
-              >
-                {(item) => <Select.Item id={item.id} label={item.label} />}
-              </Select>
-              <Select
-                placeholder="All statuses"
-                selectedKey={statusFilter}
-                onSelectionChange={(key) => setStatusFilter(key as string)}
-                items={[
-                  { id: 'all', label: 'All statuses' },
-                  { id: 'active', label: 'Active' },
-                  { id: 'archived', label: 'Archived' },
-                ]}
-              >
-                {(item) => <Select.Item id={item.id} label={item.label} />}
-              </Select>
-              <Link href="/admin/ingredients/create">
-                <Button color="primary" size="sm">Add ingredient</Button>
-              </Link>
-            </div>
-          }
-        />
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h1 className="text-base font-semibold text-gray-900">Ingredients</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Ingredient library with provenance details</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search ingredients…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-52"
+            />
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All categories</option>
+              {taxonomyCategories.map((c) => (
+                <option key={c.id} value={c.id}>{c.label}</option>
+              ))}
+            </select>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
+            <Link href="/admin/ingredients/create">
+              <Button variant="primary" size="sm">Add ingredient</Button>
+            </Link>
+          </div>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <p className="text-sm text-tertiary">No ingredients found</p>
+            <p className="text-sm text-gray-500">No ingredients found</p>
             <Link href="/admin/ingredients/create">
-              <Button color="secondary" size="sm">Add your first ingredient</Button>
+              <Button variant="secondary" size="sm">Add your first ingredient</Button>
             </Link>
           </div>
         ) : (
-          <Table aria-label="Ingredients">
-            <Table.Header>
-              <Table.Head isRowHeader label="Name" />
-              <Table.Head label="Category" />
-              <Table.Head label="Origin" />
-              <Table.Head label="Allergens" />
-              <Table.Head label="Properties" />
-              <Table.Head label="" />
-            </Table.Header>
-            <Table.Body items={filtered}>
-              {(ingredient) => (
-                <Table.Row
-                  key={ingredient.id}
-                  id={ingredient.id}
-                  onAction={() => router.push(`/admin/ingredients/${ingredient.id}`)}
-                >
-                  <Table.Cell>
-                    <div className="flex items-center gap-3">
-                      {ingredient.image && (
-                        <img src={ingredient.image} alt={ingredient.name} className="h-10 w-10 rounded-lg object-cover" />
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Origin</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Allergens</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
+                <th className="px-6 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((ingredient) => {
+                const categoryLabel = getCategoryLabel(ingredient);
+                return (
+                  <tr
+                    key={ingredient.id}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => router.push(`/admin/ingredients/${ingredient.id}`)}
+                  >
+                    <td className="px-6 py-3">
+                      <div className="flex items-center gap-3">
+                        {ingredient.image && (
+                          <img src={ingredient.image} alt={ingredient.name} className="h-8 w-8 rounded-lg object-cover shrink-0" />
+                        )}
+                        <div>
+                          <p className="font-medium text-gray-900">{ingredient.name}</p>
+                          {ingredient.latinName && (
+                            <p className="text-xs text-gray-400 italic">{ingredient.latinName}</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <Badge color={CATEGORY_COLOR[categoryLabel] ?? 'gray'} size="sm">{categoryLabel}</Badge>
+                    </td>
+                    <td className="px-6 py-3 text-gray-500">{ingredient.origin || '—'}</td>
+                    <td className="px-6 py-3">
+                      {!ingredient.allergens?.length ? (
+                        <Badge color="success" size="sm">None</Badge>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {ingredient.allergens.slice(0, 3).map((a) => (
+                            <Badge key={a} color={ALLERGEN_COLOR[a] ?? 'error'} size="sm">{a}</Badge>
+                          ))}
+                          {ingredient.allergens.length > 3 && (
+                            <span className="text-xs text-gray-400">+{ingredient.allergens.length - 3}</span>
+                          )}
+                        </div>
                       )}
-                      <div>
-                        <p className="text-sm font-medium text-primary">{ingredient.name}</p>
-                        {ingredient.latinName && (
-                          <p className="text-xs text-tertiary italic">{ingredient.latinName}</p>
-                        )}
-                      </div>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge color="blue">{getCategoryLabel(ingredient)}</Badge>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="text-sm text-secondary">{ingredient.origin || '—'}</span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {!ingredient.allergens?.length ? (
-                      <span className="text-sm text-tertiary">None</span>
-                    ) : (
+                    </td>
+                    <td className="px-6 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {ingredient.allergens.slice(0, 3).map((a) => (
-                          <Badge key={a} color="error">{a}</Badge>
-                        ))}
-                        {ingredient.allergens.length > 3 && (
-                          <span className="text-xs text-tertiary">+{ingredient.allergens.length - 3}</span>
-                        )}
+                        <BadgeWithDot color={ingredient.status === 'archived' ? 'gray' : 'success'} size="sm">
+                          {ingredient.status || 'active'}
+                        </BadgeWithDot>
+                        {ingredient.seasonal && <Badge color="blue" size="sm">Seasonal</Badge>}
                       </div>
-                    )}
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex flex-wrap gap-1">
-                      {ingredient.seasonal && <Badge color="success">Seasonal</Badge>}
-                      {ingredient.status === 'archived' && <Badge color="gray">Archived</Badge>}
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Link href={`/admin/ingredients/${ingredient.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
-                      </Link>
-                      <Button
-                        color="primary-destructive"
-                        size="sm"
-                        onClick={() => setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name })}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Link href={`/admin/ingredients/${ingredient.id}`}>
+                          <Button variant="secondary" size="sm">Edit</Button>
+                        </Link>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => setDeleteConfirm({ show: true, id: ingredient.id, name: ingredient.name })}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
-      </TableCard.Root>
+      </div>
 
       <DeleteModal
         isOpen={deleteConfirm.show}

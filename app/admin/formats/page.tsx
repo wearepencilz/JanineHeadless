@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Format } from '@/types';
-import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
-import { Select } from '@/src/app/admin/components/ui/base/select/select';
-import { Button } from '@/app/admin/components/ui/buttons/button';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+import { Button } from '@/app/admin/components/ui/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';
 
 const CATEGORY_COLOR: Record<string, 'purple' | 'blue' | 'orange' | 'success' | 'gray'> = {
@@ -17,6 +15,13 @@ const CATEGORY_COLOR: Record<string, 'purple' | 'blue' | 'orange' | 'success' | 
   bundle: 'success',
 };
 
+const SERVING_COLOR: Record<string, 'gray' | 'indigo' | 'blue' | 'pink'> = {
+  scoop: 'indigo',
+  'soft-serve': 'pink',
+  packaged: 'blue',
+  plated: 'gray',
+};
+
 export default function FormatsPage() {
   const router = useRouter();
   const [formats, setFormats] = useState<Format[]>([]);
@@ -24,9 +29,7 @@ export default function FormatsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: '', name: '' });
 
-  useEffect(() => {
-    fetchFormats();
-  }, []);
+  useEffect(() => { fetchFormats(); }, []);
 
   const fetchFormats = async () => {
     try {
@@ -53,114 +56,110 @@ export default function FormatsPage() {
     }
   };
 
-  const filtered = formats.filter((f) =>
-    categoryFilter === 'all' || f.category === categoryFilter
-  );
+  const filtered = formats.filter((f) => categoryFilter === 'all' || f.category === categoryFilter);
 
   return (
     <>
-      <TableCard.Root>
-        <TableCard.Header
-          title="Formats"
-          badge={filtered.length}
-          description="Manage product format templates"
-          contentTrailing={
-            <div className="flex items-center gap-3">
-              <Select
-                placeholder="All categories"
-                selectedKey={categoryFilter}
-                onSelectionChange={(key) => setCategoryFilter(key as string)}
-                items={[
-                  { id: 'all', label: 'All categories' },
-                  { id: 'frozen', label: 'Frozen' },
-                  { id: 'food', label: 'Food' },
-                  { id: 'experience', label: 'Experience' },
-                  { id: 'bundle', label: 'Bundle' },
-                ]}
-              >
-                {(item) => <Select.Item id={item.id} label={item.label} />}
-              </Select>
-              <Link href="/admin/formats/create">
-                <Button color="primary" size="sm">Add format</Button>
-              </Link>
-            </div>
-          }
-        />
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h1 className="text-base font-semibold text-gray-900">Formats</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Product format templates</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All categories</option>
+              <option value="frozen">Frozen</option>
+              <option value="food">Food</option>
+              <option value="experience">Experience</option>
+              <option value="bundle">Bundle</option>
+            </select>
+            <Link href="/admin/formats/create">
+              <Button variant="primary" size="sm">Add format</Button>
+            </Link>
+          </div>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-600" />
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <p className="text-sm text-tertiary">No formats found</p>
+            <p className="text-sm text-gray-500">No formats found</p>
             <Link href="/admin/formats/create">
-              <Button color="secondary" size="sm">Add your first format</Button>
+              <Button variant="secondary" size="sm">Add your first format</Button>
             </Link>
           </div>
         ) : (
-          <Table aria-label="Formats">
-            <Table.Header>
-              <Table.Head isRowHeader label="Name" />
-              <Table.Head label="Category" />
-              <Table.Head label="Description" />
-              <Table.Head label="Serving" />
-              <Table.Head label="Flavours" />
-              <Table.Head label="" />
-            </Table.Header>
-            <Table.Body items={filtered}>
-              {(format) => (
-                <Table.Row
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Serving</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Flavours</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Add-ons</th>
+                <th className="px-6 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.map((format) => (
+                <tr
                   key={format.id}
-                  id={format.id}
-                  onAction={() => router.push(`/admin/formats/${format.id}`)}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => router.push(`/admin/formats/${format.id}`)}
                 >
-                  <Table.Cell>
-                    <div>
-                      <p className="text-sm font-medium text-primary">{format.name}</p>
-                      <p className="text-xs text-tertiary">{format.slug}</p>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge color={CATEGORY_COLOR[format.category] ?? 'gray'}>{format.category}</Badge>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="text-sm text-secondary truncate max-w-xs block">{format.description}</span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge color="gray">{format.servingStyle}</Badge>
-                  </Table.Cell>
-                  <Table.Cell>
+                  <td className="px-6 py-3">
+                    <p className="font-medium text-gray-900">{format.name}</p>
+                    <p className="text-xs text-gray-400">{format.slug}</p>
+                  </td>
+                  <td className="px-6 py-3">
+                    <Badge color={CATEGORY_COLOR[format.category] ?? 'gray'} size="sm">{format.category}</Badge>
+                  </td>
+                  <td className="px-6 py-3">
+                    <Badge color={SERVING_COLOR[format.servingStyle] ?? 'gray'} size="sm">{format.servingStyle}</Badge>
+                  </td>
+                  <td className="px-6 py-3">
                     {!format.requiresFlavours ? (
-                      <span className="text-sm text-tertiary">N/A</span>
+                      <span className="text-gray-400">—</span>
                     ) : (
-                      <Badge color="purple">
+                      <Badge color="purple" size="sm">
                         {format.minFlavours === format.maxFlavours
                           ? `${format.minFlavours} flavour${format.minFlavours !== 1 ? 's' : ''}`
                           : `${format.minFlavours}–${format.maxFlavours} flavours`}
                       </Badge>
                     )}
-                  </Table.Cell>
-                  <Table.Cell>
+                  </td>
+                  <td className="px-6 py-3">
+                    {format.canIncludeAddOns
+                      ? <Badge color="success" size="sm">Add-ons</Badge>
+                      : <span className="text-gray-400">—</span>}
+                  </td>
+                  <td className="px-6 py-3">
                     <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                       <Link href={`/admin/formats/${format.id}`}>
-                        <Button color="secondary" size="sm">Edit</Button>
+                        <Button variant="secondary" size="sm">Edit</Button>
                       </Link>
                       <Button
-                        color="primary-destructive"
+                        variant="danger"
                         size="sm"
                         onClick={() => setDeleteConfirm({ show: true, id: format.id, name: format.name })}
                       >
                         Delete
                       </Button>
                     </div>
-                  </Table.Cell>
-                </Table.Row>
-              )}
-            </Table.Body>
-          </Table>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
-      </TableCard.Root>
+      </div>
 
       <DeleteModal
         isOpen={deleteConfirm.show}

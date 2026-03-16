@@ -9,8 +9,11 @@ import ConfirmModal from '@/app/admin/components/ConfirmModal';
 import { useToast } from '@/app/admin/components/ToastContainer';
 import { Button } from '@/app/admin/components/ui/button';
 import { Select } from '@/app/admin/components/ui/select';
+import { Input } from '@/app/admin/components/ui/input';
+import { Textarea } from '@/app/admin/components/ui/textarea';
 import { DateRangePicker } from '@/app/admin/components/ui/date-picker/date-range-picker';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import { stringToDateValue, dateValueToString } from '@/lib/date-utils';
 import ImageUploader from '@/app/admin/components/ImageUploader';
 
@@ -39,7 +42,7 @@ interface Product {
   id: string;
   internalName?: string;
   publicName?: string;
-  name?: string; // Legacy field for backwards compatibility
+  name?: string;
   shopifyProductId?: string;
 }
 
@@ -52,6 +55,13 @@ interface Format {
   maxFlavours: number;
   allowMixedTypes?: boolean;
 }
+
+const STATUS_COLOR: Record<string, 'blue' | 'success' | 'gray' | 'error'> = {
+  upcoming: 'blue',
+  active: 'success',
+  ended: 'gray',
+  archived: 'error',
+};
 
 export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -80,12 +90,11 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
     try {
       const response = await fetch(`/api/launches/${params.id}`);
       if (response.ok) {
-        const data = await response.json();
-        setLaunch(data);
+        setLaunch(await response.json());
       } else {
         setError('Launch not found');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load launch');
     } finally {
       setLoading(false);
@@ -97,12 +106,9 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       const response = await fetch('/api/flavours?pageSize=1000');
       if (response.ok) {
         const result = await response.json();
-        // Flavours API returns paginated response: { data: [], total, page, pageSize }
         setFlavours(Array.isArray(result.data) ? result.data : []);
       }
-    } catch (err) {
-      console.error('Failed to load flavours', err);
-    }
+    } catch (err) { console.error('Failed to load flavours', err); }
   };
 
   const fetchProducts = async () => {
@@ -110,12 +116,9 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        // Products API returns plain array
         setProducts(Array.isArray(data) ? data : []);
       }
-    } catch (err) {
-      console.error('Failed to load products', err);
-    }
+    } catch (err) { console.error('Failed to load products', err); }
   };
 
   const fetchFormats = async () => {
@@ -125,56 +128,34 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
         const data = await response.json();
         setFormats(Array.isArray(data) ? data : []);
       }
-    } catch (err) {
-      console.error('Failed to load formats', err);
-    }
+    } catch (err) { console.error('Failed to load formats', err); }
   };
 
   const handleGenerateProducts = async (selectedFormatIds: string[]) => {
-    if (!launch || launch.featuredFlavourIds.length === 0) {
-      return;
-    }
-
+    if (!launch || launch.featuredFlavourIds.length === 0) return;
     setGenerating(true);
     setError('');
     setShowFormatModal(false);
-
     try {
       const response = await fetch(`/api/launches/${params.id}/generate-products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          flavourIds: launch.featuredFlavourIds,
-          formatIds: selectedFormatIds
-        }),
+        body: JSON.stringify({ flavourIds: launch.featuredFlavourIds, formatIds: selectedFormatIds }),
       });
-
       if (response.ok) {
         const data = await response.json();
-        const message = data.message || `Successfully generated ${data.created} product(s)`;
-        alert(message);
-        // Refresh products and launch data
+        alert(data.message || `Successfully generated ${data.created} product(s)`);
         await fetchProducts();
         await fetchLaunch();
       } else {
         const data = await response.json();
-        console.error('Generate products error:', data);
         setError(data.error || 'Failed to generate products');
-        alert(`Error: ${data.error || 'Failed to generate products'}`);
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while generating products');
     } finally {
       setGenerating(false);
     }
-  };
-
-  const handleOpenFormatModal = () => {
-    if (!launch || launch.featuredFlavourIds.length === 0) {
-      alert('Please select at least one flavour first');
-      return;
-    }
-    setShowFormatModal(true);
   };
 
   const toggleFlavour = (flavourId: string) => {
@@ -196,24 +177,21 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!launch) return;
-
     setSaving(true);
     setError('');
-
     try {
       const response = await fetch(`/api/launches/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(launch),
       });
-
       if (response.ok) {
         router.push('/admin/launches');
       } else {
         const data = await response.json();
         setError(data.error || 'Failed to update launch');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while updating the launch');
     } finally {
       setSaving(false);
@@ -222,13 +200,8 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
 
   const handleDelete = async () => {
     setDeleting(true);
-    setError('');
-
     try {
-      const response = await fetch(`/api/launches/${params.id}`, {
-        method: 'DELETE',
-      });
-
+      const response = await fetch(`/api/launches/${params.id}`, { method: 'DELETE' });
       if (response.ok) {
         toast.success('Launch deleted', `${launch?.title} has been removed`);
         router.push('/admin/launches');
@@ -237,7 +210,7 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
         setError(data.error || 'Failed to delete launch');
         toast.error('Delete failed', data.error || 'Unable to delete launch');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while deleting the launch');
       toast.error('Delete failed', 'Unable to delete launch');
     } finally {
@@ -246,49 +219,18 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    if (!launch) return;
-    const { name, value, type } = e.target;
-    
-    // Auto-generate slug from title if slug hasn't been manually edited
-    if (name === 'title' && !slugTouched) {
-      setLaunch({
-        ...launch,
-        title: value,
-        slug: generateSlug(value)
-      });
-    } else if (name === 'slug') {
-      setSlugTouched(true);
-      setLaunch({
-        ...launch,
-        slug: generateSlug(value)
-      });
-    } else {
-      setLaunch({
-        ...launch,
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   if (!launch) {
     return (
-      <EditPageLayout
-        title="Edit Launch"
-        backHref="/admin/launches"
-        backLabel="Back to Launches"
-        onSave={() => {}}
-        onCancel={() => router.push('/admin/launches')}
-        error={error || 'Launch not found'}
-      >
+      <EditPageLayout title="Edit Launch" backHref="/admin/launches" backLabel="Back to Launches"
+        onSave={() => {}} onCancel={() => router.push('/admin/launches')} error={error || 'Launch not found'}>
         <div />
       </EditPageLayout>
     );
@@ -305,204 +247,202 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
       saving={saving}
       deleting={deleting}
       error={error}
+      maxWidth="7xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white shadow rounded-lg px-6 py-4 space-y-6">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-3 gap-6">
 
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              value={launch.title}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          {/* Left column */}
+          <div className="col-span-2 space-y-6">
 
-          <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
-              Slug
-            </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              value={launch.slug}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Auto-generated from title, but you can edit it
-            </p>
-          </div>
-
-          <div>
-            <Select
-              label="Status"
-              value={launch.status}
-              onChange={(value) => setLaunch({ ...launch, status: value })}
-              options={[
-                { id: 'upcoming', label: 'Upcoming' },
-                { id: 'active', label: 'Active' },
-                { id: 'ended', label: 'Ended' },
-                { id: 'archived', label: 'Archived' },
-              ]}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={3}
-              value={launch.description || ''}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="story" className="block text-sm font-medium text-gray-700 mb-2">
-              Story
-            </label>
-            <textarea
-              id="story"
-              name="story"
-              rows={6}
-              value={launch.story || ''}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Active Period
-            </label>
-            <DateRangePicker
-              value={
-                launch.activeStart && launch.activeEnd
-                  ? {
-                      start: stringToDateValue(launch.activeStart)!,
-                      end: stringToDateValue(launch.activeEnd)!,
-                    }
-                  : null
-              }
-              onChange={(range) => {
-                if (range) {
-                  setLaunch({
-                    ...launch,
-                    activeStart: dateValueToString(range.start),
-                    activeEnd: dateValueToString(range.end),
-                  });
-                } else {
-                  setLaunch({
-                    ...launch,
-                    activeStart: undefined,
-                    activeEnd: undefined,
-                  });
-                }
-              }}
-            />
-            <p className="mt-2 text-sm text-gray-600">
-              When this launch will be active and visible to customers
-            </p>
-          </div>
-
-          <div>
-            <ImageUploader
-              label="Hero Image"
-              value={launch.heroImage || ''}
-              onChange={(url) => setLaunch({ ...launch, heroImage: url })}
-              aspectRatio="16:9"
-            />
-          </div>
-
-          <Checkbox
-            isSelected={launch.featured}
-            onChange={(v) => setLaunch({ ...launch, featured: v })}
-            label="Featured on homepage"
-          />
-
-          {/* Flavours Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Featured Flavours</h3>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleOpenFormatModal}
-                isDisabled={generating || launch.featuredFlavourIds.length === 0}
-                isLoading={generating}
-              >
-                {generating ? 'Generating...' : 'Generate Products from Flavours'}
-              </Button>
+            {/* Launch details */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Launch details</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Title, slug, description and story.</p>
+              </div>
+              <div className="px-6 py-6 space-y-5">
+                <Input
+                  label="Title"
+                  isRequired
+                  value={launch.title}
+                  onChange={(v) => {
+                    setLaunch({ ...launch, title: v, slug: slugTouched ? launch.slug : generateSlug(v) });
+                  }}
+                />
+                <div>
+                  <Input
+                    label="Slug"
+                    value={launch.slug}
+                    onChange={(v) => { setSlugTouched(true); setLaunch({ ...launch, slug: generateSlug(v) }); }}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Auto-generated from title</p>
+                </div>
+                <Textarea
+                  label="Description"
+                  rows={3}
+                  value={launch.description || ''}
+                  onChange={(v) => setLaunch({ ...launch, description: v })}
+                  placeholder="Short description shown in listings"
+                />
+                <Textarea
+                  label="Story"
+                  rows={6}
+                  value={launch.story || ''}
+                  onChange={(v) => setLaunch({ ...launch, story: v })}
+                  placeholder="Editorial story for this launch..."
+                />
+              </div>
             </div>
-            <p className="text-sm text-gray-600 mb-3">
-              Select flavours to feature in this launch. You can auto-generate products from selected flavours.
-            </p>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
-              {flavours.length === 0 ? (
-                <p className="text-sm text-gray-500">No flavours available</p>
-              ) : (
-                <div className="space-y-2">
-                  {flavours.map((flavour) => (
-                    <div key={flavour.id} className="p-2 hover:bg-gray-50 rounded">
+
+            {/* Featured flavours */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">Featured flavours</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {launch.featuredFlavourIds.length} selected
+                  </p>
+                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    if (launch.featuredFlavourIds.length === 0) {
+                      alert('Please select at least one flavour first');
+                      return;
+                    }
+                    setShowFormatModal(true);
+                  }}
+                  isDisabled={generating || launch.featuredFlavourIds.length === 0}
+                  isLoading={generating}
+                >
+                  Generate products
+                </Button>
+              </div>
+              <div className="px-6 py-4 max-h-72 overflow-y-auto divide-y divide-gray-50">
+                {flavours.length === 0 ? (
+                  <p className="text-sm text-gray-500 py-4">No flavours available</p>
+                ) : (
+                  flavours.map((flavour) => (
+                    <div key={flavour.id} className="flex items-center justify-between py-2.5">
                       <Checkbox
                         isSelected={launch.featuredFlavourIds.includes(flavour.id)}
                         onChange={() => toggleFlavour(flavour.id)}
-                        label={`${flavour.name} (${flavour.type})`}
+                        label={flavour.name}
                       />
+                      <Badge color="gray" size="sm">{flavour.type}</Badge>
                     </div>
-                  ))}
-                </div>
-              )}
+                  ))
+                )}
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {launch.featuredFlavourIds.length} flavour(s) selected
-            </p>
+
           </div>
 
-          {/* Products Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Featured Products</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Select products to feature in this launch. Products can be auto-generated from flavours above.
-            </p>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
-              {products.length === 0 ? (
-                <p className="text-sm text-gray-500">No products available</p>
-              ) : (
-                <div className="space-y-2">
-                  {products.map((product) => (
-                    <div key={product.id} className="p-2 hover:bg-gray-50 rounded">
+          {/* Right column */}
+          <div className="col-span-1 space-y-6">
+
+            {/* Status & settings */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Status</h2>
+                <BadgeWithDot color={STATUS_COLOR[launch.status] ?? 'gray'}>
+                  {launch.status}
+                </BadgeWithDot>
+              </div>
+              <div className="px-6 py-5 space-y-5">
+                <Select
+                  label="Status"
+                  value={launch.status}
+                  onChange={(v) => setLaunch({ ...launch, status: v })}
+                  options={[
+                    { id: 'upcoming', label: 'Upcoming' },
+                    { id: 'active', label: 'Active' },
+                    { id: 'ended', label: 'Ended' },
+                    { id: 'archived', label: 'Archived' },
+                  ]}
+                />
+                <Checkbox
+                  isSelected={launch.featured}
+                  onChange={(v) => setLaunch({ ...launch, featured: v })}
+                  label="Featured on homepage"
+                />
+              </div>
+            </div>
+
+            {/* Active period */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Active period</h2>
+                <p className="text-sm text-gray-500 mt-0.5">When this launch is visible to customers.</p>
+              </div>
+              <div className="px-6 py-5">
+                <DateRangePicker
+                  value={
+                    launch.activeStart && launch.activeEnd
+                      ? { start: stringToDateValue(launch.activeStart)!, end: stringToDateValue(launch.activeEnd)! }
+                      : null
+                  }
+                  onChange={(range) => {
+                    setLaunch({
+                      ...launch,
+                      activeStart: range ? dateValueToString(range.start) : undefined,
+                      activeEnd: range ? dateValueToString(range.end) : undefined,
+                    });
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Hero image */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Hero image</h2>
+                <p className="text-sm text-gray-500 mt-0.5">16:9 banner shown at the top of the launch page.</p>
+              </div>
+              <div className="px-6 py-5">
+                <ImageUploader
+                  label=""
+                  value={launch.heroImage || ''}
+                  onChange={(url) => setLaunch({ ...launch, heroImage: url })}
+                  aspectRatio="16:9"
+                />
+              </div>
+            </div>
+
+            {/* Featured products */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Featured products</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {launch.featuredProductIds?.length || 0} selected
+                </p>
+              </div>
+              <div className="px-6 py-4 max-h-72 overflow-y-auto divide-y divide-gray-50">
+                {products.length === 0 ? (
+                  <p className="text-sm text-gray-500 py-4">No products available</p>
+                ) : (
+                  products.map((product) => (
+                    <div key={product.id} className="flex items-center justify-between py-2.5">
                       <Checkbox
-                        isSelected={launch?.featuredProductIds?.includes(product.id) || false}
+                        isSelected={launch.featuredProductIds?.includes(product.id) || false}
                         onChange={() => toggleProduct(product.id)}
-                        label={`${product.name || product.publicName || product.internalName || 'Unnamed Product'}${product.shopifyProductId ? ' (Shopify)' : ''}`}
+                        label={product.publicName || product.internalName || product.name || 'Unnamed'}
                       />
+                      {product.shopifyProductId && (
+                        <Badge color="success" size="sm">Shopify</Badge>
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  ))
+                )}
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {launch.featuredProductIds?.length || 0} product(s) selected
-            </p>
-          </div>
 
+          </div>
         </div>
       </form>
 
-      {/* Format Selection Modal */}
       <FormatSelectionModal
         isOpen={showFormatModal}
         onClose={() => setShowFormatModal(false)}
@@ -512,7 +452,6 @@ export default function EditLaunchPage({ params }: { params: { id: string } }) {
         isGenerating={generating}
       />
 
-      {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={showDeleteModal}
         variant="danger"

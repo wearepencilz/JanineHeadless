@@ -12,36 +12,37 @@ import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+
+const STATUS_COLOR: Record<string, 'success' | 'blue' | 'gray' | 'error'> = {
+  active: 'success',
+  upcoming: 'blue',
+  archived: 'error',
+};
 
 export default function EditFlavourPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Flavour | null>(null);
 
   useEffect(() => {
-    if (id) {
-      fetchFlavour();
-    }
+    if (id) fetchFlavour();
   }, [id]);
 
   const fetchFlavour = async () => {
     try {
       const response = await fetch(`/api/flavours/${id}`);
-      
       if (response.ok) {
-        const flavour = await response.json();
-        setFormData(flavour);
+        setFormData(await response.json());
       } else {
-        alert('Flavour not found');
         router.push('/admin/flavours');
       }
     } catch (error) {
       console.error('Error fetching flavour:', error);
-      alert('Error loading flavour');
     } finally {
       setLoading(false);
     }
@@ -50,7 +51,6 @@ export default function EditFlavourPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
-
     setSaving(true);
     try {
       const response = await fetch(`/api/flavours/${id}`, {
@@ -58,7 +58,6 @@ export default function EditFlavourPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       if (response.ok) {
         router.push('/admin/flavours');
       } else {
@@ -67,21 +66,15 @@ export default function EditFlavourPage() {
       }
     } catch (error) {
       console.error('Error updating flavour:', error);
-      alert('Error updating flavour');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleIngredientsChange = (ingredients: FlavourIngredient[]) => {
-    if (!formData) return;
-    setFormData({ ...formData, ingredients });
-  };
-
   if (loading || !formData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-600">Loading...</div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -94,180 +87,197 @@ export default function EditFlavourPage() {
       onSave={() => handleSubmit(new Event('submit') as any)}
       onCancel={() => router.push('/admin/flavours')}
       saving={saving}
-      maxWidth="4xl"
+      maxWidth="7xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Info Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
-          
-          <div>
-            <Input
-              label="Name *"
-              type="text"
-              isRequired
-              value={formData.name}
-              onChange={(value) => setFormData({ ...formData, name: value })}
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-3 gap-6">
 
-          <div className="grid grid-cols-2 gap-4">
-            <TaxonomySelect
-              category="flavourTypes"
-              value={formData.type || 'gelato'}
-              onChange={(value) => setFormData({ ...formData, type: value as FlavourType })}
-              label="Type"
-              required
-              description="Determines which formats this flavour can be used in"
-            />
+          {/* Left column */}
+          <div className="col-span-2 space-y-6">
 
-            <div>
-              <Select
-                label="Status *"
-                isRequired
-                value={formData.status || 'active'}
-                onChange={(value) => setFormData({ ...formData, status: value as Status })}
-                options={[
-                  { id: 'active', label: 'Active' },
-                  { id: 'upcoming', label: 'Upcoming' },
-                  { id: 'archived', label: 'Archived' },
-                ]}
-              />
+            {/* Flavour details */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Flavour details</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Name, type, description and tasting notes.</p>
+              </div>
+              <div className="px-6 py-6 space-y-5">
+                <Input
+                  label="Name"
+                  isRequired
+                  value={formData.name}
+                  onChange={(v) => setFormData({ ...formData, name: v })}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <TaxonomySelect
+                    category="flavourTypes"
+                    value={formData.type || 'gelato'}
+                    onChange={(v) => setFormData({ ...formData, type: v as FlavourType })}
+                    label="Type"
+                    required
+                    description="Determines which formats this flavour can be used in"
+                  />
+                  {(formData.type === 'gelato' || formData.type === 'special') && (
+                    <Select
+                      label="Base"
+                      isRequired
+                      value={formData.baseStyle || 'dairy'}
+                      onChange={(v) => setFormData({ ...formData, baseStyle: v as BaseStyle })}
+                      options={[
+                        { id: 'dairy', label: 'Dairy' },
+                        { id: 'non-dairy', label: 'Non-Dairy' },
+                        { id: 'cheese', label: 'Cheese' },
+                        { id: 'other', label: 'Other' },
+                      ]}
+                    />
+                  )}
+                </div>
+                <Input
+                  label="Short notes"
+                  isRequired
+                  value={formData.shortDescription || ''}
+                  onChange={(v) => setFormData({ ...formData, shortDescription: v })}
+                  placeholder="e.g. Browned butter, grilled corn, honey"
+                />
+                <Textarea
+                  label="Description"
+                  isRequired
+                  rows={4}
+                  value={formData.description}
+                  onChange={(v) => setFormData({ ...formData, description: v })}
+                  placeholder="Longer editorial description..."
+                />
+
+              </div>
             </div>
-          </div>
 
-          <div>
-            <Input
-              label="Short Notes *"
-              type="text"
-              isRequired
-              value={formData.shortDescription || ''}
-              onChange={(value) => setFormData({ ...formData, shortDescription: value })}
-              placeholder="Brief, merchandisable descriptor (e.g., Browned butter, grilled corn, honey)"
-            />
-          </div>
-
-          <div>
-            <Textarea
-              label="Description *"
-              isRequired
-              rows={4}
-              value={formData.description}
-              onChange={(value) => setFormData({ ...formData, description: value })}
-              placeholder="Longer editorial description (e.g., A sweet, savoury gelato built around grilled corn, browned butter, and honey)"
-            />
-          </div>
-
-          {/* Base - Only show for gelato or special types */}
-          {(formData.type === 'gelato' || formData.type === 'special') && (
-            <div>
-              <Select
-                label="Base *"
-                isRequired
-                value={formData.baseStyle || 'dairy'}
-                onChange={(value) => setFormData({ ...formData, baseStyle: value as BaseStyle })}
-                options={[
-                  { id: 'dairy', label: 'Dairy' },
-                  { id: 'non-dairy', label: 'Non-Dairy' },
-                  { id: 'cheese', label: 'Cheese' },
-                  { id: 'other', label: 'Other' },
-                ]}
-              />
+            {/* Tasting notes */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Tasting notes</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Flavour tags and optional prose notes.</p>
+              </div>
+              <div className="px-6 py-6 space-y-5">
+                <TaxonomyTagSelect
+                  category="keyNotes"
+                  values={formData.keyNotes || []}
+                  onChange={(values) => setFormData({ ...formData, keyNotes: values })}
+                  label="Tags"
+                  description="e.g. smoky, sweet, floral, summer"
+                  allowCreate={true}
+                />
+                <Textarea
+                  label="Notes"
+                  rows={3}
+                  value={formData.tastingNotes || ''}
+                  onChange={(v) => setFormData({ ...formData, tastingNotes: v })}
+                  placeholder="Optional prose — e.g. Sweet and creamy with a long caramel finish..."
+                />
+              </div>
             </div>
-          )}
 
-          {/* Flavour Tags - Connected to taxonomy */}
-          <TaxonomyTagSelect
-            category="keyNotes"
-            values={formData.keyNotes || []}
-            onChange={(values) => setFormData({ ...formData, keyNotes: values })}
-            label="Flavour Tags"
-            description="Select tags that describe this flavour (e.g., smoky, sweet, summer)"
-            allowCreate={true}
-          />
+            {/* Ingredients */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Ingredients</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Components and allergen sources for this flavour.</p>
+              </div>
+              <div className="px-6 py-6">
+                <FlavourIngredientSelector
+                  selectedIngredients={formData.ingredients || []}
+                  onChange={(ingredients: FlavourIngredient[]) => setFormData({ ...formData, ingredients })}
+                />
+              </div>
+            </div>
 
-          <div>
-            <Textarea
-              label="Tasting Notes"
-              rows={3}
-              value={formData.tastingNotes || ''}
-              onChange={(value) => setFormData({ ...formData, tastingNotes: value })}
-              placeholder="Sweet, creamy, hints of vanilla..."
-            />
           </div>
-        </div>
 
-        {/* Advanced Options - Collapsible */}
-        <details className="bg-white rounded-lg border border-gray-200">
-          <summary className="cursor-pointer p-6 font-medium text-gray-900 hover:bg-gray-50">
-            Advanced Options
-          </summary>
-          <div className="px-6 pb-6 space-y-6 border-t border-gray-200 pt-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Colour
-                </label>
-                <div className="flex gap-2">
+          {/* Right column */}
+          <div className="col-span-1 space-y-6">
+
+            {/* Status */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Status</h2>
+                <BadgeWithDot color={STATUS_COLOR[formData.status] ?? 'gray'}>
+                  {formData.status}
+                </BadgeWithDot>
+              </div>
+              <div className="px-6 py-5 space-y-4">
+                <Select
+                  label="Status"
+                  isRequired
+                  value={formData.status || 'active'}
+                  onChange={(v) => setFormData({ ...formData, status: v as Status })}
+                  options={[
+                    { id: 'active', label: 'Active' },
+                    { id: 'upcoming', label: 'Upcoming' },
+                    { id: 'archived', label: 'Archived' },
+                  ]}
+                />
+                <div className="flex items-center gap-4">
+                  <Checkbox
+                    isSelected={formData.featured ?? false}
+                    onChange={(v) => setFormData({ ...formData, featured: v })}
+                    label="Featured"
+                  />
+                </div>
+                <Input
+                  label="Sort order"
+                  type="number"
+                  value={String(formData.sortOrder ?? 0)}
+                  onChange={(v) => setFormData({ ...formData, sortOrder: parseInt(v) || 0 })}
+                />
+              </div>
+            </div>
+
+            {/* Appearance */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Appearance</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Display colour for this flavour.</p>
+              </div>
+              <div className="px-6 py-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Colour</label>
+                <div className="flex gap-2 items-center">
                   <input
                     type="color"
                     value={formData.colour || '#FFFFFF'}
                     onChange={(e) => setFormData({ ...formData, colour: e.target.value })}
-                    className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                    className="w-10 h-10 border border-gray-300 rounded cursor-pointer p-0.5"
                   />
                   <Input
                     type="text"
                     value={formData.colour || '#FFFFFF'}
-                    onChange={(value) => setFormData({ ...formData, colour: value })}
+                    onChange={(v) => setFormData({ ...formData, colour: v })}
                     placeholder="#FFFFFF"
-                    className="flex-1"
                   />
                 </div>
               </div>
             </div>
 
-            <div>
-              <Textarea
-                label="Archive Note"
-                rows={4}
-                value={formData.story || ''}
-                onChange={(value) => setFormData({ ...formData, story: value })}
-                placeholder="Context about this flavour (e.g., Served alongside Wild Tomatoes)"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Input
-                  label="Sort Order"
-                  type="number"
-                  value={String(formData.sortOrder ?? 0)}
-                  onChange={(value) => setFormData({ ...formData, sortOrder: parseInt(value) || 0 })}
-                />
+            {/* Archive note */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-sm font-semibold text-gray-900">Archive note</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Context for the flavour archive.</p>
               </div>
-
-              <div className="flex items-end">
-                <Checkbox
-                  isSelected={formData.featured ?? false}
-                  onChange={(v) => setFormData({ ...formData, featured: v })}
-                  label="Featured"
+              <div className="px-6 py-5">
+                <Textarea
+                  label=""
+                  rows={4}
+                  value={formData.story || ''}
+                  onChange={(v) => setFormData({ ...formData, story: v })}
+                  placeholder="e.g. Served alongside Wild Tomatoes, summer 2024"
                 />
               </div>
             </div>
+
+            {/* Usage tracking */}
+            <FlavourUsagePanel flavourId={formData.id} />
+
           </div>
-        </details>
-
-        {/* Ingredients Card */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Ingredients</h2>
-          <FlavourIngredientSelector
-            selectedIngredients={formData.ingredients || []}
-            onChange={handleIngredientsChange}
-          />
         </div>
-
-        {/* Usage Tracking Card */}
-        <FlavourUsagePanel flavourId={formData.id} />
       </form>
     </EditPageLayout>
   );
