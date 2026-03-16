@@ -16,6 +16,7 @@ import {
     Announcement01,
     Dice1,
     Settings01,
+    Tag01,
 } from '@untitledui/icons';
 
 const sections: NavSectionType[] = [
@@ -29,7 +30,7 @@ const sections: NavSectionType[] = [
         label: 'Commerce',
         items: [
             { label: 'Launches', href: '/admin/launches', icon: Rocket01 },
-            { label: 'Menu Items', href: '/admin/products', icon: ShoppingBag01 },
+            { label: 'Products', href: '/admin/products', icon: ShoppingBag01 },
         ],
     },
     {
@@ -38,12 +39,6 @@ const sections: NavSectionType[] = [
             { label: 'Flavours', href: '/admin/flavours', icon: Star01 },
             { label: 'Ingredients', href: '/admin/ingredients', icon: Atom01 },
             { label: 'Batches', href: '/admin/batches', icon: Beaker01 },
-        ],
-    },
-    {
-        label: 'Taxonomy',
-        items: [
-            { label: 'Formats', href: '/admin/formats', icon: LayersThree01 },
             { label: 'Modifiers', href: '/admin/modifiers', icon: Sliders01 },
         ],
     },
@@ -57,6 +52,8 @@ const sections: NavSectionType[] = [
     {
         label: 'System',
         items: [
+            { label: 'Formats', href: '/admin/formats', icon: LayersThree01 },
+            { label: 'Taxonomies', href: '/admin/taxonomies', icon: Tag01 },
             { label: 'Settings', href: '/admin/settings', icon: Settings01 },
         ],
     },

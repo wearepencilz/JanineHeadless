@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Offering, Format, Flavour, Ingredient } from '@/types';
 import ShopifyProductPicker from '../../components/ShopifyProductPicker';
 import { computeProductAllergens, formatAllergen, formatDietaryClaim } from '@/lib/product-allergens';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Badge } from '@/app/admin/components/ui/nav/badges';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';

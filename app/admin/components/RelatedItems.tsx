@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Badge } from '@/app/admin/components/ui/nav/badges';
 
 interface RelatedItem {
   id: string;

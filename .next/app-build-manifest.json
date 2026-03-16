@@ -30,6 +30,46 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/products/page.js"
+    ],
+    "/admin/flavours/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/flavours/page.js"
+    ],
+    "/admin/launches/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/launches/[id]/page.js"
+    ],
+    "/admin/products/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/products/[id]/page.js"
+    ],
+    "/admin/flavours/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/flavours/[id]/page.js"
+    ],
+    "/admin/ingredients/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/ingredients/page.js"
+    ],
+    "/admin/ingredients/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/ingredients/[id]/page.js"
+    ],
+    "/admin/batches/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/batches/page.js"
+    ],
+    "/admin/formats/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/formats/page.js"
     ]
   }
 }

@@ -1,4 +1,7 @@
 {
-  "/admin/modifiers/page": "app/admin/modifiers/page.js",
-  "/admin/products/page": "app/admin/products/page.js"
+  "/api/local-ip/route": "app/api/local-ip/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/modifiers/route": "app/api/modifiers/route.js",
+  "/admin/batches/page": "app/admin/batches/page.js",
+  "/admin/modifiers/page": "app/admin/modifiers/page.js"
 }
