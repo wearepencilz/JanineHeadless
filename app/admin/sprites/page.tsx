@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { findAll } from '@/lib/db-game';
 import type { WalkingSprite } from '@/types/sprite';
-import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { Badge } from '@/app/admin/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
 

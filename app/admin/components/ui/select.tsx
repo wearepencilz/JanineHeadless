@@ -181,4 +181,7 @@ Select.displayName = 'Select';
 export { UntitledSelect, SelectItem };
 export type { SelectItemType };
 
+// Attach Item as a sub-component for compound usage (Select.Item)
+(Select as any).Item = SelectItem;
+
 export default Select;

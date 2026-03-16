@@ -8,6 +8,8 @@ export type BadgeSize = 'sm' | 'md' | 'lg';
 export interface BadgeProps {
   children: ReactNode;
   variant?: BadgeVariant;
+  /** Alias for variant — accepted for compatibility */
+  color?: BadgeVariant;
   size?: BadgeSize;
   /** Optional icon rendered before the label */
   icon?: FC<{ className?: string }>;
@@ -33,13 +35,15 @@ const sizeClasses: Record<BadgeSize, string> = {
 export function Badge({
   children,
   variant = 'default',
+  color,
   size = 'md',
   icon: Icon,
   className = '',
 }: BadgeProps) {
+  const resolvedVariant = color ?? variant;
   return (
     <span
-      className={`inline-flex items-center gap-1 font-medium rounded ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center gap-1 font-medium rounded ${variantClasses[resolvedVariant]} ${sizeClasses[size]} ${className}`}
     >
       {Icon && <Icon className="w-3 h-3" />}
       {children}

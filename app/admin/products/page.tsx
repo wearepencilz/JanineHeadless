@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Table, TableCard } from '@/src/app/admin/components/ui/application/table/table';
 import { Badge } from '@/src/app/admin/components/ui/base/badges/badges';
+import { BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
 import { Select } from '@/src/app/admin/components/ui/base/select/select';
 import { Button } from '@/app/admin/components/ui/buttons/button';
 import DeleteModal from '@/app/admin/components/DeleteModal';

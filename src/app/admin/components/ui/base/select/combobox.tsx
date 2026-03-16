@@ -27,7 +27,7 @@ interface ComboBoxValueProps extends AriaGroupProps {
     shortcutClassName?: string;
     onFocus?: FocusEventHandler;
     onPointerEnter?: PointerEventHandler;
-    ref?: RefObject<HTMLDivElement | null>;
+    ref?: RefObject<HTMLDivElement>;
 }
 
 const ComboBoxValue = ({ size, shortcut, placeholder, shortcutClassName, ...otherProps }: ComboBoxValueProps) => {
