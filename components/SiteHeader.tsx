@@ -1,22 +1,32 @@
-'use client';
-
 import Link from 'next/link';
-import { useCart } from '@/contexts/CartContext';
+import Image from 'next/image';
+import { getSettings } from '@/lib/db';
 
-export default function SiteHeader() {
-  const { cart, openCart } = useCart();
-  const itemCount = cart?.totalQuantity || 0;
+export default async function SiteHeader() {
+  const settings = await getSettings().catch(() => ({}));
+  const logo: string = settings?.logo || '';
+  const companyName: string = settings?.companyName || 'Janine';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between px-8 pt-8 mix-blend-multiply pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between px-8 pt-8 pointer-events-none">
       {/* Logo */}
-      <Link href="/" className="pointer-events-auto" aria-label="Janine home">
-        <span
-          className="text-[#333112] text-sm tracking-widest uppercase"
-          style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 500 }}
-        >
-          Janine
-        </span>
+      <Link href="/" className="pointer-events-auto" aria-label={`${companyName} home`}>
+        {logo ? (
+          <Image
+            src={logo}
+            alt={companyName}
+            width={124}
+            height={27}
+            className="h-[27px] w-auto object-contain"
+          />
+        ) : (
+          <span
+            className="text-[#333112] text-sm tracking-widest uppercase"
+            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 500 }}
+          >
+            {companyName}
+          </span>
+        )}
       </Link>
 
       {/* Right nav */}
@@ -28,15 +38,6 @@ export default function SiteHeader() {
         <Link href="/stories" className="hover:opacity-60 transition-opacity">Stories</Link>
         <Link href="#visit" className="hover:opacity-60 transition-opacity">Come See Us</Link>
         <Link href="#archive" className="hover:opacity-60 transition-opacity">Archive</Link>
-        {itemCount > 0 && (
-          <button
-            onClick={openCart}
-            className="hover:opacity-60 transition-opacity"
-            aria-label={`Cart (${itemCount})`}
-          >
-            Cart ({itemCount})
-          </button>
-        )}
       </nav>
     </header>
   );
