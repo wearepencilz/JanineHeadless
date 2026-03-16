@@ -3,30 +3,95 @@
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { NavList } from './ui/nav/nav-list';
-import type { NavItemType } from './ui/nav/config';
+import type { NavItemType, NavItemDividerType } from './ui/nav/nav-list';
+import {
+  HomeLine,
+  Rocket01,
+  ShoppingBag01,
+  Star01,
+  Beaker01,
+  LayersThree01,
+  Sliders01,
+  Type01,
+  Announcement01,
+  Dice1,
+  Settings01,
+  Atom01,
+} from '@untitledui/icons';
 
-const navItems: NavItemType[] = [
-  { label: 'Dashboard', href: '/admin' },
-  { label: 'Launches', href: '/admin/launches' },
-  { label: 'Menu Items', href: '/admin/products' },
-  { label: 'Flavours', href: '/admin/flavours' },
-  { label: 'Ingredients', href: '/admin/ingredients' },
-  { label: 'Formats', href: '/admin/formats' },
-  { label: 'Modifiers', href: '/admin/modifiers' },
-  { label: 'Batches', href: '/admin/batches' },
-  { label: 'News', href: '/admin/news' },
-  { label: 'Games', href: '/admin/games' },
-  { label: 'Settings', href: '/admin/settings' },
+const navItems: (NavItemType | NavItemDividerType)[] = [
+  {
+    label: 'Dashboard',
+    href: '/admin',
+    icon: HomeLine,
+  },
+  { divider: true },
+  {
+    label: 'Launches',
+    href: '/admin/launches',
+    icon: Rocket01,
+  },
+  {
+    label: 'Menu Items',
+    href: '/admin/products',
+    icon: ShoppingBag01,
+  },
+  { divider: true },
+  {
+    label: 'Flavours',
+    href: '/admin/flavours',
+    icon: Star01,
+  },
+  {
+    label: 'Ingredients',
+    href: '/admin/ingredients',
+    icon: Atom01,
+  },
+  {
+    label: 'Batches',
+    href: '/admin/batches',
+    icon: Beaker01,
+  },
+  { divider: true },
+  {
+    label: 'Formats',
+    href: '/admin/formats',
+    icon: LayersThree01,
+  },
+  {
+    label: 'Modifiers',
+    href: '/admin/modifiers',
+    icon: Sliders01,
+  },
+  { divider: true },
+  {
+    label: 'News',
+    href: '/admin/news',
+    icon: Announcement01,
+  },
+  {
+    label: 'Games',
+    href: '/admin/games',
+    icon: Dice1,
+  },
+  { divider: true },
+  {
+    label: 'Settings',
+    href: '/admin/settings',
+    icon: Settings01,
+  },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
-  // Resolve active URL: exact for dashboard, prefix for others
-  const activeUrl = navItems.find((item) =>
-    item.href === '/admin'
-      ? pathname === '/admin'
-      : pathname?.startsWith(item.href + '/') || pathname === item.href
+  const activeUrl = navItems.find((item): item is NavItemType =>
+    !('divider' in item) &&
+    !!item.href && (
+      item.href === '/admin'
+        ? pathname === '/admin'
+        : pathname?.startsWith(item.href + '/') || pathname === item.href
+    )
   )?.href;
 
   return (
