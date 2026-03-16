@@ -45,7 +45,7 @@ export default async function LaunchPage({ params }: { params: { slug: string } 
 
       {/* Hero */}
       <section
-        className="relative w-full min-h-[60vh] flex flex-col justify-end px-8 pb-16 pt-[120px]"
+        className="relative w-full min-h-[50vh] md:min-h-[60vh] flex flex-col justify-end px-4 md:px-8 pb-10 md:pb-16 pt-[100px] md:pt-[120px]"
         style={{ backgroundColor: heroBg }}
       >
         {dateRange && (
@@ -74,7 +74,7 @@ export default async function LaunchPage({ params }: { params: { slug: string } 
 
       {/* Flavours */}
       {flavours.length > 0 && (
-        <section className="px-8 py-16 border-b border-[#333112]/10">
+        <section className="px-4 md:px-8 py-12 md:py-16 border-b border-[#333112]/10">
           <p
             className="text-[#333112] text-[13px] tracking-[0.26px] uppercase mb-10"
             style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
@@ -158,7 +158,7 @@ export default async function LaunchPage({ params }: { params: { slug: string } 
 
       {/* Products */}
       {products.length > 0 && (
-        <section className="px-8 py-16 border-b border-[#333112]/10">
+        <section className="px-4 md:px-8 py-12 md:py-16 border-b border-[#333112]/10">
           <p
             className="text-[#333112] text-[13px] tracking-[0.26px] uppercase mb-10"
             style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
@@ -187,7 +187,7 @@ export default async function LaunchPage({ params }: { params: { slug: string } 
 
       {/* Story / notes */}
       {launch.story && (
-        <section className="px-8 py-16 max-w-2xl">
+        <section className="px-4 md:px-8 py-12 md:py-16 max-w-2xl">
           <p
             className="text-[#333112] text-[13px] tracking-[0.26px] uppercase mb-6"
             style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}

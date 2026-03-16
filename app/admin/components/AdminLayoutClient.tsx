@@ -3,8 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
-import Sidebar from './Sidebar';
-import MobileSidebar from './MobileSidebar';
+import AdminSidebar from './AdminSidebar';
 
 export default function AdminLayoutClient({
   children,
@@ -41,10 +40,7 @@ export default function AdminLayoutClient({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
-      <Sidebar />
-
-      {/* Mobile Header with Sidebar */}
-      <MobileSidebar />
+      <AdminSidebar />
 
       {/* Main Content */}
       <main className="lg:pl-64">

@@ -9,30 +9,31 @@ export default async function AboutSection() {
   const image: string = about.image || '';
 
   return (
-    <section className="relative w-full h-[854px] overflow-hidden" style={{ backgroundColor: bg }}>
-      {/* Right image */}
-      <div className="absolute right-0 top-0 w-[742px] h-full overflow-hidden">
-        {image ? (
-          <img src={image} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full opacity-60" style={{ backgroundColor: bg }} />
-        )}
-      </div>
+    <section className="relative w-full overflow-hidden" style={{ backgroundColor: bg }}>
+      <div className="flex flex-col md:flex-row min-h-[500px] md:min-h-[854px]">
+        {/* Text content */}
+        <div className="relative z-10 flex flex-col justify-start md:justify-start px-6 md:px-[46px] pt-12 md:pt-[57px] pb-12 md:pb-16 w-full md:w-[480px] shrink-0">
+          <div
+            className="text-white text-[16px] md:text-[18px] leading-[22px] mb-8 [&_p]:mb-4 [&_p:last-child]:mb-0"
+            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
+            dangerouslySetInnerHTML={{ __html: text }}
+          />
+          <p
+            className="text-white text-[16px] md:text-[18px] leading-[22px]"
+            style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+          >
+            [ ABOUT ]
+          </p>
+        </div>
 
-      {/* Text content */}
-      <div className="absolute left-[46px] top-[57px] w-[400px]">
-        <div
-          className="text-white text-[18px] leading-[22px] mb-8 [&_p]:mb-4 [&_p:last-child]:mb-0"
-          style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
-          dangerouslySetInnerHTML={{ __html: text }}
-        />
-
-        <p
-          className="text-white text-[18px] leading-[22px]"
-          style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-        >
-          [ ABOUT ]
-        </p>
+        {/* Right image */}
+        <div className="w-full md:flex-1 h-[300px] md:h-auto overflow-hidden">
+          {image ? (
+            <img src={image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full opacity-60" style={{ backgroundColor: bg }} />
+          )}
+        </div>
       </div>
     </section>
   );
