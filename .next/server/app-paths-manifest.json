@@ -1,4 +1,7 @@
 {
-  "/admin/flavours/page": "app/admin/flavours/page.js",
-  "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/local-ip/route": "app/api/local-ip/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/admin/flavours/[id]/page": "app/admin/flavours/[id]/page.js",
+  "/admin/flavours/page": "app/admin/flavours/page.js"
 }
