@@ -7,7 +7,7 @@ import { Textarea } from '@/app/admin/components/ui/textarea';
 import RichTextEditor from '@/app/admin/components/RichTextEditor';
 import ImageUploader from '@/app/admin/components/ImageUploader';
 import {
-  GripVertical,
+  DotsGrid,
   Plus,
   Trash01,
   ChevronUp,
@@ -16,7 +16,7 @@ import {
   AlignLeft,
   Film01,
   LayoutGrid01,
-  Quote,
+  Annotation,
   User01,
   Tag01,
 } from '@untitledui/icons';
@@ -60,10 +60,10 @@ const BLOCK_TYPES: { type: BlockType; label: string; icon: any; description: str
   { type: 'image', label: 'Image', icon: Image01, description: 'Single or full-bleed image' },
   { type: 'image-grid', label: 'Photo Grid', icon: LayoutGrid01, description: '2 or 3 column photos' },
   { type: 'video', label: 'Video', icon: Film01, description: 'Embed a video URL' },
-  { type: 'quote', label: 'Quote', icon: Quote, description: 'Pull quote or excerpt' },
+  { type: 'quote', label: 'Quote', icon: Annotation, description: 'Pull quote or excerpt' },
   { type: 'ingredient-focus', label: 'Ingredient Focus', icon: Tag01, description: 'Ingredient breakout card' },
   { type: 'word-by', label: 'Word by', icon: User01, description: 'Author attribution' },
-  { type: 'divider', label: 'Divider', icon: GripVertical, description: 'Section break' },
+  { type: 'divider', label: 'Divider', icon: DotsGrid, description: 'Section break' },
 ];
 
 function newBlock(type: BlockType): StoryBlock {
@@ -249,7 +249,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown, isFirst,
       {/* Block header */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
         <div className="text-gray-400 cursor-grab">
-          <GripVertical className="w-4 h-4" />
+          <DotsGrid className="w-4 h-4" />
         </div>
         {Icon && <Icon className="w-4 h-4 text-gray-500" />}
         <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex-1">{meta?.label}</span>
