@@ -26,7 +26,22 @@ async function migrateToRedis() {
 
   console.log('✅ Connected to Redis\n')
 
-  const files = ['projects.json', 'news.json', 'settings.json', 'pages.json']
+  const files = [
+    'projects.json',
+    'news.json',
+    'settings.json',
+    'pages.json',
+    'flavours.json',
+    'ingredients.json',
+    'formats.json',
+    'modifiers.json',
+    'launches.json',
+    'products.json',
+    'taxonomies.json',
+    'stories.json',
+    'users.json',
+    'bundles.json',
+  ]
 
   for (const filename of files) {
     const filePath = path.join(dataDir, filename)

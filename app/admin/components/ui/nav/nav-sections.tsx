@@ -7,7 +7,7 @@ import { NavItemBase } from "./nav-item";
 export interface NavSectionItemType {
     label: string;
     href?: string;
-    icon?: FC<HTMLAttributes<HTMLOrSVGElement>>;
+    icon?: FC<HTMLAttributes<HTMLOrSVGElement>> | string;
     badge?: ReactNode;
 }
 
