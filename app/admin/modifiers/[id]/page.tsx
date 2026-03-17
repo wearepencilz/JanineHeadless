@@ -8,6 +8,7 @@ import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
 import { Badge, BadgeWithDot } from '@/app/admin/components/ui/nav/badges';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface Modifier {
   id: string;
@@ -39,6 +40,7 @@ const TYPE_COLOR: Record<string, 'blue' | 'purple' | 'orange' | 'pink' | 'indigo
 
 export default function EditModifierPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -82,6 +84,7 @@ export default function EditModifierPage({ params }: { params: { id: string } })
         body: JSON.stringify(modifier),
       });
       if (response.ok) {
+        toast.success('Modifier saved', `"${modifier.name}" has been updated`);
         router.push('/admin/modifiers');
       } else {
         const data = await response.json();

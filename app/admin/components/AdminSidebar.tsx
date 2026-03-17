@@ -5,60 +5,46 @@ import { useSession } from 'next-auth/react';
 import { NavSections } from './ui/nav/nav-sections';
 import { NavUserBlock } from './ui/nav/nav-user-block';
 import type { NavSectionType } from './ui/nav/nav-sections';
-import {
-    HomeLine,
-    Rocket01,
-    ShoppingBag01,
-    Star01,
-    Atom01,
-    Beaker01,
-    LayersThree01,
-    Sliders01,
-    Announcement01,
-    Dice1,
-    Settings01,
-    Tag01,
-    Users01,
-} from '@untitledui/icons';
 
 const sections: NavSectionType[] = [
     {
         label: 'General',
         items: [
-            { label: 'Dashboard', href: '/admin', icon: HomeLine },
+            { label: 'Dashboard', href: '/admin', icon: '🏠' },
         ],
     },
     {
         label: 'Commerce',
         items: [
-            { label: 'Launches', href: '/admin/launches', icon: Rocket01 },
-            { label: 'Products', href: '/admin/products', icon: ShoppingBag01 },
+            { label: 'Launches', href: '/admin/launches', icon: '🚀' },
+            { label: 'Products', href: '/admin/products', icon: '🎁' },
         ],
     },
     {
         label: 'Archive',
         items: [
-            { label: 'Flavours', href: '/admin/flavours', icon: Star01 },
-            { label: 'Batches', href: '/admin/batches', icon: Beaker01 },
-            { label: 'Modifiers', href: '/admin/modifiers', icon: Sliders01 },
-            { label: 'Ingredients', href: '/admin/ingredients', icon: Atom01 },
+            { label: 'Flavours', href: '/admin/flavours', icon: '🍦' },
+            { label: 'Batches', href: '/admin/batches', icon: '🧪' },
+            { label: 'Modifiers', href: '/admin/modifiers', icon: '✨' },
+            { label: 'Ingredients', href: '/admin/ingredients', icon: '🌿' },
         ],
     },
     {
         label: 'Content',
         items: [
-            { label: 'Pages', href: '/admin/pages', icon: Announcement01 },
-            { label: 'News', href: '/admin/news', icon: Announcement01 },
-            { label: 'Games', href: '/admin/games', icon: Dice1 },
+            { label: 'Stories', href: '/admin/stories', icon: '📖' },
+            { label: 'News', href: '/admin/news', icon: '📰' },
+            { label: 'Pages', href: '/admin/pages', icon: '📄' },
+            { label: 'Games', href: '/admin/games', icon: '🎮' },
         ],
     },
     {
         label: 'System',
         items: [
-            { label: 'Formats', href: '/admin/formats', icon: LayersThree01 },
-            { label: 'Taxonomies', href: '/admin/taxonomies', icon: Tag01 },
-            { label: 'Users', href: '/admin/settings/users', icon: Users01 },
-            { label: 'Settings', href: '/admin/settings', icon: Settings01 },
+            { label: 'Users', href: '/admin/users', icon: '👤' },
+            { label: 'Formats', href: '/admin/formats', icon: '📦' },
+            { label: 'Taxonomies', href: '/admin/taxonomies', icon: '🏷️' },
+            { label: 'Settings', href: '/admin/settings', icon: '⚙️' },
         ],
     },
 ];

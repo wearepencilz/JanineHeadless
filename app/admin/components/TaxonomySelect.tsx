@@ -14,7 +14,9 @@ export type TaxonomyCategory =
   | 'servingStyles'
   | 'modifierTypes'
   | 'allergens'
-  | 'contentBlockTypes';
+  | 'contentBlockTypes'
+  | 'storyCategories'
+  | 'storyTags';
 
 interface TaxonomyValue {
   id: string;

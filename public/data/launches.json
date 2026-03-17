@@ -159,14 +159,22 @@
     "description": null,
     "activeStart": null,
     "activeEnd": null,
-    "featuredFlavourIds": [],
-    "featuredProductIds": [],
+    "featuredFlavourIds": [
+      "1773687488580",
+      "1773687436915"
+    ],
+    "featuredProductIds": [
+      "product-1773691688669-zb72keo6p",
+      "product-1773691688669-djn35tmvc",
+      "product-1773691688669-df2kh05dw",
+      "product-1773691688669-7wg1sdchq"
+    ],
     "contentBlocks": [],
     "relatedEventIds": [],
     "relatedMembershipDropIds": [],
     "sortOrder": 7,
     "featured": false,
     "createdAt": "2026-03-16T04:29:41.671Z",
-    "updatedAt": "2026-03-16T04:29:41.671Z"
+    "updatedAt": "2026-03-16T20:08:12.696Z"
   }
 ]

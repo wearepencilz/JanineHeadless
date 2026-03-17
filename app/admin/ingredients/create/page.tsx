@@ -8,12 +8,14 @@ import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
 import { Button } from '@/app/admin/components/ui/button';
+import { useToast } from '@/app/admin/components/ToastContainer';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function CreateIngredientPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -60,11 +62,11 @@ export default function CreateIngredientPage() {
       if (response.ok) {
         router.push('/admin/ingredients');
       } else {
-        alert('Failed to create ingredient');
+        toast.error('Failed to create ingredient');
       }
     } catch (error) {
       console.error('Error creating ingredient:', error);
-      alert('Failed to create ingredient');
+      toast.error('Failed to create ingredient');
     } finally {
       setLoading(false);
     }

@@ -7,9 +7,11 @@ import type { FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import { Select } from '@/app/admin/components/ui/select';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 export default function CreateFormatPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -53,11 +55,11 @@ export default function CreateFormatPage() {
         router.push('/admin/formats');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to create format');
+        toast.error(error.error || 'Failed to create format');
       }
     } catch (error) {
       console.error('Error creating format:', error);
-      alert('Failed to create format');
+      toast.error('Failed to create format');
     } finally {
       setLoading(false);
     }

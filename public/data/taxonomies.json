@@ -86,6 +86,21 @@
     { "id": "sesame", "label": "Sesame", "value": "sesame", "sortOrder": 6, "archived": false },
     { "id": "soy", "label": "Soy", "value": "soy", "sortOrder": 7, "archived": false }
   ],
+  "storyCategories": [
+    { "id": "the-lab", "label": "The Lab", "value": "the-lab", "description": "Process, testing, and experimentation", "sortOrder": 1, "archived": false },
+    { "id": "flavour-notes", "label": "Flavour Notes", "value": "flavour-notes", "description": "Deep dives into ingredients and flavour", "sortOrder": 2, "archived": false },
+    { "id": "core-idea", "label": "Core Idea", "value": "core-idea", "description": "Philosophy, vision, and brand stories", "sortOrder": 3, "archived": false },
+    { "id": "people", "label": "People", "value": "people", "description": "Farmers, makers, and collaborators", "sortOrder": 4, "archived": false },
+    { "id": "places", "label": "Places", "value": "places", "description": "Markets, farms, and regions", "sortOrder": 5, "archived": false },
+    { "id": "seasons", "label": "Seasons", "value": "seasons", "description": "Seasonal moments and ingredients", "sortOrder": 6, "archived": false }
+  ],
+  "storyTags": [
+    { "id": "strawberry", "label": "Strawberry", "value": "strawberry", "sortOrder": 1, "archived": false },
+    { "id": "summer", "label": "Summer", "value": "summer", "sortOrder": 2, "archived": false },
+    { "id": "milk", "label": "Milk", "value": "milk", "sortOrder": 3, "archived": false },
+    { "id": "basil", "label": "Basil", "value": "basil", "sortOrder": 4, "archived": false },
+    { "id": "montreal", "label": "Montréal", "value": "montreal", "sortOrder": 5, "archived": false }
+  ],
   "contentBlockTypes": [
     { "id": "hero", "label": "Hero", "value": "hero", "description": "Large hero image/video section", "sortOrder": 1, "archived": false },
     { "id": "text", "label": "Text", "value": "text", "description": "Text content block", "sortOrder": 2, "archived": false },

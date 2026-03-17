@@ -16,7 +16,7 @@ export interface NavItemBaseProps {
     open?: boolean;
     href?: string;
     type: "link" | "collapsible" | "collapsible-child";
-    icon?: FC<HTMLAttributes<HTMLOrSVGElement>>;
+    icon?: FC<HTMLAttributes<HTMLOrSVGElement>> | string;
     badge?: ReactNode;
     current?: boolean;
     truncate?: boolean;
@@ -25,7 +25,11 @@ export interface NavItemBaseProps {
 }
 
 export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, truncate = true, onClick }: NavItemBaseProps) => {
-    const iconElement = Icon && <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-gray-600 transition-inherit-all" />;
+    const iconElement = Icon && (
+        typeof Icon === 'string'
+            ? <span aria-hidden="true" className="mr-2 size-5 shrink-0 text-base leading-none">{Icon}</span>
+            : <Icon aria-hidden="true" className="mr-2 size-5 shrink-0 text-gray-600 transition-inherit-all" />
+    );
 
     const badgeElement =
         badge && (typeof badge === "string" || typeof badge === "number") ? (

@@ -1,8 +1,4 @@
 {
   "/visit/page": "app/visit/page.js",
-  "/stories/page": "app/stories/page.js",
-  "/page": "app/page.js",
-  "/api/settings/route": "app/api/settings/route.js",
-  "/archive/page": "app/archive/page.js",
-  "/flavours/page": "app/flavours/page.js"
+  "/admin/news/page": "app/admin/news/page.js"
 }

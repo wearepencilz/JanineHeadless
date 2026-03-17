@@ -14,10 +14,6 @@ interface DashboardGroup {
 
 const groups: DashboardGroup[] = [
   {
-    label: 'General',
-    cards: [],
-  },
-  {
     label: 'Commerce',
     cards: [
       { title: 'Launches', description: 'Create and manage product launches', href: '/admin/launches', icon: '🚀' },
@@ -36,13 +32,16 @@ const groups: DashboardGroup[] = [
   {
     label: 'Content',
     cards: [
+      { title: 'Stories', description: 'Brand stories and editorial features', href: '/admin/stories', icon: '📖' },
       { title: 'News', description: 'Editorial content and updates', href: '/admin/news', icon: '📰' },
+      { title: 'Pages', description: 'Static page content management', href: '/admin/pages', icon: '📄' },
       { title: 'Games', description: 'Interactive game experiences', href: '/admin/games', icon: '🎮' },
     ],
   },
   {
     label: 'System',
     cards: [
+      { title: 'Users', description: 'Manage admin users and access', href: '/admin/users', icon: '👤' },
       { title: 'Formats', description: 'Product format templates', href: '/admin/formats', icon: '📦' },
       { title: 'Taxonomies', description: 'Tags, types, and classification values', href: '/admin/taxonomies', icon: '🏷️' },
       { title: 'Settings', description: 'Global configuration', href: '/admin/settings', icon: '⚙️' },

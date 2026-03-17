@@ -37,9 +37,12 @@ const TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
   { key: 'modifierTypes', label: 'Modifier Types', description: 'Types of modifiers (toppings, sauces, etc.)', group: 'Formats & Modifiers' },
   // Launches
   { key: 'contentBlockTypes', label: 'Content Block Types', description: 'Types of content blocks for launches', group: 'Launches' },
+  // Stories
+  { key: 'storyCategories', label: 'Categories', description: 'Story sections — The Lab, Flavour Notes, Core Idea, etc.', group: 'Stories' },
+  { key: 'storyTags', label: 'Tags', description: 'Ingredient, place, theme, and season tags for stories', group: 'Stories' },
 ];
 
-const GROUPS = ['Ingredients', 'Flavours', 'Formats & Modifiers', 'Launches'];
+const GROUPS = ['Ingredients', 'Flavours', 'Formats & Modifiers', 'Launches', 'Stories'];
 
 export default function TaxonomiesPage() {
   const searchParams = useSearchParams();

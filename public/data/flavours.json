@@ -445,5 +445,82 @@
     "syncStatus": "not_linked",
     "createdAt": "2026-03-13T14:00:07.254Z",
     "updatedAt": "2026-03-13T14:00:07.254Z"
+  },
+  {
+    "id": "1773687436915",
+    "name": "Pistachio",
+    "slug": "pistachio",
+    "description": "Delicious soft roasted pistachio Gelato",
+    "shortDescription": "Gelato made from roasted pistachio",
+    "ingredients": [
+      {
+        "ingredientId": "milk",
+        "displayOrder": 0,
+        "quantity": "",
+        "notes": ""
+      },
+      {
+        "ingredientId": "cream",
+        "displayOrder": 1,
+        "quantity": "",
+        "notes": ""
+      }
+    ],
+    "allergens": [],
+    "dietaryClaims": [],
+    "type": "gelato",
+    "baseStyle": "dairy",
+    "keyNotes": [
+      "sweet",
+      "buttery"
+    ],
+    "colour": "#84b067",
+    "status": "active",
+    "canBeUsedInTwist": true,
+    "canBeSoldAsPint": true,
+    "canBeUsedInSandwich": true,
+    "sortOrder": 0,
+    "featured": false,
+    "syncStatus": "not_linked",
+    "story": "",
+    "tastingNotes": "",
+    "createdAt": "2026-03-16T18:57:16.915Z",
+    "updatedAt": "2026-03-16T20:11:20.250Z"
+  },
+  {
+    "id": "1773687488580",
+    "name": "Cardamom",
+    "slug": "cardamom",
+    "description": "Sorbet",
+    "shortDescription": "Soft Cardamom",
+    "ingredients": [
+      {
+        "ingredientId": "madagascar-bourbon-vanilla",
+        "displayOrder": 0,
+        "quantity": "",
+        "notes": ""
+      }
+    ],
+    "allergens": [],
+    "dietaryClaims": [],
+    "type": "sorbet",
+    "baseStyle": "dairy",
+    "keyNotes": [
+      "sweet",
+      "honeyed",
+      "bright"
+    ],
+    "colour": "#757331",
+    "status": "active",
+    "canBeUsedInTwist": true,
+    "canBeSoldAsPint": true,
+    "canBeUsedInSandwich": true,
+    "sortOrder": 0,
+    "featured": false,
+    "syncStatus": "not_linked",
+    "story": "",
+    "tastingNotes": "",
+    "createdAt": "2026-03-16T18:58:08.580Z",
+    "updatedAt": "2026-03-16T18:59:29.543Z"
   }
 ]

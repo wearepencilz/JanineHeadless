@@ -7,6 +7,7 @@ import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
 import { parseDate } from '@internationalized/date';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface NewsItem {
   id?: number;
@@ -20,6 +21,7 @@ export default function NewsEditPage() {
   const router = useRouter();
   const params = useParams();
   const isNew = params?.id === 'new';
+  const toast = useToast();
 
   const [formData, setFormData] = useState<NewsItem>({
     title: '',
@@ -69,7 +71,7 @@ export default function NewsEditPage() {
       setFormData((prev) => ({ ...prev, image: data.url }));
     } catch (error) {
       console.error('Upload failed:', error);
-      alert('Failed to upload image');
+      toast.error('Failed to upload image');
     } finally {
       setUploading(false);
     }
@@ -90,13 +92,14 @@ export default function NewsEditPage() {
       });
 
       if (res.ok) {
+        toast.success(isNew ? 'Article created' : 'Article saved');
         router.push('/admin/news');
       } else {
-        alert('Failed to save news');
+        toast.error('Failed to save article');
       }
     } catch (error) {
       console.error('Failed to save:', error);
-      alert('Failed to save news');
+      toast.error('Failed to save article');
     } finally {
       setSaving(false);
     }

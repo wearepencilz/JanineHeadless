@@ -5,6 +5,7 @@ import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import RichTextEditor from '@/app/admin/components/RichTextEditor';
 import Link from 'next/link';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface VisitSettings {
   message: string;
@@ -21,6 +22,7 @@ const defaultVisit: VisitSettings = {
 };
 
 export default function ComeSeeUsAdmin() {
+  const toast = useToast();
   const [visit, setVisit] = useState<VisitSettings>(defaultVisit);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,9 +45,10 @@ export default function ComeSeeUsAdmin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...current, visit }),
       });
-      if (!res.ok) alert('Failed to save');
+      if (!res.ok) toast.error('Failed to save');
+      else toast.success('Page saved');
     } catch {
-      alert('Failed to save');
+      toast.error('Failed to save');
     } finally {
       setSaving(false);
     }
@@ -59,9 +62,9 @@ export default function ComeSeeUsAdmin() {
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.url) setVisit((v) => ({ ...v, photo: data.url }));
-      else alert('Upload failed');
+      else toast.error('Upload failed');
     } catch {
-      alert('Upload failed');
+      toast.error('Upload failed');
     } finally {
       setUploading(false);
     }
