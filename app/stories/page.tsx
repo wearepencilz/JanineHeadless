@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/home/SiteFooter';
+import { getStories as getStoriesFromDB } from '@/lib/db';
 
 export const metadata = {
   title: 'Stories – Janine',
@@ -9,12 +10,8 @@ export const metadata = {
 
 async function getStories() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stories`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return [];
-    const all = await res.json();
-    return all.filter((s: any) => s.status === 'published');
+    const all = (await getStoriesFromDB()) as any[];
+    return all.filter((s) => s.status === 'published');
   } catch {
     return [];
   }
@@ -32,137 +29,186 @@ export default async function StoriesPage() {
     <main className="bg-white min-h-screen">
       <SiteHeader />
 
-      <div className="px-4 md:px-8 pt-[100px] md:pt-[120px] pb-24">
+      {/* Full-bleed hero */}
+      {hero ? (
+        <Link href={`/stories/${hero.slug}`} className="block group relative w-full overflow-hidden" style={{ height: 'clamp(480px, 75vh, 860px)' }}>
+          {hero.coverImage ? (
+            <img
+              src={hero.coverImage}
+              alt={hero.coverImageAlt || hero.title}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-1000 ease-out"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[#333112]" />
+          )}
 
-        {/* Label */}
-        <p
-          className="text-[#333112] text-[13px] tracking-[0.26px] mb-12 uppercase"
-          style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-        >
-          [Stories]
-        </p>
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
+          {/* Top label */}
+          <div className="absolute top-0 left-0 right-0 flex items-start justify-between px-4 md:px-8 pt-[100px] md:pt-[120px]">
+            <p
+              className="text-white/60 text-[11px] tracking-[0.22px] uppercase"
+              style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+            >
+              [Stories]
+            </p>
+            {hero.category && (
+              <p
+                className="text-white/60 text-[11px] tracking-[0.22px] uppercase"
+                style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+              >
+                {hero.category.replace(/-/g, ' ')}
+              </p>
+            )}
+          </div>
+
+          {/* Bottom content */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 md:px-8 pb-10 md:pb-14">
+            {hero.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {hero.tags.slice(0, 4).map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="text-white/60 text-[10px] tracking-[0.2px] uppercase border border-white/25 px-2 py-0.5"
+                    style={{ fontFamily: 'var(--font-diatype-mono)' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            <h1
+              className="text-white text-[clamp(32px,6vw,80px)] leading-[0.95] uppercase tracking-tight max-w-3xl"
+              style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
+            >
+              {hero.title}
+            </h1>
+            {hero.intro && (
+              <p
+                className="mt-4 text-white/70 text-[15px] md:text-[17px] leading-[1.6] max-w-md"
+                style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
+              >
+                {hero.intro}
+              </p>
+            )}
+            <p
+              className="mt-5 text-white/50 text-[11px] tracking-[0.22px] uppercase"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              Read →
+            </p>
+          </div>
+        </Link>
+      ) : (
+        /* Empty state header */
+        <div className="px-4 md:px-8 pt-[100px] md:pt-[120px] pb-12">
+          <p
+            className="text-[#333112] text-[13px] tracking-[0.26px] uppercase"
+            style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+          >
+            [Stories]
+          </p>
+        </div>
+      )}
+
+      {/* Story grid */}
+      <div className="px-4 md:px-8 pt-16 pb-24">
         {sorted.length === 0 ? (
           <p className="text-[#333112]/40 text-[14px]" style={{ fontFamily: 'var(--font-neue-montreal)' }}>
             Nothing here yet.
           </p>
-        ) : (
+        ) : rest.length > 0 ? (
           <>
-            {/* Hero story */}
-            {hero && (
-              <Link href={`/stories/${hero.slug}`} className="block group mb-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-end">
-                  {hero.coverImage && (
-                    <div className="overflow-hidden">
-                      <img
-                        src={hero.coverImage}
-                        alt={hero.coverImageAlt || hero.title}
-                        className="w-full aspect-[4/3] object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                      />
-                    </div>
-                  )}
-                  <div className="pb-2">
-                    {hero.category && (
-                      <p
-                        className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase mb-4"
-                        style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-                      >
-                        {hero.category.replace(/-/g, ' ')}
-                      </p>
-                    )}
-                    <h2
-                      className="text-[#333112] text-[36px] md:text-[52px] leading-[1.0] uppercase mb-4"
-                      style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
-                    >
-                      {hero.title}
-                    </h2>
-                    {hero.intro && (
-                      <p
-                        className="text-[#333112]/60 text-[16px] leading-[1.6] max-w-sm"
-                        style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
-                      >
-                        {hero.intro}
-                      </p>
-                    )}
-                    {hero.tags?.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-6">
-                        {hero.tags.map((tag: string) => (
-                          <span
-                            key={tag}
-                            className="text-[#333112]/50 text-[11px] tracking-[0.22px] uppercase border border-[#333112]/20 px-2 py-0.5"
-                            style={{ fontFamily: 'var(--font-diatype-mono)' }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            )}
+            <div className="flex items-center justify-between mb-10">
+              <p
+                className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase"
+                style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+              >
+                More stories
+              </p>
+              <div className="h-px flex-1 bg-[#333112]/10 mx-6" />
+            </div>
 
-            {/* Story grid */}
-            {rest.length > 0 && (
-              <>
-                <div className="h-px bg-[#333112] opacity-10 mb-12" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14">
-                  {rest.map((story: any) => (
-                    <Link key={story.id} href={`/stories/${story.slug}`} className="group block">
-                      {story.coverImage && (
-                        <div className="overflow-hidden mb-4">
-                          <img
-                            src={story.coverImage}
-                            alt={story.coverImageAlt || story.title}
-                            className="w-full aspect-[4/3] object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                          />
-                        </div>
-                      )}
-                      {story.category && (
-                        <p
-                          className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase mb-2"
-                          style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
-                        >
-                          {story.category.replace(/-/g, ' ')}
-                        </p>
-                      )}
-                      <h3
-                        className="text-[#333112] text-[20px] leading-[1.1] uppercase mb-2"
-                        style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
-                      >
-                        {story.title}
-                      </h3>
-                      {story.intro && (
-                        <p
-                          className="text-[#333112]/60 text-[14px] leading-[1.6] line-clamp-2"
-                          style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
-                        >
-                          {story.intro}
-                        </p>
-                      )}
-                      {story.tags?.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          {story.tags.slice(0, 3).map((tag: string) => (
-                            <span
-                              key={tag}
-                              className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase border border-[#333112]/15 px-1.5 py-0.5"
-                              style={{ fontFamily: 'var(--font-diatype-mono)' }}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              </>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16">
+              {rest.map((story: any, i: number) => (
+                <StoryCard key={story.id} story={story} featured={i === 0 && rest.length > 3} />
+              ))}
+            </div>
           </>
-        )}
+        ) : null}
       </div>
 
       <SiteFooter />
     </main>
+  );
+}
+
+function StoryCard({ story, featured }: { story: any; featured?: boolean }) {
+  return (
+    <Link
+      href={`/stories/${story.slug}`}
+      className={`group block ${featured ? 'md:col-span-2' : ''}`}
+    >
+      {story.coverImage && (
+        <div className="overflow-hidden mb-5">
+          <img
+            src={story.coverImage}
+            alt={story.coverImageAlt || story.title}
+            className={`w-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ${featured ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}
+          />
+        </div>
+      )}
+
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          {story.category && (
+            <p
+              className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase mb-2"
+              style={{ fontFamily: 'var(--font-diatype-mono)', fontWeight: 500 }}
+            >
+              {story.category.replace(/-/g, ' ')}
+            </p>
+          )}
+          <h2
+            className={`text-[#333112] leading-[1.05] uppercase mb-3 ${featured ? 'text-[28px] md:text-[36px]' : 'text-[20px] md:text-[22px]'}`}
+            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
+          >
+            {story.title}
+          </h2>
+          {story.intro && (
+            <p
+              className="text-[#333112]/55 text-[14px] leading-[1.65] line-clamp-2"
+              style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
+            >
+              {story.intro}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {story.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-4">
+          {story.tags.slice(0, 3).map((tag: string) => (
+            <span
+              key={tag}
+              className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase border border-[#333112]/15 px-2 py-0.5"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {story.wordBy && (
+        <p
+          className="mt-3 text-[#333112]/30 text-[10px] tracking-[0.2px] uppercase"
+          style={{ fontFamily: 'var(--font-diatype-mono)' }}
+        >
+          Word by {story.wordBy}
+        </p>
+      )}
+    </Link>
   );
 }

@@ -2,338 +2,325 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import ImageUploader from '../../components/ImageUploader';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
-import { ingredientCategoryOptions, ingredientRoleOptions, ingredientDescriptorTags } from '@/types';
-import { Button } from '@/app/admin/components/ui/button';
-import { useToast } from '@/app/admin/components/ToastContainer';
+import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
-import { Checkbox } from '@/app/admin/components/ui/checkbox';
+import { useToast } from '@/app/admin/components/ToastContainer';
+import TaxonomyTagPicker from '@/app/admin/components/TaxonomyTagPicker';
+import AiAutofillButton from '@/app/admin/components/AiAutofillButton';
+import { ingredientSourceTypeOptions } from '@/types';
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function TagPicker({
+  label,
+  description,
+  options,
+  selected,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  options: readonly string[];
+  selected: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const toggle = (val: string) =>
+    onChange(selected.includes(val) ? selected.filter((s) => s !== val) : [...selected, val]);
+  return (
+    <div>
+      <p className="text-sm font-medium text-gray-900 mb-0.5">{label}</p>
+      {description && <p className="text-xs text-gray-500 mb-2">{description}</p>}
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggle(opt)}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
+              selected.includes(opt)
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+            }`}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionCard({ title, description, children, collapsible = false, defaultOpen = true, action, forceOpen }: { title: string; description?: string; children: React.ReactNode; collapsible?: boolean; defaultOpen?: boolean; action?: React.ReactNode; forceOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const isOpen = forceOpen || open;
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div
+        className={`px-6 py-4 border-b border-gray-100 flex items-center justify-between ${collapsible ? 'cursor-pointer select-none' : ''}`}
+        onClick={collapsible ? () => setOpen((o) => !o) : undefined}
+      >
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+          {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+          {action && <span onClick={(e) => e.stopPropagation()}>{action}</span>}
+          {collapsible && (
+            <svg
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          )}
+        </div>
+      </div>
+      {(!collapsible || isOpen) && (
+        <div className="px-6 py-5 space-y-5">{children}</div>
+      )}
+    </div>
+  );
+}
+
+const emptyForm = {
+  name: '',
+  latinName: '',
+  origin: '',
+  taxonomyCategory: '',
+  description: '',
+  story: '',
+  tastingNotes: [] as string[],
+  texture: [] as string[],
+  process: [] as string[],
+  attributes: [] as string[],
+  usedAs: [] as string[],
+  sourceName: '',
+  sourceType: '',
+  allergens: [] as string[],
+  availableMonths: [] as number[],
+  animalDerived: false,
+  image: '',
+  imageAlt: '',
+};
 
 export default function CreateIngredientPage() {
   const router = useRouter();
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    latinName: '',
-    origin: '',
-    taxonomyCategory: '', // Changed from 'category'
-    roles: [] as string[],
-    descriptors: [] as string[],
-    description: '',
-    story: '',
-    tastingNotes: '',
-    supplier: '',
-    farm: '',
-    seasonal: false,
-    availableMonths: [] as number[],
-    allergens: [] as string[],
-    animalDerived: false,
-    vegetarian: true,
-    isOrganic: false,
-    image: '',
-    imageAlt: '',
-  });
+  const [saving, setSaving] = useState(false);
+  const [allOpen, setAllOpen] = useState(false);
+  const [formData, setFormData] = useState(emptyForm);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
-  const commonAllergens = ['dairy', 'nuts', 'gluten', 'soy', 'eggs', 'sesame'];
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  const set = (patch: Partial<typeof emptyForm>, touch = true) => {
+    if (touch) {
+      setTouchedFields((prev) => {
+        const next = new Set(prev);
+        Object.keys(patch).forEach((k) => next.add(k));
+        return next;
+      });
+    }
+    setFormData((p) => ({ ...p, ...patch }));
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleAutofill = (result: Partial<typeof emptyForm>) => {
+    setAllOpen(true);
+    const skip = (field: string) => touchedFields.has(field);
+    set({
+      ...(!skip('latinName') && result.latinName && { latinName: result.latinName }),
+      ...(!skip('origin') && result.origin && { origin: result.origin }),
+      ...(!skip('description') && result.description && { description: result.description }),
+      ...(!skip('story') && result.story && { story: result.story }),
+      ...(!skip('tastingNotes') && result.tastingNotes?.length && { tastingNotes: result.tastingNotes }),
+      ...(!skip('texture') && result.texture?.length && { texture: result.texture }),
+      ...(!skip('process') && result.process?.length && { process: result.process }),
+      ...(!skip('attributes') && result.attributes?.length && { attributes: result.attributes }),
+      ...(!skip('availableMonths') && result.availableMonths?.length && { availableMonths: result.availableMonths }),
+    }, false);
+  };
 
+  const toggleMonth = (i: number) =>
+    set({
+      availableMonths: formData.availableMonths.includes(i)
+        ? formData.availableMonths.filter((m) => m !== i)
+        : [...formData.availableMonths, i].sort((a, b) => a - b),
+    });
+
+  const handleSave = async () => {
+    if (!formData.name) { toast.error('Name is required'); return; }
+    setSaving(true);
     try {
-      const response = await fetch('/api/ingredients', {
+      const res = await fetch('/api/ingredients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          tastingNotes: formData.tastingNotes.split(',').map(n => n.trim()).filter(Boolean),
-        }),
+        body: JSON.stringify(formData),
       });
-
-      if (response.ok) {
-        router.push('/admin/ingredients');
+      if (res.ok) {
+        const created = await res.json();
+        toast.success('Ingredient created');
+        router.push(`/admin/ingredients/${created.id}`);
       } else {
         toast.error('Failed to create ingredient');
       }
-    } catch (error) {
-      console.error('Error creating ingredient:', error);
+    } catch {
       toast.error('Failed to create ingredient');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const toggleRole = (role: string) => {
-    setFormData(prev => ({
-      ...prev,
-      roles: prev.roles.includes(role)
-        ? prev.roles.filter(r => r !== role)
-        : [...prev.roles, role]
-    }));
-  };
-
-  const toggleDescriptor = (descriptor: string) => {
-    setFormData(prev => ({
-      ...prev,
-      descriptors: prev.descriptors.includes(descriptor)
-        ? prev.descriptors.filter(d => d !== descriptor)
-        : [...prev.descriptors, descriptor]
-    }));
-  };
-
-  const toggleAllergen = (allergen: string) => {
-    setFormData(prev => ({
-      ...prev,
-      allergens: prev.allergens.includes(allergen)
-        ? prev.allergens.filter(a => a !== allergen)
-        : [...prev.allergens, allergen]
-    }));
-  };
-
-  const toggleMonth = (monthIndex: number) => {
-    setFormData(prev => ({
-      ...prev,
-      availableMonths: prev.availableMonths.includes(monthIndex)
-        ? prev.availableMonths.filter(m => m !== monthIndex)
-        : [...prev.availableMonths, monthIndex].sort((a, b) => a - b)
-    }));
-  };
-
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <Link
-          href="/admin/ingredients"
-          className="text-blue-600 hover:text-blue-700 text-sm mb-2 inline-block"
-        >
-          ← Back to Ingredients
-        </Link>
-        <h1 className="text-3xl font-semibold text-gray-900">Add Ingredient</h1>
-        <p className="text-gray-600 mt-1">Create a new ingredient with provenance details</p>
-      </div>
+    <EditPageLayout
+      title="New Ingredient"
+      backHref="/admin/ingredients"
+      backLabel="Back to Ingredients"
+      onSave={handleSave}
+      onCancel={() => router.push('/admin/ingredients')}
+      saving={saving}
+      maxWidth="7xl"
+    >
+      <div className="grid grid-cols-3 gap-6">
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <Input
-            label="Name"
-            type="text"
-            isRequired
-            value={formData.name}
-            onChange={(value) => setFormData({ ...formData, name: value })}
-            placeholder="e.g., Blood Orange"
-          />
+        {/* ── Left: main form ── */}
+        <div className="col-span-2 space-y-5">
 
-          <Input
-            label="Latin Name"
-            type="text"
-            value={formData.latinName}
-            onChange={(value) => setFormData({ ...formData, latinName: value })}
-            placeholder="e.g., Citrus × sinensis"
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Origin"
-              type="text"
-              isRequired
-              value={formData.origin}
-              onChange={(value) => setFormData({ ...formData, origin: value })}
-              placeholder="e.g., Sicily"
+          <SectionCard title="Basics" description="Name, category, and origin." action={
+            <AiAutofillButton
+              name={formData.name}
+              latinName={formData.latinName}
+              origin={formData.origin}
+              onResult={handleAutofill}
             />
-
-            <TaxonomySelect
-              category="ingredientCategories"
-              value={formData.taxonomyCategory}
-              onChange={(value) => setFormData({ ...formData, taxonomyCategory: value })}
-              label="Primary Category"
-              required
-            />
-          </div>
-
-          {/* Usage Roles */}
-          <TaxonomyTagSelect
-            category="ingredientRoles"
-            values={formData.roles}
-            onChange={(values) => setFormData({ ...formData, roles: values })}
-            label="Usage Roles"
-            description="Select all applicable usage roles"
-          />
-
-          {/* Descriptor Tags */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Descriptor Tags (optional)
-            </label>
-            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg">
-              {ingredientDescriptorTags.map((descriptor) => (
-                <button
-                  key={descriptor}
-                  type="button"
-                  onClick={() => toggleDescriptor(descriptor)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    formData.descriptors.includes(descriptor)
-                      ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
-                      : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
-                  }`}
-                >
-                  {descriptor}
-                </button>
-              ))}
+          }>
+            <Input label="Name" type="text" isRequired value={formData.name} onChange={(v) => set({ name: v })} placeholder="e.g., Blood Orange" />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Origin" type="text" value={formData.origin} onChange={(v) => set({ origin: v })} placeholder="e.g., Sicily" />
+              <TaxonomySelect category="ingredientCategories" value={formData.taxonomyCategory} onChange={(v) => set({ taxonomyCategory: v })} label="Category" />
             </div>
-            <p className="text-sm text-gray-500 mt-1">Add descriptive characteristics</p>
-          </div>
+            <Input label="Latin Name" type="text" value={formData.latinName} onChange={(v) => set({ latinName: v })} placeholder="e.g., Citrus × sinensis" />
+          </SectionCard>
 
-          {/* Description */}
-          <Textarea
-            label="Description"
-            value={formData.description}
-            onChange={(value) => setFormData({ ...formData, description: value })}
-            rows={3}
-            placeholder="Brief description of this ingredient..."
-          />
+          <SectionCard title="Story & Provenance" description="Editorial context for this ingredient.">
+            <Textarea label="Description" value={formData.description} onChange={(v) => set({ description: v })} rows={2} placeholder="One-line description..." />
+            <Textarea label="Story & Provenance" value={formData.story} onChange={(v) => set({ story: v })} rows={5} placeholder="Where does it come from? Who grows it? Why does it matter?" />
+          </SectionCard>
 
-          {/* Story */}
-          <Textarea
-            label="Story & Provenance"
-            value={formData.story}
-            onChange={(value) => setFormData({ ...formData, story: value })}
-            rows={4}
-            placeholder="Tell the story of this ingredient..."
-          />
-
-          {/* Tasting Notes */}
-          <Input
-            label="Tasting Notes"
-            type="text"
-            value={formData.tastingNotes}
-            onChange={(value) => setFormData({ ...formData, tastingNotes: value })}
-            placeholder="citrus, floral, bittersweet (comma separated)"
-            helperText="Separate multiple notes with commas"
-          />
-
-          {/* Sourcing */}
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Supplier"
-              type="text"
-              value={formData.supplier}
-              onChange={(value) => setFormData({ ...formData, supplier: value })}
+          <SectionCard title="Sensory & Culinary Profile" description="How this ingredient is perceived and prepared." collapsible defaultOpen={false} forceOpen={allOpen}>
+            <TaxonomyTagPicker
+              category="tastingNotes"
+              label="Tasting Notes"
+              description="How this ingredient is perceived on the palate"
+              values={formData.tastingNotes}
+              onChange={(v) => set({ tastingNotes: v })}
             />
-
-            <Input
-              label="Farm"
-              type="text"
-              value={formData.farm}
-              onChange={(value) => setFormData({ ...formData, farm: value })}
+            <TaxonomyTagPicker
+              category="ingredientTextures"
+              label="Texture"
+              description="Mouthfeel contribution"
+              values={formData.texture}
+              onChange={(v) => set({ texture: v })}
             />
-          </div>
+            <TaxonomyTagPicker
+              category="ingredientProcesses"
+              label="Process / Preparation"
+              description="How this ingredient is transformed before use"
+              values={formData.process}
+              onChange={(v) => set({ process: v })}
+            />
+            <TaxonomyTagPicker
+              category="ingredientAttributes"
+              label="Attributes"
+              description="Provenance and dietary characteristics"
+              values={formData.attributes}
+              onChange={(v) => set({ attributes: v })}
+            />
+          </SectionCard>
 
-          {/* Allergens */}
-          <TaxonomyTagSelect
-            category="allergens"
-            values={formData.allergens}
-            onChange={(values) => setFormData({ ...formData, allergens: values })}
-            label="Allergens"
-          />
-
-          {/* Dietary Facts */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Dietary Facts</p>
-            <div className="space-y-2">
-              <Checkbox
-                isSelected={formData.animalDerived}
-                onChange={(v) => setFormData({ ...formData, animalDerived: v })}
-                label="Contains animal-derived ingredients"
-              />
-              <Checkbox
-                isSelected={formData.vegetarian}
-                onChange={(v) => setFormData({ ...formData, vegetarian: v })}
-                label="Suitable for vegetarians"
-              />
+          <SectionCard title="Sourcing" description="Where this ingredient comes from." collapsible defaultOpen={false} forceOpen={allOpen}>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Source Name" type="text" value={formData.sourceName} onChange={(v) => set({ sourceName: v })} placeholder="e.g., Ferme Cadet-Roussel" />
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-1.5">Source Type</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {ingredientSourceTypeOptions.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => set({ sourceType: formData.sourceType === t ? '' : t })}
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
+                        formData.sourceType === t
+                          ? 'bg-gray-900 text-white border-gray-900'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              Dietary claims (vegan, dairy-free, etc.) are computed automatically from these facts
-            </p>
-          </div>
+          </SectionCard>
 
-          {/* Seasonal */}
-          <Checkbox
-            isSelected={formData.seasonal}
-            onChange={(v) => setFormData({ ...formData, seasonal: v })}
-            label="Seasonal Ingredient"
-          />
+          <SectionCard title="Usage" description="How this ingredient is used in a recipe." collapsible defaultOpen={false} forceOpen={allOpen}>
+            <TaxonomyTagSelect
+              category="ingredientUsedAs"
+              values={formData.usedAs}
+              onChange={(v) => set({ usedAs: v })}
+              label="Used As"
+            />
+          </SectionCard>
 
-          {formData.seasonal && (
+          <SectionCard title="Operational" description="Allergens and seasonal availability." collapsible defaultOpen={false} forceOpen={allOpen}>
+            <TaxonomyTagSelect
+              category="allergens"
+              values={formData.allergens}
+              onChange={(v) => set({ allergens: v })}
+              label="Allergens"
+              allowCreate={false}
+            />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Available Months
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {months.map((month, index) => (
+              <p className="text-sm font-medium text-gray-900 mb-1">Season</p>
+              <p className="text-xs text-gray-500 mb-2">Leave empty if available year-round</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {MONTHS.map((m, i) => (
                   <button
-                    key={month}
+                    key={m}
                     type="button"
-                    onClick={() => toggleMonth(index)}
-                    className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                      formData.availableMonths.includes(index)
-                        ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                        : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                    onClick={() => toggleMonth(i)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
+                      formData.availableMonths.includes(i)
+                        ? 'bg-gray-900 text-white border-gray-900'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                     }`}
                   >
-                    {month}
+                    {m}
                   </button>
                 ))}
               </div>
             </div>
-          )}
+          </SectionCard>
 
-          {/* Organic */}
-          <Checkbox
-            isSelected={formData.isOrganic}
-            onChange={(v) => setFormData({ ...formData, isOrganic: v })}
-            label="Organic"
-          />
-
-          {/* Image Upload */}
-          <ImageUploader
-            value={formData.image}
-            onChange={(url: string) => setFormData({ ...formData, image: url })}
-            altText={formData.imageAlt}
-            onAltTextChange={(alt: string) => setFormData({ ...formData, imageAlt: alt })}
-            aspectRatio="1:1"
-            label="Ingredient Image"
-            required={false}
-          />
         </div>
 
-        <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
-          <Button
-            type="submit"
-            variant="primary"
-            isLoading={loading}
-            isDisabled={loading}
-            className="flex-1"
-          >
-            {loading ? 'Creating...' : 'Create Ingredient'}
-          </Button>
-          <Link
-            href="/admin/ingredients"
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </Link>
+        {/* ── Right rail ── */}
+        <div className="col-span-1">
+          <SectionCard title="Image" description="Upload a photo of this ingredient.">
+            <ImageUploader
+              value={formData.image}
+              onChange={(url: string) => set({ image: url })}
+              altText={formData.imageAlt}
+              onAltTextChange={(alt: string) => set({ imageAlt: alt })}
+              aspectRatio="1:1"
+              label="Ingredient Image"
+              required={false}
+            />
+          </SectionCard>
         </div>
-      </form>
-    </div>
+
+      </div>
+    </EditPageLayout>
   );
 }

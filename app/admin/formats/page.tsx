@@ -127,7 +127,11 @@ export default function FormatsPage() {
                     <Badge color={CATEGORY_COLOR[format.category] ?? 'gray'} size="sm">{format.category}</Badge>
                   </td>
                   <td className="px-6 py-3">
-                    <Badge color={SERVING_COLOR[format.servingStyle] ?? 'gray'} size="sm">{format.servingStyle}</Badge>
+                    <div className="flex gap-1 flex-wrap">
+                      {(format.servingStyles || (format.servingStyle ? [format.servingStyle] : [])).map((s: string) => (
+                        <Badge key={s} color={SERVING_COLOR[s] ?? 'gray'} size="sm">{s}</Badge>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-6 py-3">
                     {!format.requiresFlavours ? (

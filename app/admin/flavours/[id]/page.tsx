@@ -6,6 +6,7 @@ import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientS
 import FlavourUsagePanel from '@/app/admin/components/FlavourUsagePanel';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
+import TaxonomyTagPicker from '@/app/admin/components/TaxonomyTagPicker';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import type { Flavour, FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 import { Input } from '@/app/admin/components/ui/input';
@@ -161,13 +162,12 @@ export default function EditFlavourPage() {
                 <p className="text-sm text-gray-500 mt-0.5">Flavour tags and optional prose notes.</p>
               </div>
               <div className="px-6 py-6 space-y-5">
-                <TaxonomyTagSelect
+                <TaxonomyTagPicker
                   category="keyNotes"
                   values={formData.keyNotes || []}
                   onChange={(values) => setFormData({ ...formData, keyNotes: values })}
                   label="Tags"
                   description="e.g. smoky, sweet, floral, summer"
-                  allowCreate={true}
                 />
                 <Textarea
                   label="Notes"

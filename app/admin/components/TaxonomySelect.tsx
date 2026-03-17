@@ -10,11 +10,14 @@ export type TaxonomyCategory =
   | 'ingredientCategories'
   | 'ingredientRoles'
   | 'tastingNotes'
+  | 'ingredientTextures'
+  | 'ingredientProcesses'
+  | 'ingredientAttributes'
+  | 'ingredientUsedAs'
   | 'formatCategories'
   | 'servingStyles'
   | 'modifierTypes'
   | 'allergens'
-  | 'contentBlockTypes'
   | 'storyCategories'
   | 'storyTags';
 

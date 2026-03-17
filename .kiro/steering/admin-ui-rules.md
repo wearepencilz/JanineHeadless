@@ -67,3 +67,11 @@ Only build custom components if no suitable Untitled UI component exists.
 - Unauthenticated users redirect to `/admin/login`
 - Session via NextAuth JWT
 - Default credentials: `admin / admin123` (change in production)
+
+## Protected Files — Do Not Revert
+
+The following files have been intentionally redesigned and must not be reverted to previous versions:
+
+- `app/admin/taxonomies/page.tsx` — sidebar-based layout with grouped categories (Ingredients, Flavours, Formats & Modifiers, Launches, Stories). Do not replace with the tab-based layout from `app/admin/settings/taxonomies/page.tsx`.
+- `app/admin/ingredients/[id]/page.tsx` — sectioned layout (Basics, Story & Provenance, Sensory & Culinary Profile, Sourcing, Usage, Operational). Do not revert to the single-card form.
+- `app/admin/ingredients/create/page.tsx` — mirrors the edit page section structure above.

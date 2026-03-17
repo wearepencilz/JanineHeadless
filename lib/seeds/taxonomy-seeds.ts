@@ -115,14 +115,6 @@ export const allergensSeed = [
   { value: "soy", label: "Soy" }
 ];
 
-// Content Block Types
-export const contentBlockTypesSeed = [
-  { value: "hero", label: "Hero", description: "Large hero image/video section" },
-  { value: "text", label: "Text", description: "Text content block" },
-  { value: "image-gallery", label: "Image Gallery", description: "Multiple images in a gallery" },
-  { value: "product-showcase", label: "Product Showcase", description: "Featured products section" }
-];
-
 /**
  * Helper function to convert seed array to taxonomy format
  * 
