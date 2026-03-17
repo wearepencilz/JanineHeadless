@@ -18,22 +18,18 @@ const variantConfig = {
   success: {
     icon: CheckCircle,
     iconColor: 'text-success-600',
-    accent: 'border-l-success-500',
   },
   error: {
     icon: AlertCircle,
     iconColor: 'text-error-600',
-    accent: 'border-l-error-500',
   },
   warning: {
     icon: AlertTriangle,
     iconColor: 'text-warning-500',
-    accent: 'border-l-warning-400',
   },
   info: {
     icon: InfoCircle,
     iconColor: 'text-primary-600',
-    accent: 'border-l-primary-500',
   },
 };
 
@@ -60,7 +56,7 @@ export default function Toast({
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
-      className={`bg-white border border-gray-200 border-l-4 ${config.accent} rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}
+      className={`bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-0.5">
