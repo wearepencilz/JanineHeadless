@@ -18,7 +18,7 @@
   },
   "about": {
     "bg": "#948c22",
-    "text": "<p>Handcraft soft serve mediterranean gelato, made with the heart and honesty.</p><p>Local supplier and a research of insane flavour, so everyone can find a piece of their happy memory in each icy creation.</p>",
+    "text": "<p>Handcrafted soft-serve Mediterranean gelato, made with heart and honesty.</p><p>We work with local producers and chase remarkable flavours so that every creation carries a memory. Each swirl is meant to bring back a small moment of happiness, something familiar and comforting in a frozen form.</p>",
     "image": "/uploads/1773635788718-image-171.jpg"
   },
   "home": {
@@ -29,15 +29,15 @@
     },
     "editorial": [
       {
-        "text": "<p>For our inspiration our chef kept her habit from the south to go directly to the market to source the best flavours of perfectly ripped season fruits.</p><p>The fruits are the main character in the creation process and we pair the fruit sorbet with a creamy jersey cow milk based gelato infused with spices or native herbs that will marry perfectly and balanced the acidity or the overly sweet power of fruit.</p>",
+        "text": "<p>Our inspiration begins at the market. Following a tradition our chef learned in the south, we start with perfectly ripe seasonal fruit and build every flavour from there. </p><p>Fruit is always the main character. Each sorbet is paired with a creamy Jersey milk gelato, gently infused with spices or native herbs chosen to complement the fruit. The result is a balance where acidity, sweetness, and aromatics meet in harmony.</p>",
         "image": "/uploads/1773636969137-frame-127.png"
       },
       {
-        "text": "<p>Our jersey milk comes from MC dairy, a coop from small farmer that provide a great environment for cow, that spend their summer in pasture for incredible product with ethical animal care value.</p><p>An Ontario-based producer, offers \"Naturally Golden Yolks\" eggs from free-run hens fed a diet containing marigold petals, which are rich in lutein for eye health.</p>",
+        "text": "<p>Our gelato base is made with Jersey cow milk from MC Dairy, a cooperative of small farmers committed to responsible agriculture. Their cows spend the summer grazing in open pasture, producing rich milk while maintaining strong standards for animal care. </p><p>Our eggs come from an Ontario producer known for their naturally golden yolks, laid by free-run hens fed a marigold-rich diet that enhances both colour and nutritional value.</p>",
         "image": "/uploads/1773636975659-frame-128.png"
       },
       {
-        "text": "<p>All our supplier are selected for their locality (when season allowed) and that care about the product and the well being of the planet and animal.</p><p>Our main supplier is mediserre, a small Montreal base supplier on the rise created by two chef, Andrew and Olivier that provide the best product from small Canadian producer.</p>",
+        "text": "<p>Whenever possible, we source ingredients locally and choose partners who care deeply about the land, their animals, and the quality of what they grow. </p><p>One of our main suppliers is Médiserre, a Montreal-based distributor founded by chefs Andrew and Olivier. They work closely with small Canadian producers to bring exceptional ingredients to kitchens that value seasonality, transparency, and flavour.</p>",
         "image": "/uploads/1773636982745-frame-129.png"
       }
     ],

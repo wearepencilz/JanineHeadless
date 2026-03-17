@@ -15,6 +15,7 @@ import {
     LayersThree01,
     Sliders01,
     Announcement01,
+    BookOpen01,
     Dice1,
     Settings01,
     Tag01,
@@ -48,7 +49,7 @@ const sections: NavSectionType[] = [
         label: 'Content',
         items: [
             { label: 'Pages', href: '/admin/pages', icon: Announcement01 },
-            { label: 'News', href: '/admin/news', icon: Announcement01 },
+            { label: 'Stories', href: '/admin/stories', icon: BookOpen01 },
             { label: 'Games', href: '/admin/games', icon: Dice1 },
         ],
     },
