@@ -8,6 +8,7 @@ import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
 import type { FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 import { Button } from '@/app/admin/components/ui/button';
+import { useToast } from '@/app/admin/components/ToastContainer';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
@@ -15,6 +16,7 @@ import { Checkbox } from '@/app/admin/components/ui/checkbox';
 
 export default function CreateFlavourPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -51,11 +53,11 @@ export default function CreateFlavourPage() {
         router.push('/admin/flavours');
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to create flavour');
+        toast.error(error.error || 'Failed to create flavour');
       }
     } catch (error) {
       console.error('Error creating flavour:', error);
-      alert('Failed to create flavour');
+      toast.error('Failed to create flavour');
     } finally {
       setLoading(false);
     }

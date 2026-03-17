@@ -9,6 +9,7 @@ import { Textarea } from '@/app/admin/components/ui/textarea';
 import { Select } from '@/app/admin/components/ui/select';
 import { DatePicker } from '@/app/admin/components/ui/date-picker/date-picker';
 import { parseDate } from '@internationalized/date';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface Flavour {
   id: string;
@@ -17,6 +18,7 @@ interface Flavour {
 
 export default function CreateBatchPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [flavours, setFlavours] = useState<Flavour[]>([]);
   const [formData, setFormData] = useState({
@@ -57,11 +59,11 @@ export default function CreateBatchPage() {
       if (res.ok) {
         router.push('/admin/batches');
       } else {
-        alert('Error creating batch');
+        toast.error('Error creating batch');
       }
     } catch (error) {
       console.error('Error creating batch:', error);
-      alert('Error creating batch');
+      toast.error('Error creating batch');
     } finally {
       setLoading(false);
     }

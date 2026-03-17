@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/admin/components/ui/button';
 import RichTextEditor from '@/app/admin/components/RichTextEditor';
+import { useToast } from '@/app/admin/components/ToastContainer';
 import Link from 'next/link';
 
 const SECTIONS = [
@@ -27,6 +28,7 @@ const defaultEditorial: EditorialColumn[] = [
 const defaultPhotos: PhotosSettings = { photo1: '', photo2: '' };
 
 export default function HomePageAdmin() {
+  const toast = useToast();
   const [activeSection, setActiveSection] = useState('about');
   const [about, setAbout] = useState<AboutSettings>(defaultAbout);
   const [story, setStory] = useState<StorySettings>(defaultStory);
@@ -60,9 +62,10 @@ export default function HomePageAdmin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...current, ...patch }),
       });
-      if (!res.ok) alert('Failed to save');
+      if (!res.ok) toast.error('Failed to save');
+      else toast.success('Saved');
     } catch {
-      alert('Failed to save');
+      toast.error('Failed to save');
     } finally {
       setSaving(false);
     }
@@ -80,9 +83,9 @@ export default function HomePageAdmin() {
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.url) onSuccess(data.url);
-      else alert('Upload failed');
+      else toast.error('Upload failed');
     } catch {
-      alert('Upload failed');
+      toast.error('Upload failed');
     } finally {
       setUploading(false);
     }

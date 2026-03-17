@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import { Textarea } from '@/app/admin/components/ui/textarea';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface PageContent {
   title?: string;
@@ -16,6 +17,7 @@ export default function PageEditPage() {
   const router = useRouter();
   const params = useParams();
   const pageName = params?.pageName as string;
+  const toast = useToast();
 
   const [formData, setFormData] = useState<PageContent>({
     title: '',
@@ -52,13 +54,13 @@ export default function PageEditPage() {
       });
 
       if (res.ok) {
-        alert('Page saved successfully');
+        toast.success('Page saved', `${pageName} page has been updated`);
       } else {
-        alert('Failed to save page');
+        toast.error('Failed to save page');
       }
     } catch (error) {
       console.error('Failed to save:', error);
-      alert('Failed to save page');
+      toast.error('Failed to save page');
     } finally {
       setSaving(false);
     }

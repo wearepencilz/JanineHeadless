@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/app/admin/components/ui/button';
 import { Input } from '@/app/admin/components/ui/input';
 import RichTextEditor from '@/app/admin/components/RichTextEditor';
+import { useToast } from '@/app/admin/components/ToastContainer';
 
 interface FooterSettings {
   address: string;
@@ -31,6 +32,7 @@ const defaultFooter: FooterSettings = {
 };
 
 export default function SettingsPage() {
+  const toast = useToast();
   const [formData, setFormData] = useState<Settings>({
     logo: '',
     email: '',
@@ -75,9 +77,9 @@ export default function SettingsPage() {
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.url) onSuccess(data.url);
-      else alert('Upload failed');
+      else toast.error('Upload failed');
     } catch {
-      alert('Upload failed');
+      toast.error('Upload failed');
     } finally {
       setBusy(false);
     }
@@ -93,10 +95,10 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...current, ...formData }),
       });
-      if (res.ok) alert('Settings saved');
-      else alert('Failed to save settings');
+      if (res.ok) toast.success('Settings saved');
+      else toast.error('Failed to save settings');
     } catch {
-      alert('Failed to save settings');
+      toast.error('Failed to save settings');
     } finally {
       setSaving(false);
     }
