@@ -17,27 +17,23 @@ interface ToastProps {
 const variantConfig = {
   success: {
     icon: CheckCircle,
-    iconColor: 'text-success-primary',
-    bg: 'bg-success-secondary',
-    border: 'border-success-primary/20',
+    iconColor: 'text-success-600',
+    accent: 'border-l-success-500',
   },
   error: {
     icon: AlertCircle,
-    iconColor: 'text-error-primary',
-    bg: 'bg-error-secondary',
-    border: 'border-error-primary/20',
+    iconColor: 'text-error-600',
+    accent: 'border-l-error-500',
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: 'text-warning-primary',
-    bg: 'bg-warning-secondary',
-    border: 'border-warning-primary/20',
+    iconColor: 'text-warning-500',
+    accent: 'border-l-warning-400',
   },
   info: {
     icon: InfoCircle,
-    iconColor: 'text-primary',
-    bg: 'bg-primary-secondary',
-    border: 'border-primary/20',
+    iconColor: 'text-primary-600',
+    accent: 'border-l-primary-500',
   },
 };
 
@@ -54,10 +50,7 @@ export default function Toast({
 
   useEffect(() => {
     if (duration > 0) {
-      const timer = setTimeout(() => {
-        onClose(id);
-      }, duration);
-
+      const timer = setTimeout(() => onClose(id), duration);
       return () => clearTimeout(timer);
     }
   }, [id, duration, onClose]);
@@ -67,21 +60,22 @@ export default function Toast({
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
-      className={`${config.bg} ${config.border} border rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}
+      className={`bg-white border border-gray-200 border-l-4 ${config.accent} rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}
     >
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-0.5">
           <Icon className={`w-5 h-5 ${config.iconColor}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900">{title}</p>
+          <p className="text-sm font-semibold text-gray-900">{title}</p>
           {message && (
-            <p className="mt-1 text-sm text-gray-600">{message}</p>
+            <p className="mt-0.5 text-sm text-gray-600">{message}</p>
           )}
         </div>
         <button
           onClick={() => onClose(id)}
-          className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="Dismiss"
+          className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors -mt-0.5 -mr-0.5"
         >
           <X className="w-4 h-4" />
         </button>
