@@ -128,7 +128,7 @@ export default function FormatsPage() {
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex gap-1 flex-wrap">
-                      {(format.servingStyles || (format.servingStyle ? [format.servingStyle] : [])).map((s: string) => (
+                      {(format.servingStyles || []).map((s: string) => (
                         <Badge key={s} color={SERVING_COLOR[s] ?? 'gray'} size="sm">{s}</Badge>
                       ))}
                     </div>

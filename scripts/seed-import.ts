@@ -223,7 +223,7 @@ function mapFormat(legacy: LegacyFormat): Format {
     allowMixedTypes: legacy.itemCategory === 'Twist',
     canIncludeAddOns: legacy.allowsOptionalAddOns,
     defaultSizes: ['regular'],
-    servingStyle: inferServingStyle(legacy),
+    servingStyles: [inferServingStyle(legacy)].filter(Boolean),
     createdAt: now,
     updatedAt: now,
   } as Format;
