@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { Format, FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
+import TaxonomyTagPicker from '@/app/admin/components/TaxonomyTagPicker';
 import EditPageLayout from '@/app/admin/components/EditPageLayout';
 import { useToast } from '@/app/admin/components/ToastContainer';
 import ConfirmModal from '@/app/admin/components/ConfirmModal';
@@ -161,12 +162,11 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                     label="Category"
                     required
                   />
-                  <TaxonomySelect
+                  <TaxonomyTagPicker
                     category="servingStyles"
-                    value={format.servingStyle}
-                    onChange={(v) => setFormat({ ...format, servingStyle: v as ServingStyle })}
+                    values={format.servingStyles || []}
+                    onChange={(v) => setFormat({ ...format, servingStyles: v as ServingStyle[] })}
                     label="Serving style"
-                    required
                   />
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
                         onChange={(v) => setFormat({ ...format, maxFlavours: parseInt(v) })}
                       />
                     </div>
-                    <TaxonomyTagSelect
+                    <TaxonomyTagPicker
                       category="flavourTypes"
                       values={format.eligibleFlavourTypes || []}
                       onChange={(values) => setFormat({ ...format, eligibleFlavourTypes: values })}
@@ -234,7 +234,11 @@ export default function EditFormatPage({ params }: { params: { id: string } }) {
               <div className="px-6 py-5 space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Serving style</span>
-                  <Badge color="gray" size="sm">{format.servingStyle}</Badge>
+                  <div className="flex gap-1 flex-wrap justify-end">
+                    {(format.servingStyles || []).map((s) => (
+                      <Badge key={s} color="gray" size="sm">{s}</Badge>
+                    ))}
+                  </div>
                 </div>
                 {format.requiresFlavours && (
                   <div className="flex items-center justify-between text-sm">

@@ -83,9 +83,48 @@ export const ingredientDescriptorTags = [
   "Creamy"
 ] as const;
 
+export const ingredientTastingNoteOptions = [
+  "Sweet", "Floral", "Acidic", "Bitter", "Salty", "Umami",
+  "Fruity", "Citrus", "Herbal", "Earthy", "Smoky", "Spicy",
+  "Nutty", "Caramel", "Vanilla", "Chocolate", "Tropical", "Stone Fruit",
+  "Berry", "Vegetal", "Fermented", "Creamy", "Fresh", "Bright",
+] as const;
+
+export const ingredientTextureOptions = [
+  "Creamy", "Icy", "Crunchy", "Silky", "Chewy", "Smooth",
+  "Grainy", "Airy", "Dense", "Liquid", "Gel", "Crisp",
+] as const;
+
+export const ingredientProcessOptions = [
+  "Raw", "Roasted", "Toasted", "Grilled", "Infused", "Fermented",
+  "Candied", "Caramelized", "Dried", "Freeze-dried", "Smoked",
+  "Pickled", "Compressed", "Extracted", "Reduced", "Browned",
+] as const;
+
+export const ingredientAttributeOptions = [
+  "Local", "Imported", "Seasonal", "Foraged", "Organic",
+  "Biodynamic", "Fair Trade", "Wild", "Heritage Variety",
+  "Animal-Derived", "Vegan", "Vegetarian",
+] as const;
+
+export const ingredientUsedAsOptions = [
+  "Base", "Accent", "Infusion", "Garnish", "Swirl",
+  "Mix-in", "Topping", "Coating", "Filling", "Pairing",
+] as const;
+
+export const ingredientSourceTypeOptions = [
+  "Farm", "Distributor", "Producer", "Cooperative", "Market", "Forager", "Direct Import",
+] as const;
+
 export type IngredientCategory = typeof ingredientCategoryOptions[number];
 export type IngredientRole = typeof ingredientRoleOptions[number];
 export type IngredientDescriptor = typeof ingredientDescriptorTags[number];
+export type IngredientTastingNote = typeof ingredientTastingNoteOptions[number];
+export type IngredientTexture = typeof ingredientTextureOptions[number];
+export type IngredientProcess = typeof ingredientProcessOptions[number];
+export type IngredientAttribute = typeof ingredientAttributeOptions[number];
+export type IngredientUsedAs = typeof ingredientUsedAsOptions[number];
+export type IngredientSourceType = typeof ingredientSourceTypeOptions[number];
 
 export type Allergen = 
   | 'dairy' 
@@ -257,7 +296,7 @@ export interface Format {
   // Configuration
   canIncludeAddOns: boolean;     // Supports toppings/add-ons?
   defaultSizes: string[];        // e.g., ["small", "medium", "large"]
-  servingStyle: ServingStyle;    // How it's served
+  servingStyles: ServingStyle[];  // How it's served (multi-select)
   
   // Display
   image?: string;                // Format image URL

@@ -25,8 +25,11 @@ interface TaxonomyCategory {
 const TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
   // Ingredients
   { key: 'ingredientCategories', label: 'Categories', description: 'Categories for ingredient classification', group: 'Ingredients' },
-  { key: 'ingredientRoles', label: 'Roles', description: 'How ingredients are used in flavours', group: 'Ingredients' },
   { key: 'tastingNotes', label: 'Tasting Notes', description: 'Common tasting note descriptors', group: 'Ingredients' },
+  { key: 'ingredientTextures', label: 'Textures', description: 'Mouthfeel and texture descriptors', group: 'Ingredients' },
+  { key: 'ingredientProcesses', label: 'Process / Preparation', description: 'How ingredients are transformed before use', group: 'Ingredients' },
+  { key: 'ingredientAttributes', label: 'Attributes', description: 'Provenance and dietary characteristics', group: 'Ingredients' },
+  { key: 'ingredientUsedAs', label: 'Used As', description: 'How an ingredient is used in a recipe', group: 'Ingredients' },
   { key: 'allergens', label: 'Allergens', description: 'Common allergen tags', group: 'Ingredients' },
   // Flavours
   { key: 'flavourTypes', label: 'Types', description: 'Types of flavours (determines format eligibility)', group: 'Flavours' },
@@ -35,14 +38,12 @@ const TAXONOMY_CATEGORIES: TaxonomyCategory[] = [
   { key: 'formatCategories', label: 'Format Categories', description: 'Categories for product formats', group: 'Formats & Modifiers' },
   { key: 'servingStyles', label: 'Serving Styles', description: 'How formats are served', group: 'Formats & Modifiers' },
   { key: 'modifierTypes', label: 'Modifier Types', description: 'Types of modifiers (toppings, sauces, etc.)', group: 'Formats & Modifiers' },
-  // Launches
-  { key: 'contentBlockTypes', label: 'Content Block Types', description: 'Types of content blocks for launches', group: 'Launches' },
   // Stories
   { key: 'storyCategories', label: 'Categories', description: 'Story sections — The Lab, Flavour Notes, Core Idea, etc.', group: 'Stories' },
   { key: 'storyTags', label: 'Tags', description: 'Ingredient, place, theme, and season tags for stories', group: 'Stories' },
 ];
 
-const GROUPS = ['Ingredients', 'Flavours', 'Formats & Modifiers', 'Launches', 'Stories'];
+const GROUPS = ['Ingredients', 'Flavours', 'Formats & Modifiers', 'Stories'];
 
 export default function TaxonomiesPage() {
   const searchParams = useSearchParams();

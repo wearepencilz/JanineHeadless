@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { FormatCategory, ServingStyle } from '@/types';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
-import { Select } from '@/app/admin/components/ui/select';
+import TaxonomyTagPicker from '@/app/admin/components/TaxonomyTagPicker';
 import { Checkbox } from '@/app/admin/components/ui/checkbox';
 import { useToast } from '@/app/admin/components/ToastContainer';
 
@@ -23,14 +23,13 @@ export default function CreateFormatPage() {
     maxFlavours: 1,
     canIncludeAddOns: false,
     defaultSizes: [] as string[],
-    servingStyle: 'scoop' as ServingStyle,
+    servingStyles: [] as ServingStyle[],
     menuSection: '',
     image: '',
     icon: '',
   });
 
   const categories: FormatCategory[] = ['frozen', 'food', 'experience', 'bundle'];
-  const servingStyles: ServingStyle[] = ['scoop', 'soft-serve', 'packaged', 'plated'];
 
   const handleNameChange = (name: string) => {
     setFormData(prev => ({
@@ -118,19 +117,12 @@ export default function CreateFormatPage() {
               label="Category"
               required
             />
-
-            <div>
-              <Select
-                label="Serving Style *"
-                isRequired
-                value={formData.servingStyle}
-                onChange={(value) => setFormData({ ...formData, servingStyle: value as ServingStyle })}
-                options={servingStyles.map((style) => ({
-                  id: style,
-                  label: style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-                }))}
-              />
-            </div>
+            <TaxonomyTagPicker
+              category="servingStyles"
+              values={formData.servingStyles}
+              onChange={(values) => setFormData({ ...formData, servingStyles: values as ServingStyle[] })}
+              label="Serving Style"
+            />
           </div>
 
           <div>

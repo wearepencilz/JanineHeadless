@@ -57,7 +57,7 @@ export default function FormatSelector({ formats, selectedFormat, onSelect }: Fo
 
               <div className="flex items-center">
                 <span className="font-medium mr-2">Serving:</span>
-                <span>{format.servingStyle}</span>
+                <span>{(format.servingStyles || (format.servingStyle ? [format.servingStyle] : [])).join(', ')}</span>
               </div>
 
               {format.canIncludeAddOns && (

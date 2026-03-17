@@ -75,13 +75,32 @@
     "seasonal": false,
     "description": "Butter cooked until nutty and aromatic.",
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T17:23:07.081Z",
+    "updatedAt": "2026-03-17T18:35:56.426Z",
     "tastingNotes": [],
     "availableMonths": [],
     "imageAlt": "",
     "animalDerived": true,
     "vegetarian": true,
-    "taxonomyCategory": "dairy-bases"
+    "taxonomyCategory": "dairy-bases",
+    "latinName": "N/A",
+    "story": "Browned butter has its roots in French cuisine, often used to enhance the flavor of pastries and sauces. Artisan producers focus on the careful cooking process to develop its complex flavor profile, making it a prized ingredient in high-quality desserts.",
+    "texture": [
+      "creamy",
+      "smooth"
+    ],
+    "process": [
+      "browned"
+    ],
+    "attributes": [
+      "local",
+      "organic"
+    ],
+    "usedAs": [
+      "Supporting Flavour"
+    ],
+    "sourceName": "",
+    "sourceType": "",
+    "image": ""
   },
   {
     "id": "garden-tomato-mix",
@@ -201,8 +220,42 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z",
-    "taxonomyCategory": "fruits-vegetables"
+    "updatedAt": "2026-03-17T18:36:11.093Z",
+    "taxonomyCategory": "fruits-vegetables",
+    "latinName": "Citrullus lanatus",
+    "description": "Red watermelon is a juicy, sweet fruit known for its refreshing flavor and vibrant color.",
+    "story": "Watermelon has been cultivated for thousands of years, with origins tracing back to Africa. Today, it is grown in various regions, particularly in the United States, where farmers prioritize sustainable practices to enhance flavor and quality. Its importance in artisan food lies in its ability to evoke summer and provide a natural sweetness in desserts.",
+    "tastingNotes": [
+      "tropical"
+    ],
+    "texture": [
+      "icy",
+      "smooth"
+    ],
+    "process": [
+      "raw",
+      "extracted"
+    ],
+    "attributes": [
+      "local",
+      "seasonal",
+      "organic"
+    ],
+    "usedAs": [
+      "Base",
+      "Primary Flavour"
+    ],
+    "sourceName": "",
+    "sourceType": "",
+    "availableMonths": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "animalDerived": false,
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "yellow-watermelon",
@@ -221,8 +274,42 @@
     "dietaryFlags": [],
     "seasonal": true,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z",
-    "taxonomyCategory": "fruits-vegetables"
+    "updatedAt": "2026-03-17T18:53:29.750Z",
+    "taxonomyCategory": "fruits-vegetables",
+    "latinName": "Citrullus lanatus",
+    "description": "Yellow watermelon is a sweet and refreshing fruit with a vibrant yellow flesh.",
+    "story": "Yellow watermelon is often grown by small-scale farmers who prioritize sustainable practices. Its unique color and flavor profile make it a sought-after ingredient for artisan ice creams, adding a touch of creativity and seasonal freshness to the menu.",
+    "tastingNotes": [
+      "tropical",
+      "citrus"
+    ],
+    "texture": [
+      "smooth",
+      "icy"
+    ],
+    "process": [
+      "raw"
+    ],
+    "attributes": [
+      "local",
+      "seasonal",
+      "organic"
+    ],
+    "usedAs": [
+      "Base",
+      "Primary Flavour"
+    ],
+    "sourceName": "",
+    "sourceType": "",
+    "availableMonths": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "animalDerived": false,
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "lime",
@@ -241,8 +328,48 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z",
-    "taxonomyCategory": "fruits-vegetables"
+    "updatedAt": "2026-03-17T18:36:36.248Z",
+    "taxonomyCategory": "fruits-vegetables",
+    "latinName": "Citrus aurantiifolia",
+    "description": "Lime is a small, green citrus fruit known for its tart flavor and aromatic zest.",
+    "story": "Limes are primarily grown in tropical and subtropical regions, with Mexico being one of the largest producers. Their bright acidity enhances a variety of dishes and beverages, making them a staple in artisan culinary creations.",
+    "tastingNotes": [
+      "citrus"
+    ],
+    "texture": [
+      "liquid"
+    ],
+    "process": [
+      "raw",
+      "extracted"
+    ],
+    "attributes": [
+      "local",
+      "seasonal",
+      "organic"
+    ],
+    "usedAs": [
+      "Supporting Flavour"
+    ],
+    "sourceName": "",
+    "sourceType": "",
+    "availableMonths": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "animalDerived": false,
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "lemon",
@@ -261,8 +388,42 @@
     "dietaryFlags": [],
     "seasonal": false,
     "createdAt": "2026-03-13T02:44:47.109Z",
-    "updatedAt": "2026-03-13T02:44:47.109Z",
-    "taxonomyCategory": "fruits-vegetables"
+    "updatedAt": "2026-03-17T18:53:42.146Z",
+    "taxonomyCategory": "fruits-vegetables",
+    "latinName": "Citrus limon",
+    "description": "Lemon is a bright, tangy citrus fruit known for its refreshing flavor and versatility in both sweet and savory dishes.",
+    "story": "Lemons are primarily grown in sunny regions, with California being a significant producer. Their vibrant flavor and acidity make them a staple in artisan food, enhancing everything from desserts to dressings.",
+    "tastingNotes": [
+      "citrus"
+    ],
+    "texture": [
+      "liquid"
+    ],
+    "process": [
+      "raw",
+      "extracted"
+    ],
+    "attributes": [
+      "organic",
+      "seasonal"
+    ],
+    "usedAs": [
+      "Supporting Flavour"
+    ],
+    "sourceName": "",
+    "sourceType": "",
+    "availableMonths": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "animalDerived": false,
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "raspberries",

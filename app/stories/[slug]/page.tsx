@@ -2,15 +2,13 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/home/SiteFooter';
+import { getStories as getStoriesFromDB } from '@/lib/db';
 import type { StoryBlock } from '@/app/admin/components/StoryBlockBuilder';
 
 async function getStory(slug: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stories/${slug}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    return res.json();
+    const all = (await getStoriesFromDB()) as any[];
+    return all.find((s) => s.slug === slug || s.id === slug) || null;
   } catch {
     return null;
   }
@@ -18,28 +16,24 @@ async function getStory(slug: string) {
 
 async function getRelatedStories(currentId: string, tags: string[]) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stories`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return [];
-    const all = await res.json();
+    const all = (await getStoriesFromDB()) as any[];
     return all
-      .filter((s: any) => s.id !== currentId && s.status === 'published')
-      .filter((s: any) => s.tags?.some((t: string) => tags.includes(t)))
+      .filter((s) => s.id !== currentId && s.status === 'published')
+      .filter((s) => s.tags?.some((t: string) => tags.includes(t)))
       .slice(0, 3);
   } catch {
     return [];
   }
 }
 
-function renderBlock(block: StoryBlock, i: number) {
+function renderBlock(block: StoryBlock) {
   switch (block.type) {
     case 'text':
       return (
         <div
           key={block.id}
-          className="prose prose-lg max-w-none text-[#333112] leading-[1.8]"
-          style={{ fontFamily: 'var(--font-neue-montreal)' }}
+          className="prose prose-lg max-w-none text-[#333112]/85 leading-[1.85] [&_p]:mb-5 [&_p:last-child]:mb-0 [&_strong]:text-[#333112] [&_strong]:font-semibold"
+          style={{ fontFamily: 'var(--font-neue-montreal)', fontSize: '17px' }}
           dangerouslySetInnerHTML={{ __html: block.content || '' }}
         />
       );
@@ -49,15 +43,15 @@ function renderBlock(block: StoryBlock, i: number) {
       if (!img?.url) return null;
       const isFullBleed = block.layout === 'full-bleed';
       return (
-        <figure key={block.id} className={isFullBleed ? '-mx-4 md:-mx-8' : ''}>
+        <figure key={block.id} className={isFullBleed ? '-mx-4 md:-mx-[calc((100vw-672px)/2+32px)]' : ''}>
           <img
             src={img.url}
             alt={img.alt || ''}
-            className={`w-full object-cover ${isFullBleed ? 'aspect-[16/7]' : 'aspect-[16/9]'}`}
+            className={`w-full object-cover ${isFullBleed ? 'aspect-[16/7]' : 'aspect-[3/2]'}`}
           />
           {img.caption && (
             <figcaption
-              className="mt-2 text-[#333112]/40 text-[12px] tracking-[0.24px]"
+              className="mt-3 text-[#333112]/35 text-[11px] tracking-[0.22px]"
               style={{ fontFamily: 'var(--font-diatype-mono)' }}
             >
               {img.caption}
@@ -70,13 +64,13 @@ function renderBlock(block: StoryBlock, i: number) {
     case 'image-grid': {
       const cols = block.layout === '3-col' ? 'grid-cols-3' : 'grid-cols-2';
       return (
-        <div key={block.id} className={`grid ${cols} gap-3`}>
+        <div key={block.id} className={`grid ${cols} gap-2 md:gap-3`}>
           {(block.images || []).filter((img) => img.url).map((img, j) => (
             <figure key={j}>
               <img src={img.url} alt={img.alt || ''} className="w-full aspect-square object-cover" />
               {img.caption && (
                 <figcaption
-                  className="mt-1.5 text-[#333112]/40 text-[11px]"
+                  className="mt-1.5 text-[#333112]/35 text-[10px] tracking-[0.2px]"
                   style={{ fontFamily: 'var(--font-diatype-mono)' }}
                 >
                   {img.caption}
@@ -90,17 +84,14 @@ function renderBlock(block: StoryBlock, i: number) {
 
     case 'video': {
       if (!block.videoUrl) return null;
-      // Convert YouTube/Vimeo to embed
       let embedUrl = block.videoUrl;
       if (embedUrl.includes('youtube.com/watch')) {
         const id = new URL(embedUrl).searchParams.get('v');
         embedUrl = `https://www.youtube.com/embed/${id}`;
       } else if (embedUrl.includes('youtu.be/')) {
-        const id = embedUrl.split('youtu.be/')[1];
-        embedUrl = `https://www.youtube.com/embed/${id}`;
+        embedUrl = `https://www.youtube.com/embed/${embedUrl.split('youtu.be/')[1]}`;
       } else if (embedUrl.includes('vimeo.com/')) {
-        const id = embedUrl.split('vimeo.com/')[1];
-        embedUrl = `https://player.vimeo.com/video/${id}`;
+        embedUrl = `https://player.vimeo.com/video/${embedUrl.split('vimeo.com/')[1]}`;
       }
       return (
         <figure key={block.id}>
@@ -109,7 +100,7 @@ function renderBlock(block: StoryBlock, i: number) {
           </div>
           {block.videoCaption && (
             <figcaption
-              className="mt-2 text-[#333112]/40 text-[12px] tracking-[0.24px]"
+              className="mt-3 text-[#333112]/35 text-[11px] tracking-[0.22px]"
               style={{ fontFamily: 'var(--font-diatype-mono)' }}
             >
               {block.videoCaption}
@@ -121,19 +112,19 @@ function renderBlock(block: StoryBlock, i: number) {
 
     case 'quote':
       return (
-        <blockquote key={block.id} className="border-l-2 border-[#333112]/20 pl-6 py-1">
+        <blockquote key={block.id} className="py-6 md:py-8">
           <p
-            className="text-[#333112] text-[22px] md:text-[28px] leading-[1.3] italic"
+            className="text-[#333112] text-[clamp(22px,3.5vw,34px)] leading-[1.25] italic"
             style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
           >
-            {block.quote}
+            &ldquo;{block.quote}&rdquo;
           </p>
           {block.attribution && (
             <cite
-              className="block mt-3 text-[#333112]/50 text-[12px] tracking-[0.24px] not-italic uppercase"
+              className="block mt-4 text-[#333112]/40 text-[11px] tracking-[0.22px] not-italic uppercase"
               style={{ fontFamily: 'var(--font-diatype-mono)' }}
             >
-              {block.attribution}
+              — {block.attribution}
             </cite>
           )}
         </blockquote>
@@ -141,36 +132,36 @@ function renderBlock(block: StoryBlock, i: number) {
 
     case 'ingredient-focus':
       return (
-        <div key={block.id} className="border border-[#333112]/15 p-6 space-y-3">
+        <div key={block.id} className="border-t border-b border-[#333112]/12 py-8 my-2">
           <p
-            className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase"
+            className="text-[#333112]/35 text-[10px] tracking-[0.2px] uppercase mb-4"
             style={{ fontFamily: 'var(--font-diatype-mono)' }}
           >
-            Ingredient
+            Ingredient focus
           </p>
           <p
-            className="text-[#333112] text-[24px] leading-[1.1] uppercase"
+            className="text-[#333112] text-[clamp(28px,4vw,44px)] leading-[1.0] uppercase mb-6"
             style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
           >
             {block.ingredient}
           </p>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-2 pt-2">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-5">
             {block.origin && (
               <div>
-                <p className="text-[#333112]/40 text-[10px] uppercase tracking-[0.2px]" style={{ fontFamily: 'var(--font-diatype-mono)' }}>Origin</p>
-                <p className="text-[#333112] text-[14px]" style={{ fontFamily: 'var(--font-neue-montreal)' }}>{block.origin}</p>
+                <p className="text-[#333112]/35 text-[10px] uppercase tracking-[0.2px] mb-1" style={{ fontFamily: 'var(--font-diatype-mono)' }}>Origin</p>
+                <p className="text-[#333112] text-[15px]" style={{ fontFamily: 'var(--font-neue-montreal)' }}>{block.origin}</p>
               </div>
             )}
             {block.season && (
               <div>
-                <p className="text-[#333112]/40 text-[10px] uppercase tracking-[0.2px]" style={{ fontFamily: 'var(--font-diatype-mono)' }}>Season</p>
-                <p className="text-[#333112] text-[14px]" style={{ fontFamily: 'var(--font-neue-montreal)' }}>{block.season}</p>
+                <p className="text-[#333112]/35 text-[10px] uppercase tracking-[0.2px] mb-1" style={{ fontFamily: 'var(--font-diatype-mono)' }}>Season</p>
+                <p className="text-[#333112] text-[15px]" style={{ fontFamily: 'var(--font-neue-montreal)' }}>{block.season}</p>
               </div>
             )}
           </div>
           {block.why && (
             <p
-              className="text-[#333112]/70 text-[14px] leading-[1.7] pt-1"
+              className="text-[#333112]/65 text-[15px] leading-[1.75]"
               style={{ fontFamily: 'var(--font-neue-montreal)' }}
             >
               {block.why}
@@ -181,10 +172,10 @@ function renderBlock(block: StoryBlock, i: number) {
 
     case 'word-by':
       return (
-        <div key={block.id} className="flex items-center gap-3 py-2">
+        <div key={block.id} className="flex items-center gap-4 py-2">
           <div className="h-px flex-1 bg-[#333112]/10" />
           <p
-            className="text-[#333112]/50 text-[11px] tracking-[0.22px] uppercase"
+            className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase whitespace-nowrap"
             style={{ fontFamily: 'var(--font-diatype-mono)' }}
           >
             Word by {block.author}{block.role ? `, ${block.role}` : ''}
@@ -209,83 +200,115 @@ export default async function StoryPage({ params }: { params: { slug: string } }
 
   return (
     <main className="bg-white min-h-screen">
-      <SiteHeader />
+      <SiteHeader theme="light" />
 
-      {/* Hero */}
-      {story.coverImage && (
-        <div className="w-full aspect-[16/7] overflow-hidden">
+      {/* Full-bleed cover */}
+      <div className="relative w-full overflow-hidden" style={{ height: 'clamp(520px, 80vh, 920px)' }}>
+        {story.coverImage ? (
           <img
             src={story.coverImage}
             alt={story.coverImageAlt || story.title}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
-        </div>
-      )}
+        ) : (
+          <div className="absolute inset-0 bg-[#333112]" />
+        )}
 
-      <div className="px-4 md:px-8 max-w-3xl mx-auto pt-12 pb-24">
+        {/* Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-10">
-          <Link
-            href="/stories"
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase hover:text-[#333112] transition-colors"
-            style={{ fontFamily: 'var(--font-diatype-mono)' }}
-          >
-            Stories
-          </Link>
-          {story.category && (
-            <>
-              <span className="text-[#333112]/20 text-[11px]">/</span>
-              <span
-                className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase"
-                style={{ fontFamily: 'var(--font-diatype-mono)' }}
-              >
-                {story.category.replace(/-/g, ' ')}
-              </span>
-            </>
-          )}
+        <div className="absolute top-0 left-0 right-0 px-4 md:px-8 pt-[100px] md:pt-[120px]">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/stories"
+              className="text-white/50 text-[11px] tracking-[0.22px] uppercase hover:text-white/80 transition-colors"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              Stories
+            </Link>
+            {story.category && (
+              <>
+                <span className="text-white/25 text-[11px]">/</span>
+                <span
+                  className="text-white/50 text-[11px] tracking-[0.22px] uppercase"
+                  style={{ fontFamily: 'var(--font-diatype-mono)' }}
+                >
+                  {story.category.replace(/-/g, ' ')}
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Title */}
-        <h1
-          className="text-[#333112] text-[36px] md:text-[56px] leading-[1.0] uppercase mb-6"
-          style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
-        >
-          {story.title}
-        </h1>
+        {/* Title block */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 md:px-8 pb-12 md:pb-16 max-w-5xl">
+          {story.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {story.tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="text-white/55 text-[10px] tracking-[0.2px] uppercase border border-white/20 px-2 py-0.5"
+                  style={{ fontFamily: 'var(--font-diatype-mono)' }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <h1
+            className="text-white text-[clamp(36px,6.5vw,88px)] leading-[0.95] uppercase tracking-tight"
+            style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
+          >
+            {story.title}
+          </h1>
+        </div>
+      </div>
 
-        {/* Intro */}
+      {/* Article body */}
+      <div className="px-4 md:px-8 max-w-[672px] mx-auto pt-14 pb-24">
+
+        {/* Intro + meta */}
         {story.intro && (
           <p
-            className="text-[#333112]/70 text-[18px] leading-[1.6] mb-8 max-w-xl"
+            className="text-[#333112] text-[19px] md:text-[21px] leading-[1.6] mb-8"
             style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 400 }}
           >
             {story.intro}
           </p>
         )}
 
-        {/* Word by */}
         {story.wordBy && (
-          <p
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase mb-12"
-            style={{ fontFamily: 'var(--font-diatype-mono)' }}
-          >
-            Word by {story.wordBy}{story.wordByRole ? `, ${story.wordByRole}` : ''}
-          </p>
+          <div className="flex items-center gap-4 mb-12 pb-10 border-b border-[#333112]/10">
+            <div className="h-px flex-1 bg-[#333112]/10" />
+            <p
+              className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase whitespace-nowrap"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              Word by {story.wordBy}{story.wordByRole ? `, ${story.wordByRole}` : ''}
+            </p>
+            <div className="h-px flex-1 bg-[#333112]/10" />
+          </div>
         )}
 
-        {/* Blocks */}
+        {/* Content blocks */}
         <div className="space-y-10">
-          {(story.blocks || []).map((block: StoryBlock, i: number) => renderBlock(block, i))}
+          {(story.blocks || []).map((block: StoryBlock) => renderBlock(block))}
         </div>
 
-        {/* Tags */}
+        {/* Tags footer */}
         {story.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-16 pt-8 border-t border-[#333112]/10">
+            <p
+              className="text-[#333112]/30 text-[10px] tracking-[0.2px] uppercase mr-2 self-center"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              Tagged
+            </p>
             {story.tags.map((tag: string) => (
               <span
                 key={tag}
-                className="text-[#333112]/50 text-[11px] tracking-[0.22px] uppercase border border-[#333112]/20 px-2 py-0.5"
+                className="text-[#333112]/50 text-[10px] tracking-[0.2px] uppercase border border-[#333112]/20 px-2 py-0.5"
                 style={{ fontFamily: 'var(--font-diatype-mono)' }}
               >
                 {tag}
@@ -295,9 +318,9 @@ export default async function StoryPage({ params }: { params: { slug: string } }
         )}
 
         {/* Share */}
-        <div className="mt-12 pt-8 border-t border-[#333112]/10 flex items-center gap-6">
+        <div className="mt-10 pt-8 border-t border-[#333112]/10 flex items-center gap-6">
           <p
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase"
+            className="text-[#333112]/30 text-[10px] tracking-[0.2px] uppercase"
             style={{ fontFamily: 'var(--font-diatype-mono)' }}
           >
             Share
@@ -306,16 +329,16 @@ export default async function StoryPage({ params }: { params: { slug: string } }
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(story.title)}&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/stories/${story.slug}`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase hover:text-[#333112] transition-colors"
+            className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase hover:text-[#333112] transition-colors"
             style={{ fontFamily: 'var(--font-diatype-mono)' }}
           >
             X / Twitter
           </a>
           <a
-            href={`https://www.instagram.com/`}
+            href="https://www.instagram.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase hover:text-[#333112] transition-colors"
+            className="text-[#333112]/40 text-[10px] tracking-[0.2px] uppercase hover:text-[#333112] transition-colors"
             style={{ fontFamily: 'var(--font-diatype-mono)' }}
           >
             Instagram
@@ -325,14 +348,17 @@ export default async function StoryPage({ params }: { params: { slug: string } }
 
       {/* Related stories */}
       {related.length > 0 && (
-        <div className="border-t border-[#333112]/10 px-4 md:px-8 py-16">
-          <p
-            className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase mb-10"
-            style={{ fontFamily: 'var(--font-diatype-mono)' }}
-          >
-            Related stories
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-10 max-w-5xl">
+        <section className="border-t border-[#333112]/10 px-4 md:px-8 py-16 md:py-20">
+          <div className="flex items-center gap-6 mb-12">
+            <p
+              className="text-[#333112]/40 text-[11px] tracking-[0.22px] uppercase whitespace-nowrap"
+              style={{ fontFamily: 'var(--font-diatype-mono)' }}
+            >
+              Related stories
+            </p>
+            <div className="h-px flex-1 bg-[#333112]/10" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
             {related.map((s: any) => (
               <Link key={s.id} href={`/stories/${s.slug}`} className="group block">
                 {s.coverImage && (
@@ -340,19 +366,27 @@ export default async function StoryPage({ params }: { params: { slug: string } }
                     <img
                       src={s.coverImage}
                       alt={s.coverImageAlt || s.title}
-                      className="w-full aspect-[4/3] object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                      className="w-full aspect-[4/3] object-cover group-hover:scale-[1.03] transition-transform duration-700"
                     />
                   </div>
                 )}
+                {s.category && (
+                  <p
+                    className="text-[#333112]/35 text-[10px] tracking-[0.2px] uppercase mb-2"
+                    style={{ fontFamily: 'var(--font-diatype-mono)' }}
+                  >
+                    {s.category.replace(/-/g, ' ')}
+                  </p>
+                )}
                 <h3
-                  className="text-[#333112] text-[18px] leading-[1.1] uppercase"
+                  className="text-[#333112] text-[18px] md:text-[20px] leading-[1.05] uppercase mb-2"
                   style={{ fontFamily: 'var(--font-neue-montreal)', fontWeight: 700 }}
                 >
                   {s.title}
                 </h3>
                 {s.intro && (
                   <p
-                    className="text-[#333112]/60 text-[13px] leading-[1.6] mt-1 line-clamp-2"
+                    className="text-[#333112]/55 text-[13px] leading-[1.65] line-clamp-2"
                     style={{ fontFamily: 'var(--font-neue-montreal)' }}
                   >
                     {s.intro}
@@ -361,7 +395,7 @@ export default async function StoryPage({ params }: { params: { slug: string } }
               </Link>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       <SiteFooter />

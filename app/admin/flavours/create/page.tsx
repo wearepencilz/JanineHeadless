@@ -6,6 +6,7 @@ import Link from 'next/link';
 import FlavourIngredientSelector from '@/app/admin/components/FlavourIngredientSelector';
 import TaxonomySelect from '@/app/admin/components/TaxonomySelect';
 import TaxonomyTagSelect from '@/app/admin/components/TaxonomyTagSelect';
+import TaxonomyTagPicker from '@/app/admin/components/TaxonomyTagPicker';
 import type { FlavourIngredient, FlavourType, BaseStyle, Status } from '@/types';
 import { Button } from '@/app/admin/components/ui/button';
 import { useToast } from '@/app/admin/components/ToastContainer';
@@ -158,13 +159,12 @@ export default function CreateFlavourPage() {
           )}
 
           {/* Flavour Tags - Connected to taxonomy */}
-          <TaxonomyTagSelect
+          <TaxonomyTagPicker
             category="keyNotes"
             values={formData.keyNotes}
             onChange={(values) => setFormData({ ...formData, keyNotes: values })}
             label="Flavour Tags"
             description="Select tags that describe this flavour (e.g., smoky, sweet, summer)"
-            allowCreate={true}
           />
 
           <div>
