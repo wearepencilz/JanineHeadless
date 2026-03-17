@@ -180,8 +180,8 @@ export default function EditFlavourPage() {
             </div>
 
             {/* Ingredients */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
+            <div className="bg-white rounded-lg border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 rounded-t-lg">
                 <h2 className="text-sm font-semibold text-gray-900">Ingredients</h2>
                 <p className="text-sm text-gray-500 mt-0.5">Components and allergen sources for this flavour.</p>
               </div>
